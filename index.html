@@ -32,26 +32,28 @@
         const { useState, useEffect } = React;
 
         // --- Supabase Configuration ---
-        // TODO: Replace these with your actual Supabase URL and Anon Key
-        // URL MUST start with https:// to avoid Invalid supabaseUrl error
-        const SUPABASE_URL = 'https://your-project.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        const SUPABASE_URL = 'https://abdgizkkfyhewehfearj.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'sb_publishable_MsM2-K03tGNU3G-WWZvYUA_lKu53oT9';
         
         // Initialize Supabase Client
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // গ্যালারির ছবিগুলো (একই ফোল্ডারে ছবিগুলো রাখতে হবে)
         const galleryImages = [
-          '',
-          '',
-          ''
+          'header image.jpg',
+          'gallary image.jpg',
+          'galarry image 2.jpg'
         ];
 
-        // --- Dummy Data (Fallback for when Supabase is not connected yet) ---
+        // --- Fallback Data (যদি কোনো কারণে ডাটাবেস থেকে ডাটা না আসে) ---
         const initialCommittee = [
           { id: 1, name: 'ড: বিনয় ভূষণ রায়', role: 'সভাপতি', phone: '০১৭১৭৫০৩৬৫৭', image: null },
           { id: 2, name: 'গৌরাঙ্গ লাল বাড়ৈ', role: 'সিনিয়র সহ সভাপতি', phone: '০১৭১৩৭৯৮৭৯৮', image: null },
           { id: 3, name: 'সুশান্ত কর্মকার (১)', role: 'সহ সভাপতি', phone: '০১৬১৬৯৫২৯২০', image: null },
-          { id: 4, name: 'ডা: দিলীপ কুমার দাস', role: 'সাধারণ সম্পাদক', phone: '০১৭১৫০৩২৭৯৯', image: null }
+          { id: 4, name: 'ডা: দিলীপ কুমার দাস', role: 'সাধারণ সম্পাদক', phone: '০১৭১৫০৩২৭৯৯', image: null },
+          { id: 5, name: 'শ্রী আশিষ তপাদার', role: 'সহ সাধারণ সম্পাদক', phone: '০১৭১৫২৪৩৯২৪', image: null },
+          { id: 6, name: 'কাজল দাশগুপ্ত', role: 'যুগ্ম সধারণ সম্পাদক–১', phone: '০১৬১১০৪০৫০৮', image: null },
+          { id: 7, name: 'শ্রী প্রসেনজিৎ দে', role: 'যুগ্ম সধারণ সম্পাদক–২', phone: '০১৭৩৫৭৩৭৩০৮', image: null }
         ];
 
         const initialTestimonials = [
@@ -60,7 +62,7 @@
         ];
 
         const initialEvents = [
-          { id: 1, title: 'শ্রাবণ মাসের বিশেষ পূজা ও রয়ানী গান', date: '১৫ শ্রাবণ, ১৪৩১', desc: 'ঐতিহ্যবাহী রয়ানী গান এবং বিশেষ পূজা অর্চনার আয়োজন করা হয়েছে। সকল ভক্তবৃন্দ আমন্ত্রিত।' }
+          { id: 1, title: 'শ্রাবণ মাসের বিশেষ পূজা ও রয়ানী গান', date: '১৫ শ্রাবণ, ১৪৩১', description: 'ঐতিহ্যবাহী রয়ানী গান এবং বিশেষ পূজা অর্চনার আয়োজন করা হয়েছে। সকল ভক্তবৃন্দ আমন্ত্রিত।' }
         ];
 
         const initialNotices = [
@@ -72,6 +74,7 @@
           const [currentPage, setCurrentPage] = useState('home');
           const [isMenuOpen, setIsMenuOpen] = useState(false);
           const [isLoading, setIsLoading] = useState(true);
+          const [dbError, setDbError] = useState(false);
           
           const [marqueeText, setMarqueeText] = useState('মন্দিরে স্বাগতম ✦ মায়ের আশীর্বাদ আপনার সহায় হোক ✦ ঐশ্বরিক উপস্থিতি অনুভব করুন');
           const [committeeMembers, setCommitteeMembers] = useState(initialCommittee);
@@ -88,20 +91,16 @@
 
           const fetchData = async () => {
             setIsLoading(true);
+            setDbError(false);
             try {
-                // Skip fetch if placeholder URL is still being used
-                if (SUPABASE_URL === 'https://your-project.supabase.co') {
-                    setIsLoading(false);
-                    return;
-                }
-
                 // Fetch Settings (Marquee)
-                const { data: settingsData } = await supabaseClient.from('settings').select('*').eq('key', 'marquee').single();
+                const { data: settingsData, error: settingsError } = await supabaseClient.from('settings').select('*').eq('key', 'marquee').single();
                 if(settingsData) setMarqueeText(settingsData.value);
 
                 // Fetch Committee
-                const { data: committeeData } = await supabaseClient.from('committee').select('*').order('id', { ascending: true });
+                const { data: committeeData, error: committeeError } = await supabaseClient.from('committee').select('*').order('id', { ascending: true });
                 if(committeeData && committeeData.length > 0) setCommitteeMembers(committeeData);
+                if(committeeError) throw committeeError;
 
                 // Fetch Testimonials
                 const { data: testimonialsData } = await supabaseClient.from('testimonials').select('*').order('id', { ascending: false });
@@ -116,7 +115,8 @@
                 if(noticesData && noticesData.length > 0) setNotices(noticesData);
 
             } catch (error) {
-                console.warn("Supabase fetch failed (Normal if credentials are not yet set):", error);
+                console.error("Supabase Database Error:", error);
+                setDbError(true);
             } finally {
                 setIsLoading(false);
             }
@@ -135,7 +135,7 @@
               <div className="container mx-auto px-4 py-3 flex justify-between items-center">
                 <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigateTo('home')}>
                   <div className="w-12 h-12 md:w-14 md:h-14 bg-white rounded-full flex items-center justify-center overflow-hidden border-2 border-yellow-400">
-                     <img src="" alt="Logo" className="w-full h-full object-cover" />
+                     <img src="logo (1).jpg" alt="Logo" className="w-full h-full object-cover" />
                   </div>
                   <div>
                     <h1 className="text-xl md:text-2xl font-bold font-serif">শ্রী শ্রী মা মনসা মন্দির</h1>
@@ -239,6 +239,12 @@
 
             return (
               <div className="bg-orange-50 min-h-screen">
+                {dbError && (
+                  <div className="bg-red-600 text-white text-center py-2 text-sm font-bold">
+                     ⚠ Database is not connected properly. Showing demo data. (Did you run the SQL script and turn off RLS?)
+                  </div>
+                )}
+              
                 {/* Marquee */}
                 <div className="bg-orange-800 text-yellow-200 py-2 border-b-2 border-yellow-500">
                   <marquee behavior="scroll" direction="left" className="font-medium text-sm md:text-base">
@@ -250,7 +256,7 @@
                 <section className="relative bg-orange-900 text-white overflow-hidden min-h-[500px] flex items-center">
                   <div className="absolute inset-0 z-0">
                      <div className="absolute inset-0 bg-black/60 z-10"></div>
-                     <img src="" alt="Ma Manasa" className="w-full h-full object-cover opacity-80" />
+                     <img src="header image.jpg" alt="Ma Manasa" className="w-full h-full object-cover opacity-80" />
                   </div>
                   
                   <div className="container mx-auto px-4 py-20 relative z-20 text-center">
@@ -331,6 +337,7 @@
                 </section>
 
                 {/* Testimonials Snippet */}
+                {testimonials.length > 0 && (
                 <section className="py-16 container mx-auto px-4">
                   <div className="text-center mb-12">
                     <h2 className="text-3xl md:text-4xl font-bold text-orange-900 mb-4">পুণ্যার্থীদের মতামত</h2>
@@ -354,6 +361,7 @@
                       </button>
                     </div>
                 </section>
+                )}
 
                 {/* Committee Snippet */}
                 <section className="py-16 bg-orange-100 border-y border-orange-200">
@@ -389,6 +397,7 @@
                 </section>
 
                 {/* Events Snippet */}
+                {events.length > 0 && (
                 <section className="py-16 container mx-auto px-4">
                   <div className="text-center mb-12">
                     <h2 className="text-3xl md:text-4xl font-bold text-orange-900 mb-4">সর্বশেষ ইভেন্টসমূহ</h2>
@@ -403,7 +412,7 @@
                         </div>
                         <div className="p-6 sm:w-2/3 flex flex-col justify-center">
                           <h3 className="text-xl font-bold text-gray-800 mb-2">{event.title}</h3>
-                          <p className="text-gray-600 text-sm line-clamp-3">{event.desc}</p>
+                          <p className="text-gray-600 text-sm line-clamp-3">{event.description}</p>
                         </div>
                       </div>
                     ))}
@@ -414,6 +423,7 @@
                     </button>
                   </div>
                 </section>
+                )}
               </div>
             );
           };
@@ -481,6 +491,9 @@
                        </div>
                     </div>
                   ))}
+                  {testimonials.length === 0 && (
+                      <p className="text-center text-gray-500">এখনো কোনো মতামত যোগ করা হয়নি।</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -505,13 +518,16 @@
                        </div>
                        <div className="p-6 md:p-8 md:w-3/4 flex flex-col justify-center">
                          <h3 className="text-2xl font-bold text-gray-800 mb-3">{event.title}</h3>
-                         <p className="text-gray-700 leading-relaxed">{event.desc}</p>
+                         <p className="text-gray-700 leading-relaxed">{event.description}</p>
                          <div className="mt-6 flex justify-end">
                             <button className="text-orange-600 font-bold hover:text-orange-800 flex items-center gap-1">বিস্তারিত <i className="fas fa-chevron-right text-xs"></i></button>
                          </div>
                        </div>
                     </div>
                   ))}
+                  {events.length === 0 && (
+                      <p className="text-center text-gray-500">এখনো কোনো ইভেন্ট যোগ করা হয়নি।</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -541,6 +557,9 @@
                        <p className="text-gray-700 mt-2">{notice.text}</p>
                      </div>
                    ))}
+                   {notices.length === 0 && (
+                      <p className="text-center text-gray-500">এখনো কোনো নোটিশ যোগ করা হয়নি।</p>
+                   )}
                 </div>
               </div>
             </div>
@@ -558,7 +577,6 @@
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {/* Bank Info */}
                   <div className="bg-white p-8 rounded-2xl shadow-lg border-t-4 border-orange-600">
                     <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2 border-b pb-4">
                        <i className="fas fa-university text-orange-600"></i> ব্যাংক একাউন্ট বিস্তারিত
@@ -572,7 +590,6 @@
                     </div>
                   </div>
 
-                  {/* Mobile Banking */}
                   <div className="bg-white p-8 rounded-2xl shadow-lg border-t-4 border-yellow-500">
                      <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2 border-b pb-4">
                        <i className="fas fa-mobile-alt text-yellow-600"></i> মোবাইল ব্যাংকিং
@@ -612,7 +629,7 @@
                     
                     <div className="prose prose-lg prose-orange max-w-none text-gray-700 text-justify leading-relaxed">
                       <p className="mb-6">
-                        মধ্যযুগের অন্যতম শ্রেষ্ঠ বাঙালি কবি বিজয় গুপ্ত। তিনি বরিশাল জেলার আগৈলঝাড়া উপজেলার গৈলা (তৎকালীন ফুল্লশ্রী) গ্রামে জন্মগ্রহণ করেন। তাঁর রচিত "পদ্মাপুরাণ" বা "মনসামঙ্গল" কাব্য বাংলা সাহিত্যের এক অমূল্য সম্পদ।
+                        মধ্যযুগের অন্যতম শ্রেষ্ঠ বাঙালি কবি বিজয় গুপ্ত। তিনি বরিশাল জেলার আগৈলঝাড়া উপজেলার গৈলা (তকালীন ফুল্লশ্রী) গ্রামে জন্মগ্রহণ করেন। তাঁর রচিত "পদ্মাপুরাণ" বা "মনসামঙ্গল" কাব্য বাংলা সাহিত্যের এক অমূল্য সম্পদ।
                       </p>
                       
                       <p className="mb-6">
@@ -644,6 +661,9 @@
             const [isSaving, setIsSaving] = useState(false);
 
             const [newMember, setNewMember] = useState({ name: '', role: '', phone: '', image: null });
+            
+            // New states for Notice
+            const [newNotice, setNewNotice] = useState({ title: '', date: '', text: '' });
 
             const handleLogin = (e) => {
               e.preventDefault();
@@ -683,19 +703,15 @@
               try {
                   const { error } = await supabaseClient
                     .from('settings')
-                    .upsert({ id: 1, key: 'marquee', value: marqueeText }); // Assuming id 1 is for marquee
+                    .upsert({ id: 1, key: 'marquee', value: marqueeText });
                     
-                  setIsSaving(false);
-                  
-                  if(error) {
-                     setErrorMsg("Error updating marquee");
-                     console.error(error);
-                  } else {
-                     showSuccess('স্ক্রলিং টেক্সট আপডেট করা হয়েছে!');
-                  }
+                  if(error) throw error;
+                  showSuccess('স্ক্রলিং টেক্সট আপডেট করা হয়েছে!');
               } catch (err) {
+                  setErrorMsg("ডাটাবেসে সেভ করতে সমস্যা হচ্ছে। RLS অফ করা আছে কি?");
+                  console.error(err);
+              } finally {
                   setIsSaving(false);
-                  setErrorMsg("Network or Configuration Error.");
               }
             };
 
@@ -716,20 +732,19 @@
                     .from('committee')
                     .insert([memberToInsert])
                     .select();
-                    
-                  setIsSaving(false);
 
-                  if (error) {
-                     setErrorMsg("Error adding member");
-                     console.error(error);
-                  } else if (data) {
+                  if (error) throw error;
+                  
+                  if (data) {
                       setCommitteeMembers([...committeeMembers, data[0]]);
                       setNewMember({ name: '', role: '', phone: '', image: null });
                       showSuccess('নতুন সদস্য যুক্ত করা হয়েছে!');
                   }
               } catch (err) {
+                  setErrorMsg("Error: RLS Disable করেছেন কি না চেক করুন।");
+                  console.error(err);
+              } finally {
                   setIsSaving(false);
-                  setErrorMsg("Network or Configuration Error.");
               }
             };
 
@@ -743,17 +758,13 @@
                     .delete()
                     .eq('id', id);
                     
-                  setIsSaving(false);
-                  
-                  if(error) {
-                     setErrorMsg("Error deleting member");
-                  } else {
-                     setCommitteeMembers(committeeMembers.filter(m => m.id !== id));
-                     showSuccess('সদস্য মুছে ফেলা হয়েছে!');
-                  }
+                  if(error) throw error;
+                  setCommitteeMembers(committeeMembers.filter(m => m.id !== id));
+                  showSuccess('সদস্য মুছে ফেলা হয়েছে!');
               } catch (err) {
+                  setErrorMsg("Error deleting.");
+              } finally {
                   setIsSaving(false);
-                  setErrorMsg("Network or Configuration Error.");
               }
             };
 
@@ -767,17 +778,50 @@
                         .delete()
                         .eq('id', id);
                         
-                    setIsSaving(false);
-                    
-                    if(error) {
-                        setErrorMsg("Error deleting testimonial");
-                    } else {
-                        setTestimonials(testimonials.filter(item => item.id !== id));
-                        showSuccess('মতামত মুছে ফেলা হয়েছে!');
-                    }
+                    if(error) throw error;
+                    setTestimonials(testimonials.filter(item => item.id !== id));
+                    showSuccess('মতামত মুছে ফেলা হয়েছে!');
                 } catch (err) {
+                    setErrorMsg("Error deleting testimonial.");
+                } finally {
                     setIsSaving(false);
-                    setErrorMsg("Network or Configuration Error.");
+                }
+            };
+            
+            const handleAddNotice = async (e) => {
+                e.preventDefault();
+                setIsSaving(true);
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('notices')
+                        .insert([newNotice])
+                        .select();
+                        
+                    if(error) throw error;
+                    if(data) {
+                        setNotices([data[0], ...notices]);
+                        setNewNotice({ title: '', date: '', text: '' });
+                        showSuccess('নোটিশ যোগ করা হয়েছে!');
+                    }
+                } catch(err) {
+                    setErrorMsg("Error adding notice.");
+                } finally {
+                    setIsSaving(false);
+                }
+            };
+            
+            const handleDeleteNotice = async (id) => {
+                if(!confirm('নোটিশটি মুছে ফেলতে চান?')) return;
+                setIsSaving(true);
+                try {
+                    const { error } = await supabaseClient.from('notices').delete().eq('id', id);
+                    if(error) throw error;
+                    setNotices(notices.filter(item => item.id !== id));
+                    showSuccess('নোটিশ মুছে ফেলা হয়েছে!');
+                } catch(err) {
+                    setErrorMsg("Error deleting notice.");
+                } finally {
+                    setIsSaving(false);
                 }
             };
 
@@ -830,12 +874,20 @@
                       <button onClick={() => setActiveTab('committee')} className={`px-4 py-3 text-left font-medium border-b ${activeTab === 'committee' ? 'bg-orange-50 text-orange-700 border-l-4 border-l-orange-600' : 'text-gray-600 hover:bg-gray-50'}`}>
                         কমিটি ম্যানেজমেন্ট
                       </button>
-                      <button onClick={() => setActiveTab('testimonials')} className={`px-4 py-3 text-left font-medium ${activeTab === 'testimonials' ? 'bg-orange-50 text-orange-700 border-l-4 border-l-orange-600' : 'text-gray-600 hover:bg-gray-50'}`}>
+                      <button onClick={() => setActiveTab('testimonials')} className={`px-4 py-3 text-left font-medium border-b ${activeTab === 'testimonials' ? 'bg-orange-50 text-orange-700 border-l-4 border-l-orange-600' : 'text-gray-600 hover:bg-gray-50'}`}>
                         মতামত ম্যানেজমেন্ট
+                      </button>
+                      <button onClick={() => setActiveTab('notices')} className={`px-4 py-3 text-left font-medium ${activeTab === 'notices' ? 'bg-orange-50 text-orange-700 border-l-4 border-l-orange-600' : 'text-gray-600 hover:bg-gray-50'}`}>
+                        নোটিশ বোর্ড
                       </button>
                     </div>
                     <div className="mt-4 p-4 bg-blue-50 text-blue-800 rounded-xl text-sm border border-blue-200">
-                      <p><strong>Status:</strong> {isLoading ? 'Connecting to Database...' : 'Database Connected!'}</p>
+                      <p><strong>Database Status:</strong></p>
+                      {dbError ? (
+                          <p className="text-red-600 font-bold mt-1">Not Connected / Error Fetching</p>
+                      ) : (
+                          <p className="text-green-600 font-bold mt-1">Connected Successfully!</p>
+                      )}
                     </div>
                   </div>
 
@@ -843,6 +895,11 @@
                     {successMsg && (
                       <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-center gap-2 shadow-sm">
                         <i className="fas fa-check-circle"></i> {successMsg}
+                      </div>
+                    )}
+                    {errorMsg && (
+                      <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center gap-2 shadow-sm">
+                        <i className="fas fa-exclamation-circle"></i> {errorMsg}
                       </div>
                     )}
 
@@ -883,7 +940,7 @@
                             <div className="flex gap-2 items-center">
                                <label className="flex-grow cursor-pointer bg-white border border-gray-300 px-3 py-2 rounded-md text-sm hover:bg-gray-50 flex items-center justify-center gap-1 overflow-hidden">
                                  <i className="fas fa-upload text-gray-500"></i>
-                                 <span className="text-gray-600 truncate">{newMember.image ? 'ছবি যুক্ত হয়েছে' : 'আপলোড করুন'}</span>
+                                 <span className="text-gray-600 truncate">{newMember.image ? 'ছবি যুক্ত' : 'আপলোড'}</span>
                                  <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
                                </label>
                                {newMember.image && (
@@ -957,6 +1014,46 @@
                               </button>
                             </div>
                           ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {activeTab === 'notices' && (
+                      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <h3 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">নতুন নোটিশ যোগ করুন</h3>
+                        <form onSubmit={handleAddNotice} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 bg-gray-50 p-4 rounded-lg border border-gray-100 items-end">
+                            <div>
+                                <label className="block text-xs font-medium text-gray-500 mb-1">শিরোনাম <span className="text-red-500">*</span></label>
+                                <input type="text" value={newNotice.title} onChange={e=>setNewNotice({...newNotice, title: e.target.value})} className="w-full px-3 py-2 border rounded-md text-sm" required placeholder="উদা: নতুন কমিটি গঠন" />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-medium text-gray-500 mb-1">তারিখ</label>
+                                <input type="text" value={newNotice.date} onChange={e=>setNewNotice({...newNotice, date: e.target.value})} className="w-full px-3 py-2 border rounded-md text-sm" placeholder="উদা: ১৫ মার্চ, ২০২৪" />
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-xs font-medium text-gray-500 mb-1">নোটিশের বিবরণ</label>
+                                <textarea value={newNotice.text} onChange={e=>setNewNotice({...newNotice, text: e.target.value})} className="w-full px-3 py-2 border rounded-md text-sm" placeholder="বিস্তারিত লিখুন..."></textarea>
+                            </div>
+                            <div className="md:col-span-2 mt-2">
+                             <button type="submit" disabled={isSaving} className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center justify-center gap-2 font-medium disabled:opacity-50">
+                                <i className="fas fa-plus"></i> {isSaving ? 'যুক্ত করা হচ্ছে...' : 'নোটিশ যুক্ত করুন'}
+                             </button>
+                          </div>
+                        </form>
+                        
+                        <div className="space-y-4 mt-6">
+                            <h3 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">বর্তমান নোটিশসমূহ</h3>
+                            {notices.map(n => (
+                                <div key={n.id} className="border rounded-lg p-4 bg-gray-50 flex justify-between items-start">
+                                  <div>
+                                    <p className="font-bold text-sm text-gray-800">{n.title} <span className="text-gray-400 font-normal text-xs ml-2 bg-white px-2 rounded">({n.date})</span></p>
+                                    <p className="text-sm text-gray-600 mt-1">{n.text}</p>
+                                  </div>
+                                  <button onClick={() => handleDeleteNotice(n.id)} disabled={isSaving} className="text-red-500 hover:bg-red-100 p-2 rounded shrink-0 disabled:opacity-50">
+                                     <i className="fas fa-trash"></i>
+                                  </button>
+                                </div>
+                            ))}
                         </div>
                       </div>
                     )}
