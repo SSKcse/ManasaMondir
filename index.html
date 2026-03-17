@@ -87,6 +87,15 @@
           // --- Fetch Data from Supabase ---
           useEffect(() => {
             fetchData();
+            
+            // Check if admin is already logged in (Session check)
+            const checkSession = async () => {
+              const { data: { session } } = await supabaseClient.auth.getSession();
+              if (session) {
+                setIsAdminAuthenticated(true);
+              }
+            };
+            checkSession();
           }, []);
 
           const fetchData = async () => {
@@ -492,7 +501,7 @@
                     </div>
                   ))}
                   {testimonials.length === 0 && (
-                      <p className="text-center text-gray-500">এখনো কোনো মতামত যোগ করা হয়নি।</p>
+                      <p className="text-center text-gray-500">এখনো কোনো মতামত যোগ করা হয়নি।</p>
                   )}
                 </div>
               </div>
@@ -526,7 +535,7 @@
                     </div>
                   ))}
                   {events.length === 0 && (
-                      <p className="text-center text-gray-500">এখনো কোনো ইভেন্ট যোগ করা হয়নি।</p>
+                      <p className="text-center text-gray-500">এখনো কোনো ইভেন্ট যোগ করা হয়নি।</p>
                   )}
                 </div>
               </div>
@@ -558,7 +567,7 @@
                      </div>
                    ))}
                    {notices.length === 0 && (
-                      <p className="text-center text-gray-500">এখনো কোনো নোটিশ যোগ করা হয়নি।</p>
+                      <p className="text-center text-gray-500">এখনো কোনো নোটিশ যোগ করা হয়নি।</p>
                    )}
                 </div>
               </div>
@@ -654,6 +663,7 @@
 
           // --- Admin Panel ---
           const AdminPanel = () => {
+            const [loginEmail, setLoginEmail] = useState('');
             const [loginPass, setLoginPass] = useState('');
             const [errorMsg, setErrorMsg] = useState('');
             const [activeTab, setActiveTab] = useState('marquee');
@@ -665,18 +675,30 @@
             // New states for Notice
             const [newNotice, setNewNotice] = useState({ title: '', date: '', text: '' });
 
-            const handleLogin = (e) => {
+            const handleLogin = async (e) => {
               e.preventDefault();
-              if (loginPass === 'admin123') {
+              setIsSaving(true);
+              setErrorMsg('');
+              
+              // Login via Supabase Auth
+              const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email: loginEmail,
+                password: loginPass,
+              });
+
+              setIsSaving(false);
+
+              if (error) {
+                setErrorMsg('ইমেইল বা পাসওয়ার্ড সঠিক নয়!');
+              } else if (data.session) {
                 setIsAdminAuthenticated(true);
-                setErrorMsg('');
-              } else {
-                setErrorMsg('পাসওয়ার্ড সঠিক নয়! (Demo: admin123)');
               }
             };
 
-            const handleLogout = () => {
+            const handleLogout = async () => {
+              await supabaseClient.auth.signOut();
               setIsAdminAuthenticated(false);
+              setLoginEmail('');
               setLoginPass('');
             };
 
@@ -835,22 +857,35 @@
                       <p className="text-sm text-gray-500 mt-1">কন্ট্রোল প্যানেলে প্রবেশ করুন</p>
                     </div>
                     {errorMsg && <div className="bg-red-50 text-red-600 p-3 rounded mb-4 text-sm text-center">{errorMsg}</div>}
+                    
                     <form onSubmit={handleLogin} className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">পাসওয়ার্ড</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">ইমেইল (Email)</label>
+                        <input 
+                          type="email" 
+                          value={loginEmail}
+                          onChange={(e) => setLoginEmail(e.target.value)}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                          placeholder="admin@example.com"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">পাসওয়ার্ড (Password)</label>
                         <input 
                           type="password" 
                           value={loginPass}
                           onChange={(e) => setLoginPass(e.target.value)}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
-                          placeholder="admin123"
+                          placeholder="******"
                           required
                         />
                       </div>
-                      <button type="submit" className="w-full bg-orange-600 text-white font-bold py-2 rounded-lg hover:bg-orange-700 transition-colors">
-                        লগইন করুন
+                      <button type="submit" disabled={isSaving} className="w-full bg-orange-600 text-white font-bold py-2 rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50">
+                        {isSaving ? 'লগইন হচ্ছে...' : 'লগইন করুন'}
                       </button>
                     </form>
+
                   </div>
                 </div>
               );
