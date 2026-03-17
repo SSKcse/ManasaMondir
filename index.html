@@ -33,15 +33,38 @@
 
         // --- Supabase Configuration ---
         // TODO: Replace these with your actual Supabase URL and Anon Key
-        const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+        // URL MUST start with https:// to avoid Invalid supabaseUrl error
+        const SUPABASE_URL = 'https://your-project.supabase.co'; 
         const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
         
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Initialize Supabase Client
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const galleryImages = [
           '',
           '',
           ''
+        ];
+
+        // --- Dummy Data (Fallback for when Supabase is not connected yet) ---
+        const initialCommittee = [
+          { id: 1, name: 'ড: বিনয় ভূষণ রায়', role: 'সভাপতি', phone: '০১৭১৭৫০৩৬৫৭', image: null },
+          { id: 2, name: 'গৌরাঙ্গ লাল বাড়ৈ', role: 'সিনিয়র সহ সভাপতি', phone: '০১৭১৩৭৯৮৭৯৮', image: null },
+          { id: 3, name: 'সুশান্ত কর্মকার (১)', role: 'সহ সভাপতি', phone: '০১৬১৬৯৫২৯২০', image: null },
+          { id: 4, name: 'ডা: দিলীপ কুমার দাস', role: 'সাধারণ সম্পাদক', phone: '০১৭১৫০৩২৭৯৯', image: null }
+        ];
+
+        const initialTestimonials = [
+          { id: 1, date: '১৬/০২/২০২৮', name: 'মোঃ দেলোয়ার হোসেন', designation: 'অতিঃ পরিচালক, বাংলাদেশ ব্যাংক', text: 'দেবীর সকল ভক্তদের মঙ্গল কামনা করছি। দেবীর আশির্বাদে জগতের সকলের মঙ্গল সাধিত হোক।' },
+          { id: 2, date: '২০/১২/২৩', name: 'রুম্পা সিকদার', designation: 'অতিরিক্ত জেলা প্রশাসক (শিক্ষা ও আইসিটি) বরিশাল', text: 'আজ সোমবার বিকাল ৪.৩০ মিনিটে মনসা মন্দির পরিদর্শন করার সৌভাগ্য হয়। এখানে এসিল্যান্ড বার্নীন সহ অন্যান্য গন্যমান্য ব্যক্তিবর্গ উপস্থিত ছিলেন। কবি বিজয় গুপ্ত প্রতিষ্ঠিত মনসা মন্দির সম্পর্কে অনেক তথ্য শুনে সমৃদ্ধ হলাম।' }
+        ];
+
+        const initialEvents = [
+          { id: 1, title: 'শ্রাবণ মাসের বিশেষ পূজা ও রয়ানী গান', date: '১৫ শ্রাবণ, ১৪৩১', desc: 'ঐতিহ্যবাহী রয়ানী গান এবং বিশেষ পূজা অর্চনার আয়োজন করা হয়েছে। সকল ভক্তবৃন্দ আমন্ত্রিত।' }
+        ];
+
+        const initialNotices = [
+          { id: 1, date: '০১ জানুয়ারি, ২০২৪', title: 'নতুন কমিটি গঠন', text: 'আগামী ৩ বছরের জন্য নতুন মন্দির পরিচালনা পর্ষদ গঠন করা হয়েছে।' }
         ];
 
         function App() {
@@ -51,10 +74,10 @@
           const [isLoading, setIsLoading] = useState(true);
           
           const [marqueeText, setMarqueeText] = useState('মন্দিরে স্বাগতম ✦ মায়ের আশীর্বাদ আপনার সহায় হোক ✦ ঐশ্বরিক উপস্থিতি অনুভব করুন');
-          const [committeeMembers, setCommitteeMembers] = useState([]);
-          const [testimonials, setTestimonials] = useState([]);
-          const [events, setEvents] = useState([]);
-          const [notices, setNotices] = useState([]);
+          const [committeeMembers, setCommitteeMembers] = useState(initialCommittee);
+          const [testimonials, setTestimonials] = useState(initialTestimonials);
+          const [events, setEvents] = useState(initialEvents);
+          const [notices, setNotices] = useState(initialNotices);
           
           const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
 
@@ -66,28 +89,34 @@
           const fetchData = async () => {
             setIsLoading(true);
             try {
+                // Skip fetch if placeholder URL is still being used
+                if (SUPABASE_URL === 'https://your-project.supabase.co') {
+                    setIsLoading(false);
+                    return;
+                }
+
                 // Fetch Settings (Marquee)
-                const { data: settingsData } = await supabase.from('settings').select('*').eq('key', 'marquee').single();
+                const { data: settingsData } = await supabaseClient.from('settings').select('*').eq('key', 'marquee').single();
                 if(settingsData) setMarqueeText(settingsData.value);
 
                 // Fetch Committee
-                const { data: committeeData } = await supabase.from('committee').select('*').order('id', { ascending: true });
-                if(committeeData) setCommitteeMembers(committeeData);
+                const { data: committeeData } = await supabaseClient.from('committee').select('*').order('id', { ascending: true });
+                if(committeeData && committeeData.length > 0) setCommitteeMembers(committeeData);
 
                 // Fetch Testimonials
-                const { data: testimonialsData } = await supabase.from('testimonials').select('*').order('id', { ascending: false });
-                if(testimonialsData) setTestimonials(testimonialsData);
+                const { data: testimonialsData } = await supabaseClient.from('testimonials').select('*').order('id', { ascending: false });
+                if(testimonialsData && testimonialsData.length > 0) setTestimonials(testimonialsData);
 
                 // Fetch Events
-                const { data: eventsData } = await supabase.from('events').select('*').order('id', { ascending: false });
-                if(eventsData) setEvents(eventsData);
+                const { data: eventsData } = await supabaseClient.from('events').select('*').order('id', { ascending: false });
+                if(eventsData && eventsData.length > 0) setEvents(eventsData);
                 
                 // Fetch Notices
-                const { data: noticesData } = await supabase.from('notices').select('*').order('id', { ascending: false });
-                if(noticesData) setNotices(noticesData);
+                const { data: noticesData } = await supabaseClient.from('notices').select('*').order('id', { ascending: false });
+                if(noticesData && noticesData.length > 0) setNotices(noticesData);
 
             } catch (error) {
-                console.error("Error fetching data:", error);
+                console.warn("Supabase fetch failed (Normal if credentials are not yet set):", error);
             } finally {
                 setIsLoading(false);
             }
@@ -106,7 +135,6 @@
               <div className="container mx-auto px-4 py-3 flex justify-between items-center">
                 <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigateTo('home')}>
                   <div className="w-12 h-12 md:w-14 md:h-14 bg-white rounded-full flex items-center justify-center overflow-hidden border-2 border-yellow-400">
-                     {/* Replace with actual logo URL */}
                      <img src="" alt="Logo" className="w-full h-full object-cover" />
                   </div>
                   <div>
@@ -502,8 +530,8 @@
                 </div>
 
                 <div className="bg-white shadow-xl rounded-2xl p-6 md:p-10 border-t-8 border-blue-600">
-                   {initialNotices.map((notice, idx) => (
-                     <div key={notice.id} className={`py-6 ${idx !== initialNotices.length - 1 ? 'border-b border-gray-200' : ''}`}>
+                   {notices.map((notice, idx) => (
+                     <div key={notice.id} className={`py-6 ${idx !== notices.length - 1 ? 'border-b border-gray-200' : ''}`}>
                        <div className="flex flex-col md:flex-row justify-between md:items-center mb-2">
                          <h3 className="text-xl font-bold text-gray-800">{notice.title}</h3>
                          <span className="text-sm font-semibold text-gray-500 bg-gray-100 px-3 py-1 rounded-full mt-2 md:mt-0 w-max">
@@ -627,21 +655,47 @@
               }
             };
 
+            const handleLogout = () => {
+              setIsAdminAuthenticated(false);
+              setLoginPass('');
+            };
+
+            const showSuccess = (msg) => {
+              setSuccessMsg(msg);
+              setTimeout(() => setSuccessMsg(''), 3000);
+            };
+
+            const handleImageChange = (e) => {
+              const file = e.target.files[0];
+              if (file) {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                  setNewMember({ ...newMember, image: reader.result });
+                };
+                reader.readAsDataURL(file);
+              }
+            };
+
             const handleMarqueeUpdate = async (e) => {
               e.preventDefault();
               setIsSaving(true);
               
-              const { error } = await supabase
-                .from('settings')
-                .upsert({ id: 1, key: 'marquee', value: marqueeText }); // Assuming id 1 is for marquee
-                
-              setIsSaving(false);
-              
-              if(error) {
-                 setErrorMsg("Error updating marquee");
-                 console.error(error);
-              } else {
-                 showSuccess('স্ক্রলিং টেক্সট আপডেট করা হয়েছে!');
+              try {
+                  const { error } = await supabaseClient
+                    .from('settings')
+                    .upsert({ id: 1, key: 'marquee', value: marqueeText }); // Assuming id 1 is for marquee
+                    
+                  setIsSaving(false);
+                  
+                  if(error) {
+                     setErrorMsg("Error updating marquee");
+                     console.error(error);
+                  } else {
+                     showSuccess('স্ক্রলিং টেক্সট আপডেট করা হয়েছে!');
+                  }
+              } catch (err) {
+                  setIsSaving(false);
+                  setErrorMsg("Network or Configuration Error.");
               }
             };
 
@@ -657,20 +711,25 @@
                   image: newMember.image 
               };
 
-              const { data, error } = await supabase
-                .from('committee')
-                .insert([memberToInsert])
-                .select();
-                
-              setIsSaving(false);
+              try {
+                  const { data, error } = await supabaseClient
+                    .from('committee')
+                    .insert([memberToInsert])
+                    .select();
+                    
+                  setIsSaving(false);
 
-              if (error) {
-                 setErrorMsg("Error adding member");
-                 console.error(error);
-              } else if (data) {
-                  setCommitteeMembers([...committeeMembers, data[0]]);
-                  setNewMember({ name: '', role: '', phone: '', image: null });
-                  showSuccess('নতুন সদস্য যুক্ত করা হয়েছে!');
+                  if (error) {
+                     setErrorMsg("Error adding member");
+                     console.error(error);
+                  } else if (data) {
+                      setCommitteeMembers([...committeeMembers, data[0]]);
+                      setNewMember({ name: '', role: '', phone: '', image: null });
+                      showSuccess('নতুন সদস্য যুক্ত করা হয়েছে!');
+                  }
+              } catch (err) {
+                  setIsSaving(false);
+                  setErrorMsg("Network or Configuration Error.");
               }
             };
 
@@ -678,18 +737,23 @@
               if(!confirm('আপনি কি নিশ্চিত যে এই সদস্যকে মুছে ফেলতে চান?')) return;
               setIsSaving(true);
               
-              const { error } = await supabase
-                .from('committee')
-                .delete()
-                .eq('id', id);
-                
-              setIsSaving(false);
-              
-              if(error) {
-                 setErrorMsg("Error deleting member");
-              } else {
-                 setCommitteeMembers(committeeMembers.filter(m => m.id !== id));
-                 showSuccess('সদস্য মুছে ফেলা হয়েছে!');
+              try {
+                  const { error } = await supabaseClient
+                    .from('committee')
+                    .delete()
+                    .eq('id', id);
+                    
+                  setIsSaving(false);
+                  
+                  if(error) {
+                     setErrorMsg("Error deleting member");
+                  } else {
+                     setCommitteeMembers(committeeMembers.filter(m => m.id !== id));
+                     showSuccess('সদস্য মুছে ফেলা হয়েছে!');
+                  }
+              } catch (err) {
+                  setIsSaving(false);
+                  setErrorMsg("Network or Configuration Error.");
               }
             };
 
@@ -697,18 +761,23 @@
                 if(!confirm('আপনি কি নিশ্চিত যে এই মতামত মুছে ফেলতে চান?')) return;
                 setIsSaving(true);
                 
-                const { error } = await supabase
-                    .from('testimonials')
-                    .delete()
-                    .eq('id', id);
+                try {
+                    const { error } = await supabaseClient
+                        .from('testimonials')
+                        .delete()
+                        .eq('id', id);
+                        
+                    setIsSaving(false);
                     
-                setIsSaving(false);
-                
-                if(error) {
-                    setErrorMsg("Error deleting testimonial");
-                } else {
-                    setTestimonials(testimonials.filter(item => item.id !== id));
-                    showSuccess('মতামত মুছে ফেলা হয়েছে!');
+                    if(error) {
+                        setErrorMsg("Error deleting testimonial");
+                    } else {
+                        setTestimonials(testimonials.filter(item => item.id !== id));
+                        showSuccess('মতামত মুছে ফেলা হয়েছে!');
+                    }
+                } catch (err) {
+                    setIsSaving(false);
+                    setErrorMsg("Network or Configuration Error.");
                 }
             };
 
