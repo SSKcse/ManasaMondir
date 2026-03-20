@@ -357,30 +357,42 @@
                 </div>
               </section>
 
-              {/* Famous Devotee Section */}
-              <section className="py-16 bg-white border-y border-orange-100 shadow-sm">
-                <div className="container mx-auto px-4">
-                  <div className="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-3xl shadow-lg p-8 md:p-12 flex flex-col md:flex-row items-center gap-10 border border-orange-100 relative overflow-hidden">
-                    <div className="absolute -right-20 -top-20 w-64 h-64 bg-orange-200 rounded-full opacity-40 blur-3xl"></div>
-                    <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-yellow-200 rounded-full opacity-40 blur-2xl"></div>
-                    
-                    <div className="w-full md:w-1/3 flex justify-center relative z-10">
-                      <div className="w-48 h-48 md:w-64 md:h-64 bg-white rounded-full flex items-center justify-center border-[6px] border-orange-300 shadow-xl overflow-hidden text-orange-300">
-                          <i className="fas fa-user-circle text-[10rem]"></i>
-                      </div>
-                    </div>
-                    <div className="w-full md:w-2/3 relative z-10 text-center md:text-left">
-                      <h2 className="text-3xl font-bold text-orange-900 mb-4 border-b-2 border-yellow-500 inline-block pb-2">বিখ্যাত ভক্ত: কবি বিজয় গুপ্ত</h2>
-                      <p className="text-gray-700 text-lg leading-relaxed mb-8 text-justify">
-                        মধ্যযুগের অন্যতম শ্রেষ্ঠ বাঙালি কবি বিজয় গুপ্ত। তাঁর রচিত "পদ্মাপুরাণ" বা "মনসামঙ্গল" কাব্য বাংলা সাহিত্যের এক অমূল্য রত্ন। তিনি এই গৈলা গ্রামেই জন্মগ্রহণ করেন এবং স্বয়ং মা মনসার স্বপ্নাদিষ্ট হয়ে এই পবিত্র মন্দিরটি প্রতিষ্ঠা করেন। শতাব্দীর পর শতাব্দী ধরে অসংখ্য ভক্ত মায়ের কৃপা লাভের আশায় এখানে ছুটে আসেন।
+               শ্রেষ্ঠ বাঙালি কবি বিজয় গুপ্ত। তাঁর রচিত "পদ্মাপুরাণ" বা "মনসামঙ্গল" কাব্য বাংলা সাহিত্যের এক অমূল্য রত্ন। তিনি এই গৈলা গ্রামেই জন্মগ্রহণ করেন এবং স্বয়ং মা মনসার স্বপ্নাদিষ্ট হয়ে এই পবিত্র মন্দিরটি প্রতিষ্ঠা করেন। শতাব্দীর পর শতাব্দী ধরে অসংখ্য ভক্ত মায়ের কৃপা লাভের আশায় এখানে ছুটে আসেন।
                       </p>
                       <button onClick={() => navigateTo('history')} className="text-white bg-orange-600 px-8 py-3 rounded-full font-bold inline-flex items-center gap-2 hover:bg-orange-700 transition-colors shadow-md hover:shadow-lg">
                         আরও জানুন <i className="fas fa-chevron-right text-sm"></i>
                       </button>
                     </div>
                   </div>
-                </div>
-              </section>
+                </div>{/* Famous Devotee Section */}
+<section className="py-16 bg-white border-y border-orange-100 shadow-sm">
+  <div className="container mx-auto px-4">
+    <div className="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-3xl shadow-lg p-8 md:p-12 flex flex-col md:flex-row items-center gap-10 border border-orange-100 relative overflow-hidden">
+      <div className="absolute -right-20 -top-20 w-64 h-64 bg-orange-200 rounded-full opacity-40 blur-3xl"></div>
+      <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-yellow-200 rounded-full opacity-40 blur-2xl"></div>
+      
+      <div className="w-full md:w-1/3 flex justify-center relative z-10">
+        <div className="w-48 h-48 md:w-64 md:h-64 bg-white rounded-full flex items-center justify-center border-[6px] border-orange-300 shadow-xl overflow-hidden">
+          <img 
+            src="kobi bijoy gupta.png" 
+            alt="Kobi Bijoy Gupta" 
+            className="w-full h-full object-cover"
+          />
+        </div>
+      </div>
+
+      <div className="w-full md:w-2/3 relative z-10 text-center md:text-left">
+        <h2 className="text-3xl font-bold text-orange-900 mb-4 border-b-2 border-yellow-500 inline-block pb-2">
+          বিখ্যাত ভক্ত: কবি বিজয় গুপ্ত
+        </h2>
+
+        <p className="text-gray-700 text-lg leading-relaxed mb-8 text-justify">
+          মধ্যযুগের অন্যতম
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
 
               {/* Notice Board Overview Snippet */}
               <section className="py-16 bg-gray-50 border-b border-gray-200 relative">
