@@ -3,7 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>শ্রী শ্রী মা মনসা মন্দির, গৈলা</title>
+    
+    <!-- Primary Meta Tags for SEO -->
+    <title>শ্রী শ্রী মা মনসা মন্দির, গৈলা - ঐতিহাসিক পবিত্র তীর্থস্থান</title>
+    <meta name="title" content="শ্রী শ্রী মা মনসা মন্দির, গৈলা - ঐতিহাসিক পবিত্র তীর্থস্থান">
+    <meta name="description" content="বরিশালের গৈলায় অবস্থিত মধ্যযুগের অন্যতম শ্রেষ্ঠ বাঙালি কবি বিজয় গুপ্তের প্রতিষ্ঠিত ঐতিহাসিক শ্রী শ্রী মা মনসা মন্দির। মনসামঙ্গল কাব্যের রচয়িতার পবিত্র জন্মভূমি।">
+    <meta name="keywords" content="মনসা মন্দির, গৈলা, আগৈলঝাড়া, বরিশাল, কবি বিজয় গুপ্ত, পদ্মাপুরাণ, মনসামঙ্গল, হিন্দু মন্দির, Manasa Temple, Goila, Barishal, Hindu Temple Bangladesh">
+    <meta name="author" content="মনসা মন্দির পরিচালনা কমিটি">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="Bengali">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://manasamondirgoila.com/">
+    <meta property="og:title" content="শ্রী শ্রী মা মনসা মন্দির, গৈলা">
+    <meta property="og:description" content="কবি বিজয় গুপ্তের প্রতিষ্ঠিত ঐতিহাসিক মন্দির। মায়ের আশীর্বাদে সবার জীবনে শান্তি ও সমৃদ্ধি নেমে আসুক।">
+    <meta property="og:image" content="header image.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://manasamondirgoila.com/">
+    <meta property="twitter:title" content="শ্রী শ্রী মা মনসা মন্দির, গৈলা">
+    <meta property="twitter:description" content="কবি বিজয় গুপ্তের প্রতিষ্ঠিত ঐতিহাসিক মন্দির। মায়ের আশীর্বাদে সবার জীবনে শান্তি ও সমৃদ্ধি নেমে আসুক।">
+    <meta property="twitter:image" content="header image.jpg">
     
     <!-- Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -58,6 +80,16 @@
         .toast-animate {
             animation: slideUp 0.3s ease-out forwards;
         }
+        
+        /* Glowing Avatar Animation */
+        @keyframes spiritualGlow {
+            0% { box-shadow: 0 0 15px rgba(250, 204, 21, 0.4); }
+            50% { box-shadow: 0 0 40px rgba(250, 204, 21, 0.9), 0 0 20px rgba(249, 115, 22, 0.8); }
+            100% { box-shadow: 0 0 15px rgba(250, 204, 21, 0.4); }
+        }
+        .spiritual-avatar {
+            animation: spiritualGlow 3s infinite alternate;
+        }
     </style>
 </head>
 <body>
@@ -96,6 +128,25 @@
             const year = englishToBengaliNumber(y);
             const month = months[parseInt(m, 10) - 1];
             return `${day} ${month}, ${year}`;
+        };
+
+        const shareEvent = async (ev, showToast) => {
+            const shareData = {
+                title: ev.title,
+                text: `${ev.title}\n\n${ev.description}\n\nতারিখ: ${formatDateToBengali(ev.date)}\n\nবিস্তারিত জানতে ভিজিট করুন: `,
+                url: window.location.origin + window.location.pathname + '#event'
+            };
+            
+            try {
+                if (navigator.share) {
+                    await navigator.share(shareData);
+                } else {
+                    await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
+                    showToast('ইভেন্টের তথ্য কপি করা হয়েছে!');
+                }
+            } catch (err) {
+                console.log('Share canceled or failed', err);
+            }
         };
 
         // --- Reusable Back Button Component ---
@@ -197,7 +248,7 @@
           </footer>
         );
 
-        const Home = ({ dbError, marqueeText, testimonials, featuredTestimonialIds, committeeMembers, events, notices, navigateTo }) => {
+        const Home = ({ dbError, marqueeText, testimonials, featuredTestimonialIds, committeeMembers, events, notices, navigateTo, showToast }) => {
           const [currentImg, setCurrentImg] = useState(0);
           const [testIdx, setTestIdx] = useState(0);
           
@@ -238,13 +289,20 @@
               </div>
 
               {/* Hero Section */}
-              <section className="relative bg-orange-900 text-white overflow-hidden min-h-[550px] flex items-center">
+              <section className="relative bg-orange-900 text-white overflow-hidden min-h-[550px] flex items-center pt-10">
                 <div className="absolute inset-0 z-0">
                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/60 z-10"></div>
-                   <img src="gallary image.png" alt="Ma Manasa" className="w-full h-full object-cover" />
+                   <img src="header image.jpg" alt="Ma Manasa" className="w-full h-full object-cover" />
                 </div>
                 
-                <div className="container mx-auto px-4 py-20 relative z-20 text-center">
+                <div className="container mx-auto px-4 py-16 relative z-20 text-center flex flex-col items-center">
+                  
+                  {/* Spiritual Profile Picture */}
+                  <div className="w-32 h-32 md:w-40 md:h-40 mb-6 rounded-full p-1 spiritual-avatar bg-gradient-to-tr from-yellow-300 to-orange-500 relative">
+                     <div className="absolute inset-0 rounded-full border-2 border-white/50 mix-blend-overlay"></div>
+                     <img src="logo (1).jpg" alt="Ma Manasa Deity" className="w-full h-full object-cover rounded-full border-4 border-orange-900 shadow-inner bg-white" />
+                  </div>
+
                   <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-500 mb-6 drop-shadow-2xl font-serif tracking-wide">
                     শ্রী শ্রী মা মনসা মন্দির
                   </h1>
@@ -404,7 +462,7 @@
               <section className="py-16 bg-gradient-to-b from-orange-100 to-white border-t border-orange-200">
                 <div className="container mx-auto px-4">
                   <div className="text-center mb-14">
-                    <h2 className="text-3xl md:text-4xl font-bold text-orange-900 mb-4 font-serif">কবি বিজয় গুপ্তের স্মৃতি রক্ষা, শ্রী শ্রী মা মনসা মন্দির সংরক্ষণ ও উন্নয়ন কমিটি ২০২৪-২০২৬</h2>
+                    <h2 className="text-3xl md:text-4xl font-bold text-orange-900 mb-4 font-serif">পরিচালনা পর্ষদ</h2>
                     <div className="h-1.5 w-24 bg-yellow-500 mx-auto rounded-full"></div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -463,7 +521,9 @@
                         <p className="text-gray-600 text-sm line-clamp-3 leading-relaxed flex-grow">{event.description}</p>
                         
                         <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
-                            {!event.image && <span className="text-xs text-gray-500 font-medium flex items-center gap-1"><i className="fas fa-clock text-orange-500"></i> {formatDateToBengali(event.date)}</span>}
+                            <button onClick={() => shareEvent(event, showToast)} className="text-gray-500 hover:text-blue-600 transition-colors flex items-center gap-1.5 text-sm font-medium">
+                                <i className="fas fa-share-alt"></i> শেয়ার
+                            </button>
                             <button onClick={() => navigateTo('event')} className="text-orange-600 font-bold hover:text-orange-800 flex items-center gap-1 ml-auto group-hover:underline">
                                 বিস্তারিত <i className="fas fa-chevron-right text-xs transition-transform group-hover:translate-x-1"></i>
                             </button>
@@ -557,7 +617,7 @@
           </div>
         );
 
-        const EventsPage = ({ events, navigateTo }) => (
+        const EventsPage = ({ events, navigateTo, showToast }) => (
           <div className="bg-orange-50 min-h-screen py-12">
             <div className="container mx-auto px-4 max-w-5xl">
               <BackButton navigateTo={navigateTo} />
@@ -587,7 +647,13 @@
                            </span>
                        </div>
                        <h3 className="text-2xl font-bold text-gray-800 mb-4">{event.title}</h3>
-                       <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-wrap">{event.description}</p>
+                       <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-wrap mb-4">{event.description}</p>
+                       
+                       <div className="mt-auto pt-4 border-t border-gray-100 flex justify-end">
+                           <button onClick={() => shareEvent(event, showToast)} className="text-blue-600 hover:text-white hover:bg-blue-600 bg-blue-50 border border-blue-200 px-4 py-2 rounded-lg transition-colors shadow-sm flex items-center gap-2 font-bold">
+                               <i className="fas fa-share-alt"></i> শেয়ার করুন
+                           </button>
+                       </div>
                      </div>
                   </div>
                 ))}
@@ -632,62 +698,107 @@
           </div>
         );
 
-        const DonationPage = ({ navigateTo }) => (
-          <div className="bg-orange-50 min-h-screen py-12">
-            <div className="container mx-auto px-4 max-w-4xl">
-              <BackButton navigateTo={navigateTo} />
-              <div className="text-center mb-10">
-                <div className="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl shadow-inner border border-red-200">
-                  <i className="fas fa-heart"></i>
+        const DonationPage = ({ donations, navigateTo }) => {
+          const publicDonations = donations ? donations.filter(d => !d.is_hidden) : [];
+          return (
+            <div className="bg-orange-50 min-h-screen py-12">
+              <div className="container mx-auto px-4 max-w-5xl">
+                <BackButton navigateTo={navigateTo} />
+                <div className="text-center mb-10">
+                  <div className="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl shadow-inner border border-red-200">
+                    <i className="fas fa-heart"></i>
+                  </div>
+                  <h1 className="text-4xl font-bold text-orange-900 mb-4 font-serif">মন্দিরের প্রণামী বা অনুদান</h1>
+                  <p className="text-lg text-gray-700 max-w-2xl mx-auto">আপনার যেকোনো ধরণের অনুদান মন্দিরের সেবা, রক্ষণাবেক্ষণ ও ধর্মীয় কাজে সহায়তা করবে। আপনার অবদানের জন্য আমরা গভীরভাবে কৃতজ্ঞ।</p>
                 </div>
-                <h1 className="text-4xl font-bold text-orange-900 mb-4 font-serif">মন্দিরের প্রণামী বা অনুদান</h1>
-                <p className="text-lg text-gray-700 max-w-2xl mx-auto">আপনার যেকোনো ধরণের অনুদান মন্দিরের সেবা, রক্ষণাবেক্ষণ ও ধর্মীয় কাজে সহায়তা করবে। আপনার অবদানের জন্য আমরা গভীরভাবে কৃতজ্ঞ।</p>
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="bg-white p-8 rounded-2xl shadow-lg border-t-[6px] border-orange-600">
-                  <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2 border-b pb-4">
-                     <i className="fas fa-university text-orange-600"></i> ব্যাংক একাউন্ট বিস্তারিত
-                  </h3>
-                  <div className="space-y-4 text-gray-700 text-lg">
-                    <p><strong className="text-gray-900">একাউন্টের নাম:</strong> মনসা মন্দির পরিচালনা কমিটি</p>
-                    <p><strong className="text-gray-900">একাউন্ট নম্বর:</strong> ০১৩৪-XXXX-XXXX-XXXX</p>
-                    <p><strong className="text-gray-900">ব্যাংক:</strong> সোনালী ব্যাংক লিমিটেড</p>
-                    <p><strong className="text-gray-900">শাখা:</strong> আগৈলঝাড়া শাখা, বরিশাল</p>
-                    <p><strong className="text-gray-900">রাউটিং নম্বর:</strong> XXXXXXXX</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                  <div className="bg-white p-8 rounded-2xl shadow-lg border-t-[6px] border-orange-600">
+                    <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2 border-b pb-4">
+                       <i className="fas fa-university text-orange-600"></i> ব্যাংক একাউন্ট বিস্তারিত
+                    </h3>
+                    <div className="space-y-4 text-gray-700 text-lg">
+                      <p><strong className="text-gray-900">একাউন্টের নাম:</strong> মনসা মন্দির পরিচালনা কমিটি</p>
+                      <p><strong className="text-gray-900">একাউন্ট নম্বর:</strong> ০১৩৪-XXXX-XXXX-XXXX</p>
+                      <p><strong className="text-gray-900">ব্যাংক:</strong> সোনালী ব্যাংক লিমিটেড</p>
+                      <p><strong className="text-gray-900">শাখা:</strong> আগৈলঝাড়া শাখা, বরিশাল</p>
+                      <p><strong className="text-gray-900">রাউটিং নম্বর:</strong> XXXXXXXX</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-white p-8 rounded-2xl shadow-lg border-t-[6px] border-yellow-500">
+                     <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2 border-b pb-4">
+                       <i className="fas fa-mobile-alt text-yellow-600"></i> মোবাইল ব্যাংকিং
+                    </h3>
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-5 bg-pink-50 p-5 rounded-xl border border-pink-200 shadow-sm">
+                        <div className="w-14 h-14 bg-pink-600 text-white font-bold rounded-xl flex items-center justify-center text-sm shadow-md">bKash</div>
+                        <div>
+                          <p className="text-sm text-gray-500 font-semibold mb-1">বিকাশ (মার্চেন্ট)</p>
+                          <p className="text-2xl font-bold text-gray-800 tracking-wider">০১৭XX-XXXXXX</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-5 bg-orange-50 p-5 rounded-xl border border-orange-200 shadow-sm">
+                        <div className="w-14 h-14 bg-orange-600 text-white font-bold rounded-xl flex items-center justify-center text-sm shadow-md">Nagad</div>
+                        <div>
+                          <p className="text-sm text-gray-500 font-semibold mb-1">নগদ (মার্চেন্ট)</p>
+                          <p className="text-2xl font-bold text-gray-800 tracking-wider">০১৭XX-XXXXXX</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div className="bg-white p-8 rounded-2xl shadow-lg border-t-[6px] border-yellow-500">
-                   <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2 border-b pb-4">
-                     <i className="fas fa-mobile-alt text-yellow-600"></i> মোবাইল ব্যাংকিং
-                  </h3>
-                  <div className="space-y-6">
-                    <div className="flex items-center gap-5 bg-pink-50 p-5 rounded-xl border border-pink-200 shadow-sm">
-                      <div className="w-14 h-14 bg-pink-600 text-white font-bold rounded-xl flex items-center justify-center text-sm shadow-md">bKash</div>
-                      <div>
-                        <p className="text-sm text-gray-500 font-semibold mb-1">বিকাশ (মার্চেন্ট)</p>
-                        <p className="text-2xl font-bold text-gray-800 tracking-wider">০১৭XX-XXXXXX</p>
+                {/* Donation List Section */}
+                <div className="bg-white rounded-3xl shadow-xl border border-orange-100 overflow-hidden mb-12">
+                   <div className="bg-orange-100 p-6 border-b border-orange-200">
+                      <h3 className="text-2xl font-bold text-orange-900 font-serif flex items-center justify-center gap-2">
+                         <i className="fas fa-hand-holding-heart text-orange-600"></i> আমাদের সম্মানিত দাতাগণ
+                      </h3>
+                   </div>
+                   <div className="p-6">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                          <thead>
+                            <tr className="bg-gray-50 text-gray-700 border-b-2 border-orange-200">
+                              <th className="p-4 font-bold text-base">নাম</th>
+                              <th className="p-4 font-bold text-base">ঠিকানা / পদবী</th>
+                              <th className="p-4 font-bold text-base">ধরণ</th>
+                              <th className="p-4 font-bold text-base text-right">পরিমাণ / বিবরণ</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {publicDonations.map((d, idx) => (
+                              <tr key={d.id} className="border-b border-gray-100 hover:bg-orange-50/50 transition-colors">
+                                <td className="p-4 font-bold text-gray-800">{d.name}</td>
+                                <td className="p-4 text-gray-600">{d.address || '-'}</td>
+                                <td className="p-4">
+                                   <span className={`text-xs font-bold px-2.5 py-1 rounded-md border ${d.type === 'নগদ অর্থ' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-blue-50 text-blue-700 border-blue-200'}`}>
+                                      {d.type}
+                                   </span>
+                                </td>
+                                <td className="p-4 text-right font-semibold text-orange-700">{englishToBengaliNumber(d.amount)}</td>
+                              </tr>
+                            ))}
+                            {publicDonations.length === 0 && (
+                              <tr>
+                                <td colSpan="4" className="p-8 text-center text-gray-500">এখনো কোনো অনুদান তালিকাভুক্ত করা হয়নি।</td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
                       </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-5 bg-orange-50 p-5 rounded-xl border border-orange-200 shadow-sm">
-                      <div className="w-14 h-14 bg-orange-600 text-white font-bold rounded-xl flex items-center justify-center text-sm shadow-md">Nagad</div>
-                      <div>
-                        <p className="text-sm text-gray-500 font-semibold mb-1">নগদ (মার্চেন্ট)</p>
-                        <p className="text-2xl font-bold text-gray-800 tracking-wider">০১৭XX-XXXXXX</p>
-                      </div>
-                    </div>
-                  </div>
+                   </div>
                 </div>
-              </div>
-              
-              <div className="mt-12 bg-gradient-to-r from-orange-800 to-orange-900 text-white p-8 rounded-2xl text-center shadow-xl border border-orange-700">
-                 <p className="text-xl italic font-medium">"দানবীর্যের প্রভাবে ইহকাল ও পরকালে শান্তি মেলে। মা মনসা আপনার সহায় হোন।"</p>
+                
+                <div className="bg-gradient-to-r from-orange-800 to-orange-900 text-white p-8 rounded-2xl text-center shadow-xl border border-orange-700">
+                   <p className="text-xl italic font-medium">"দানবীর্যের প্রভাবে ইহকাল ও পরকালে শান্তি মেলে। মা মনসা আপনার সহায় হোন।"</p>
+                </div>
               </div>
             </div>
-          </div>
-        );
+          );
+        };
 
         const HistoryPage = ({ navigateTo }) => (
           <div className="bg-orange-50 min-h-screen py-12">
@@ -730,13 +841,14 @@
             testimonials, setTestimonials,
             events, setEvents,
             notices, setNotices,
-            featuredTestimonialIds, setFeaturedTestimonialIds
+            donations, setDonations,
+            featuredTestimonialIds, setFeaturedTestimonialIds,
+            showToast
         }) => {
           const [loginEmail, setLoginEmail] = useState('');
           const [loginPass, setLoginPass] = useState('');
           const [errorMsg, setErrorMsg] = useState('');
           const [activeTab, setActiveTab] = useState('marquee');
-          const [successMsg, setSuccessMsg] = useState('');
           const [isSaving, setIsSaving] = useState(false);
 
           // Edit States
@@ -744,12 +856,14 @@
           const [editingTestimonialId, setEditingTestimonialId] = useState(null);
           const [editingNoticeId, setEditingNoticeId] = useState(null);
           const [editingEventId, setEditingEventId] = useState(null);
+          const [editingDonationId, setEditingDonationId] = useState(null);
 
           // Form States
           const [newMember, setNewMember] = useState({ name: '', role: '', phone: '', image: null });
           const [newTestimonial, setNewTestimonial] = useState({ name: '', designation: '', text: '', date: '' });
           const [newNotice, setNewNotice] = useState({ title: '', date: '', text: '' });
           const [newEvent, setNewEvent] = useState({ title: '', date: '', description: '', image: null });
+          const [newDonation, setNewDonation] = useState({ name: '', address: '', type: 'নগদ অর্থ', amount: '', date: '', is_hidden: false });
 
           const handleLogin = async (e) => {
             e.preventDefault();
@@ -777,11 +891,6 @@
             setLoginPass('');
           };
 
-          const showSuccess = (msg = 'সফলভাবে সেভ হয়েছে!') => {
-            setSuccessMsg(msg);
-            setTimeout(() => setSuccessMsg(''), 3000);
-          };
-
           const handleImageChange = (e, setFunc, stateVar) => {
             const file = e.target.files[0];
             if (file) {
@@ -800,7 +909,7 @@
             try {
                 const { error } = await supabaseClient.from('settings').upsert({ id: 1, key: 'marquee', value: marqueeText });
                 if(error) throw error;
-                showSuccess('স্ক্রলিং টেক্সট আপডেট করা হয়েছে!');
+                showToast('স্ক্রলিং টেক্সট আপডেট করা হয়েছে!');
             } catch (err) {
                 setErrorMsg("আপডেট করতে সমস্যা হচ্ছে।");
             } finally {
@@ -827,7 +936,7 @@
                     if (error) throw error;
                     
                     setCommitteeMembers(committeeMembers.map(m => m.id === editingCommitteeId ? { ...m, ...memberData } : m));
-                    showSuccess('সদস্যের তথ্য আপডেট করা হয়েছে!');
+                    showToast('সদস্যের তথ্য আপডেট করা হয়েছে!');
                     setEditingCommitteeId(null);
                 } else {
                     memberData.order_idx = committeeMembers.length;
@@ -835,7 +944,7 @@
                     if (error) throw error;
                     if (data) {
                         setCommitteeMembers([...committeeMembers, data[0]]);
-                        showSuccess('নতুন সদস্য যুক্ত করা হয়েছে!');
+                        showToast('নতুন সদস্য যুক্ত করা হয়েছে!');
                     }
                 }
                 setNewMember({ name: '', role: '', phone: '', image: null });
@@ -853,7 +962,7 @@
                 const { error } = await supabaseClient.from('committee').delete().eq('id', id);
                 if(error) throw error;
                 setCommitteeMembers(committeeMembers.filter(m => m.id !== id));
-                showSuccess('সদস্য মুছে ফেলা হয়েছে!');
+                showToast('সদস্য মুছে ফেলা হয়েছে!');
             } catch (err) {
                 setErrorMsg("Error deleting.");
             } finally {
@@ -880,7 +989,7 @@
                       id: m.id, name: m.name, role: m.role, phone: m.phone, image: m.image, order_idx: m.order_idx
                   }));
                   await supabaseClient.from('committee').upsert(updates);
-                  showSuccess('অর্ডার সেভ হয়েছে!');
+                  showToast('অর্ডার সেভ হয়েছে!');
               } catch (e) {
                   setErrorMsg("Order save failed.");
               }
@@ -899,7 +1008,7 @@
                       let updatedList = testimonials.map(t => t.id === editingTestimonialId ? { ...t, ...newTestimonial } : t);
                       updatedList.sort((a,b) => new Date(b.date) - new Date(a.date));
                       setTestimonials(updatedList);
-                      showSuccess('মতামত আপডেট করা হয়েছে!');
+                      showToast('মতামত আপডেট করা হয়েছে!');
                       setEditingTestimonialId(null);
                   } else {
                       const { data, error } = await supabaseClient.from('testimonials').insert([newTestimonial]).select();
@@ -908,7 +1017,7 @@
                           let updatedList = [data[0], ...testimonials];
                           updatedList.sort((a,b) => new Date(b.date) - new Date(a.date));
                           setTestimonials(updatedList);
-                          showSuccess('নতুন মতামত যোগ করা হয়েছে!');
+                          showToast('নতুন মতামত যোগ করা হয়েছে!');
                       }
                   }
                   setNewTestimonial({ name: '', designation: '', text: '', date: '' });
@@ -934,7 +1043,7 @@
                       if(existing) await supabaseClient.from('settings').update({ value: JSON.stringify(updatedIds) }).eq('id', existing.id);
                   }
                   
-                  showSuccess('মতামত মুছে ফেলা হয়েছে!');
+                  showToast('মতামত মুছে ফেলা হয়েছে!');
               } catch (err) {
                   setErrorMsg("Error deleting testimonial.");
               } finally {
@@ -960,7 +1069,7 @@
                   }
                   
                   setFeaturedTestimonialIds(updatedIds);
-                  showSuccess('হোমপেজ ফিচার্ড লিস্ট আপডেট হয়েছে!');
+                  showToast('হোমপেজ ফিচার্ড লিস্ট আপডেট হয়েছে!');
               } catch (err) {
                   setErrorMsg("আপডেট করতে সমস্যা হচ্ছে।");
               } finally {
@@ -980,7 +1089,7 @@
                       let updatedNotices = notices.map(n => n.id === editingNoticeId ? { ...n, ...newNotice } : n);
                       updatedNotices.sort((a, b) => new Date(b.date) - new Date(a.date));
                       setNotices(updatedNotices);
-                      showSuccess('নোটিশ আপডেট করা হয়েছে!');
+                      showToast('নোটিশ আপডেট করা হয়েছে!');
                       setEditingNoticeId(null);
                   } else {
                       const { data, error } = await supabaseClient.from('notices').insert([newNotice]).select();
@@ -989,7 +1098,7 @@
                           let updatedNotices = [data[0], ...notices];
                           updatedNotices.sort((a, b) => new Date(b.date) - new Date(a.date));
                           setNotices(updatedNotices);
-                          showSuccess('নোটিশ যোগ করা হয়েছে!');
+                          showToast('নোটিশ যোগ করা হয়েছে!');
                       }
                   }
                   setNewNotice({ title: '', date: '', text: '' });
@@ -1007,7 +1116,7 @@
                   const { error } = await supabaseClient.from('notices').delete().eq('id', id);
                   if(error) throw error;
                   setNotices(notices.filter(item => item.id !== id));
-                  showSuccess('নোটিশ মুছে ফেলা হয়েছে!');
+                  showToast('নোটিশ মুছে ফেলা হয়েছে!');
               } catch(err) {
                   setErrorMsg("Error deleting notice.");
               } finally {
@@ -1027,7 +1136,7 @@
                       let updatedEvents = events.map(ev => ev.id === editingEventId ? { ...ev, ...newEvent } : ev);
                       updatedEvents.sort((a, b) => new Date(b.date) - new Date(a.date));
                       setEvents(updatedEvents);
-                      showSuccess('ইভেন্ট আপডেট করা হয়েছে!');
+                      showToast('ইভেন্ট আপডেট করা হয়েছে!');
                       setEditingEventId(null);
                   } else {
                       const { data, error } = await supabaseClient.from('events').insert([newEvent]).select();
@@ -1036,12 +1145,12 @@
                           let updatedEvents = [data[0], ...events];
                           updatedEvents.sort((a, b) => new Date(b.date) - new Date(a.date));
                           setEvents(updatedEvents);
-                          showSuccess('নতুন ইভেন্ট যোগ করা হয়েছে!');
+                          showToast('নতুন ইভেন্ট যোগ করা হয়েছে!');
                       }
                   }
                   setNewEvent({ title: '', date: '', description: '', image: null });
               } catch(err) {
-                  setErrorMsg("Error saving event.");
+                  setErrorMsg("Error saving event. SQL Error? Did you run the ALTER TABLE command for event images?");
               } finally {
                   setIsSaving(false);
               }
@@ -1054,9 +1163,70 @@
                   const { error } = await supabaseClient.from('events').delete().eq('id', id);
                   if(error) throw error;
                   setEvents(events.filter(item => item.id !== id));
-                  showSuccess('ইভেন্ট মুছে ফেলা হয়েছে!');
+                  showToast('ইভেন্ট মুছে ফেলা হয়েছে!');
               } catch(err) {
                   setErrorMsg("Error deleting event.");
+              } finally {
+                  setIsSaving(false);
+              }
+          };
+
+          // -- Donations --
+          const handleSaveDonation = async (e) => {
+              e.preventDefault();
+              setIsSaving(true);
+              try {
+                  if (editingDonationId) {
+                      const { error } = await supabaseClient.from('donations').update(newDonation).eq('id', editingDonationId);
+                      if(error) throw error;
+                      
+                      let updatedD = donations.map(d => d.id === editingDonationId ? { ...d, ...newDonation } : d);
+                      updatedD.sort((a, b) => b.id - a.id);
+                      setDonations(updatedD);
+                      showToast('অনুদান আপডেট করা হয়েছে!');
+                      setEditingDonationId(null);
+                  } else {
+                      const { data, error } = await supabaseClient.from('donations').insert([newDonation]).select();
+                      if(error) throw error;
+                      if(data) {
+                          let updatedD = [data[0], ...donations];
+                          updatedD.sort((a, b) => b.id - a.id);
+                          setDonations(updatedD);
+                          showToast('নতুন অনুদান যোগ করা হয়েছে!');
+                      }
+                  }
+                  setNewDonation({ name: '', address: '', type: 'নগদ অর্থ', amount: '', date: '', is_hidden: false });
+              } catch(err) {
+                  setErrorMsg("Error saving donation. Did you run the SQL to create donations table?");
+              } finally {
+                  setIsSaving(false);
+              }
+          };
+
+          const handleDeleteDonation = async (id) => {
+              if(!confirm('অনুদানটি মুছে ফেলতে চান?')) return;
+              setIsSaving(true);
+              try {
+                  const { error } = await supabaseClient.from('donations').delete().eq('id', id);
+                  if(error) throw error;
+                  setDonations(donations.filter(item => item.id !== id));
+                  showToast('অনুদান মুছে ফেলা হয়েছে!');
+              } catch(err) {
+                  setErrorMsg("Error deleting donation.");
+              } finally {
+                  setIsSaving(false);
+              }
+          };
+
+          const handleToggleDonationVisibility = async (id, currentStatus) => {
+              setIsSaving(true);
+              try {
+                  const { error } = await supabaseClient.from('donations').update({ is_hidden: !currentStatus }).eq('id', id);
+                  if(error) throw error;
+                  setDonations(donations.map(d => d.id === id ? { ...d, is_hidden: !currentStatus } : d));
+                  showToast(currentStatus ? 'পাবলিক করা হয়েছে!' : 'হাইড করা হয়েছে!');
+              } catch(err) {
+                  setErrorMsg("Error updating visibility.");
               } finally {
                   setIsSaving(false);
               }
@@ -1110,12 +1280,6 @@
 
           return (
             <div className="bg-gray-50 min-h-screen pb-12 relative">
-              {/* Floating Success Message (Toast) */}
-              {successMsg && (
-                <div className="fixed bottom-10 right-10 z-[100] bg-green-600 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 font-bold text-lg toast-animate border border-green-500">
-                  <i className="fas fa-check-circle text-2xl"></i> {successMsg}
-                </div>
-              )}
 
               <div className="bg-gray-900 text-white py-4 px-6 flex justify-between items-center shadow-md sticky top-0 z-40 border-b-4 border-orange-500">
                  <h2 className="text-xl font-bold flex items-center gap-2"><i className="fas fa-user-shield text-orange-400"></i> ড্যাশবোর্ড (এডমিন)</h2>
@@ -1144,8 +1308,11 @@
                     <button onClick={() => setActiveTab('notices')} className={`px-5 py-3.5 text-left font-bold text-sm border-b ${activeTab === 'notices' ? 'bg-orange-50 text-orange-700 border-l-[5px] border-l-orange-600' : 'text-gray-600 hover:bg-gray-50 border-l-[5px] border-transparent'}`}>
                       <i className="fas fa-bullhorn w-5"></i> নোটিশ বোর্ড
                     </button>
-                    <button onClick={() => setActiveTab('events')} className={`px-5 py-3.5 text-left font-bold text-sm ${activeTab === 'events' ? 'bg-orange-50 text-orange-700 border-l-[5px] border-l-orange-600' : 'text-gray-600 hover:bg-gray-50 border-l-[5px] border-transparent'}`}>
+                    <button onClick={() => setActiveTab('events')} className={`px-5 py-3.5 text-left font-bold text-sm border-b ${activeTab === 'events' ? 'bg-orange-50 text-orange-700 border-l-[5px] border-l-orange-600' : 'text-gray-600 hover:bg-gray-50 border-l-[5px] border-transparent'}`}>
                       <i className="fas fa-calendar-alt w-5"></i> ইভেন্ট ম্যানেজমেন্ট
+                    </button>
+                    <button onClick={() => setActiveTab('donations')} className={`px-5 py-3.5 text-left font-bold text-sm ${activeTab === 'donations' ? 'bg-orange-50 text-orange-700 border-l-[5px] border-l-orange-600' : 'text-gray-600 hover:bg-gray-50 border-l-[5px] border-transparent'}`}>
+                      <i className="fas fa-hand-holding-usd w-5"></i> অনুদান ম্যানেজমেন্ট
                     </button>
                   </div>
                   <div className="mt-6 p-5 bg-green-50 text-green-800 rounded-2xl text-sm border border-green-200 shadow-sm flex items-start gap-3">
@@ -1467,13 +1634,99 @@
                       </div>
                     </div>
                   )}
+
+                  {activeTab === 'donations' && (
+                    <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+                      <h3 className="text-xl font-bold text-gray-800 mb-6 border-b pb-3 flex items-center gap-2">
+                        <i className="fas fa-hand-holding-usd text-orange-500"></i> {editingDonationId ? 'অনুদান আপডেট করুন' : 'নতুন অনুদান যোগ করুন'}
+                      </h3>
+                      <form onSubmit={handleSaveDonation} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-10 bg-gray-50 p-6 rounded-2xl border border-gray-200 items-end shadow-inner">
+                          <div>
+                              <label className="block text-sm font-bold text-gray-700 mb-1">দাতার নাম <span className="text-red-500">*</span></label>
+                              <input type="text" value={newDonation.name} onChange={e=>setNewDonation({...newDonation, name: e.target.value})} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500" required placeholder="নাম লিখুন" />
+                          </div>
+                          <div>
+                              <label className="block text-sm font-bold text-gray-700 mb-1">ঠিকানা বা পদবী</label>
+                              <input type="text" value={newDonation.address} onChange={e=>setNewDonation({...newDonation, address: e.target.value})} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500" placeholder="উদা: ঢাকা" />
+                          </div>
+                          <div>
+                              <label className="block text-sm font-bold text-gray-700 mb-1">অণুদানের ধরণ <span className="text-red-500">*</span></label>
+                              <select value={newDonation.type} onChange={e=>setNewDonation({...newDonation, type: e.target.value})} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500 bg-white">
+                                  <option value="নগদ অর্থ">নগদ অর্থ</option>
+                                  <option value="সরঞ্জাম/অন্যান্য">সরঞ্জাম/অন্যান্য</option>
+                              </select>
+                          </div>
+                          <div>
+                              <label className="block text-sm font-bold text-gray-700 mb-1">পরিমাণ / বিবরণ <span className="text-red-500">*</span></label>
+                              <input type="text" value={newDonation.amount} onChange={e=>setNewDonation({...newDonation, amount: e.target.value})} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500" required placeholder="উদা: ৫০০০ টাকা বা ১টি ফ্যান" />
+                          </div>
+                          <div className="lg:col-span-4 mt-2 flex gap-3">
+                           <button type="submit" disabled={isSaving} className="w-full bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 flex items-center justify-center gap-2 font-bold disabled:opacity-50 shadow-md">
+                              <i className={editingDonationId ? "fas fa-save" : "fas fa-plus"}></i> {isSaving ? 'সেভ হচ্ছে...' : (editingDonationId ? 'আপডেট করুন' : 'অনুদান যুক্ত করুন')}
+                           </button>
+                           {editingDonationId && (
+                              <button type="button" onClick={() => { setEditingDonationId(null); setNewDonation({name:'', address:'', type:'নগদ অর্থ', amount:'', date:'', is_hidden:false}); }} className="bg-gray-500 text-white px-6 py-3 rounded-xl hover:bg-gray-600 font-bold shadow-md">বাতিল</button>
+                           )}
+                        </div>
+                      </form>
+                      
+                      <div className="flex justify-between items-center mb-6 border-b pb-3 mt-8">
+                         <h3 className="text-xl font-bold text-gray-800"><i className="fas fa-list text-orange-500 mr-2"></i> বর্তমান দাতাদের তালিকা</h3>
+                         <span className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full font-bold">Total: {donations ? donations.length : 0}</span>
+                      </div>
+                      <div className="overflow-x-auto rounded-xl border border-gray-200">
+                          <table className="w-full text-left border-collapse bg-white">
+                            <thead>
+                              <tr className="bg-gray-100 text-gray-700 text-sm border-b">
+                                <th className="p-4 font-bold">নাম</th>
+                                <th className="p-4 font-bold">ঠিকানা/পদবী</th>
+                                <th className="p-4 font-bold">ধরণ</th>
+                                <th className="p-4 font-bold text-right">পরিমাণ/বিবরণ</th>
+                                <th className="p-4 text-center font-bold">অ্যাকশন</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {donations && donations.map(d => (
+                                <tr key={d.id} className={`border-b hover:bg-orange-50 transition-colors text-sm ${d.is_hidden ? 'opacity-60 bg-gray-50' : ''}`}>
+                                  <td className="p-4 font-bold text-gray-800">
+                                      {d.name}
+                                      {d.is_hidden && <span className="ml-2 text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded border border-red-200 font-bold">Hidden</span>}
+                                  </td>
+                                  <td className="p-4 text-gray-600">{d.address || '-'}</td>
+                                  <td className="p-4">
+                                     <span className={`text-xs font-bold px-2 py-1 rounded border ${d.type === 'নগদ অর্থ' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-blue-50 text-blue-700 border-blue-200'}`}>
+                                        {d.type}
+                                     </span>
+                                  </td>
+                                  <td className="p-4 text-right font-semibold text-orange-600">{d.amount}</td>
+                                  <td className="p-4 text-center whitespace-nowrap">
+                                    <button type="button" onClick={() => handleToggleDonationVisibility(d.id, d.is_hidden)} className={`border p-2 rounded-lg mr-2 transition-colors ${d.is_hidden ? 'bg-gray-200 text-gray-600 hover:bg-gray-300' : 'bg-green-50 text-green-600 border-green-200 hover:bg-green-600 hover:text-white'}`} title={d.is_hidden ? "পাবলিক করুন" : "হাইড করুন"}>
+                                      <i className={d.is_hidden ? "fas fa-eye-slash w-5" : "fas fa-eye w-5"}></i>
+                                    </button>
+                                    <button type="button" onClick={() => { setNewDonation(d); setEditingDonationId(d.id); window.scrollTo(0,0); }} className="text-blue-600 hover:text-white hover:bg-blue-600 bg-blue-50 border border-blue-200 p-2 rounded-lg mr-2 transition-colors" title="এডিট">
+                                      <i className="fas fa-edit w-5"></i>
+                                    </button>
+                                    <button type="button" onClick={() => handleDeleteDonation(d.id)} className="text-red-600 hover:text-white hover:bg-red-600 bg-red-50 border border-red-200 p-2 rounded-lg transition-colors" title="ডিলিট">
+                                      <i className="fas fa-trash w-5"></i>
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                              {(!donations || donations.length === 0) && (
+                                <tr><td colSpan="5" className="text-center p-6 text-gray-500">কোনো ডেটা নেই।</td></tr>
+                              )}
+                            </tbody>
+                          </table>
+                      </div>
+                    </div>
+                  )}
+
                 </div>
               </div>
             </div>
           );
         };
 
-        // --- Main App Setup ---
         function App() {
           const [currentPage, setCurrentPage] = useState(() => {
               return window.location.hash.replace('#', '') || 'home';
@@ -1489,8 +1742,17 @@
           const [testimonials, setTestimonials] = useState([]);
           const [events, setEvents] = useState([]);
           const [notices, setNotices] = useState([]);
+          const [donations, setDonations] = useState([]);
           
           const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+          
+          // Global Toast State
+          const [toastMsg, setToastMsg] = useState('');
+
+          const showToast = (msg) => {
+              setToastMsg(msg);
+              setTimeout(() => setToastMsg(''), 3000);
+          };
 
           useEffect(() => {
               const handleHashChange = () => {
@@ -1535,6 +1797,9 @@
                 
                 const { data: noticesData } = await supabaseClient.from('notices').select('*').order('date', { ascending: false }).order('id', { ascending: false });
                 if(noticesData) setNotices(noticesData);
+                
+                const { data: dData } = await supabaseClient.from('donations').select('*').order('id', { ascending: false });
+                if(dData) setDonations(dData);
 
             } catch (error) {
                 console.error("Supabase Database Error:", error);
@@ -1552,12 +1817,12 @@
 
           const renderPage = () => {
             switch (currentPage) {
-              case 'home': return <Home dbError={dbError} marqueeText={marqueeText} testimonials={testimonials} featuredTestimonialIds={featuredTestimonialIds} committeeMembers={committeeMembers} events={events} notices={notices} navigateTo={navigateTo} />;
+              case 'home': return <Home dbError={dbError} marqueeText={marqueeText} testimonials={testimonials} featuredTestimonialIds={featuredTestimonialIds} committeeMembers={committeeMembers} events={events} notices={notices} navigateTo={navigateTo} showToast={showToast} />;
               case 'committee': return <CommitteePage committeeMembers={committeeMembers} navigateTo={navigateTo} />;
               case 'testimonials': return <TestimonialsPage testimonials={testimonials} navigateTo={navigateTo} />;
-              case 'donation': return <DonationPage navigateTo={navigateTo} />;
+              case 'donation': return <DonationPage donations={donations} navigateTo={navigateTo} />;
               case 'history': return <HistoryPage navigateTo={navigateTo} />;
-              case 'event': return <EventsPage events={events} navigateTo={navigateTo} />;
+              case 'event': return <EventsPage events={events} navigateTo={navigateTo} showToast={showToast} />;
               case 'notice': return <NoticeBoardPage notices={notices} navigateTo={navigateTo} />;
               case 'admin': return <AdminPanel 
                                       supabaseClient={supabaseClient} dbError={dbError} navigateTo={navigateTo}
@@ -1566,14 +1831,24 @@
                                       committeeMembers={committeeMembers} setCommitteeMembers={setCommitteeMembers}
                                       testimonials={testimonials} setTestimonials={setTestimonials}
                                       events={events} setEvents={setEvents} notices={notices} setNotices={setNotices}
+                                      donations={donations} setDonations={setDonations}
                                       featuredTestimonialIds={featuredTestimonialIds} setFeaturedTestimonialIds={setFeaturedTestimonialIds}
+                                      showToast={showToast}
                                     />;
-              default: return <Home dbError={dbError} marqueeText={marqueeText} testimonials={testimonials} featuredTestimonialIds={featuredTestimonialIds} committeeMembers={committeeMembers} events={events} notices={notices} navigateTo={navigateTo} />;
+              default: return <Home dbError={dbError} marqueeText={marqueeText} testimonials={testimonials} featuredTestimonialIds={featuredTestimonialIds} committeeMembers={committeeMembers} events={events} notices={notices} navigateTo={navigateTo} showToast={showToast} />;
             }
           };
 
           return (
-            <div className="font-sans text-gray-900 selection:bg-yellow-300 selection:text-orange-900 overflow-x-hidden">
+            <div className="font-sans text-gray-900 selection:bg-yellow-300 selection:text-orange-900 overflow-x-hidden relative">
+              
+              {/* Global Toast Message */}
+              {toastMsg && (
+                <div className="fixed bottom-10 right-10 z-[100] bg-green-600 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 font-bold text-lg toast-animate border border-green-500">
+                  <i className="fas fa-check-circle text-2xl"></i> {toastMsg}
+                </div>
+              )}
+
               {currentPage !== 'admin' && <Header navigateTo={navigateTo} isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />}
               <main className="min-h-screen bg-white">
                 {isLoading && currentPage === 'home' ? (
