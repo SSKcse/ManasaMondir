@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <!-- Primary Meta Tags for SEO -->
     <title>শ্রী শ্রী মা মনসা মন্দির, গৈলা - ঐতিহাসিক পবিত্র তীর্থস্থান</title>
     <meta name="title" content="শ্রী শ্রী মা মনসা মন্দির, গৈলা - ঐতিহাসিক পবিত্র তীর্থস্থান">
@@ -26,26 +26,30 @@
     <meta property="twitter:title" content="শ্রী শ্রী মা মনসা মন্দির, গৈলা">
     <meta property="twitter:description" content="কবি বিজয় গুপ্তের প্রতিষ্ঠিত ঐতিহাসিক মন্দির। মায়ের আশীর্বাদে সবার জীবনে শান্তি ও সমৃদ্ধি নেমে আসুক।">
     <meta property="twitter:image" content="header image.jpg">
-    
+
     <!-- Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- FontAwesome Icons (CDN) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
+    <!-- Quill Editor (CDN) for Rich Text Box -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
     <!-- React & ReactDOM (CDN) -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    
+
     <!-- Babel for compiling JSX in the browser -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
+
     <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         body { font-family: 'Hind Siliguri', sans-serif; }
-        
+
         /* Modern CSS Marquee Animation */
         .marquee-wrapper {
             width: 100%;
@@ -65,7 +69,7 @@
             0% { transform: translateX(0); }
             100% { transform: translateX(-100%); }
         }
-        
+
         /* Custom Scrollbar for better UI */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #fff7ed; }
@@ -80,7 +84,7 @@
         .toast-animate {
             animation: slideUp 0.3s ease-out forwards;
         }
-        
+
         /* Glowing Avatar Animation */
         @keyframes spiritualGlow {
             0% { box-shadow: 0 0 15px rgba(250, 204, 21, 0.4); }
@@ -90,18 +94,28 @@
         .spiritual-avatar {
             animation: spiritualGlow 3s infinite alternate;
         }
+
+        /* Rich Text Editor Overrides */
+        .rich-text p { margin-bottom: 0.5em; }
+        .rich-text strong, .rich-text b { font-weight: bold; }
+        .rich-text em, .rich-text i { font-style: italic; }
+        .rich-text u { text-decoration: underline; }
+        .rich-text ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 0.5rem; }
+        .rich-text ol { list-style-type: decimal; margin-left: 1.5rem; margin-bottom: 0.5rem; }
+        .rich-text a { color: #2563eb; text-decoration: underline; }
+        .ql-editor { font-family: inherit; font-size: 14px; min-height: 120px; }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState, useEffect, useRef } = React;
 
         // --- Supabase Configuration ---
         const SUPABASE_URL = 'https://abdgizkkfyhewehfearj.supabase.co'; 
         const SUPABASE_ANON_KEY = 'sb_publishable_MsM2-K03tGNU3G-WWZvYUA_lKu53oT9';
-        
+
         // Initialize Supabase Client
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -112,6 +126,51 @@
           'ma manasa mondir font.jpg',
           'ma manasa mondir lake dighi view.jpg'
         ];
+
+        // --- Rich Text Editor Component ---
+        const QuillEditor = ({ value, onChange, placeholder }) => {
+            const editorRef = useRef(null);
+            const quillRef = useRef(null);
+
+            useEffect(() => {
+                if (editorRef.current && !quillRef.current && window.Quill) {
+                    quillRef.current = new window.Quill(editorRef.current, {
+                        theme: 'snow',
+                        placeholder: placeholder || 'এখানে বিস্তারিত লিখুন...',
+                        modules: {
+                            toolbar: [
+                                ['bold', 'italic', 'underline'],
+                                [{'list': 'ordered'}, {'list': 'bullet'}],
+                                ['link'],
+                                ['clean']
+                            ]
+                        }
+                    });
+                    quillRef.current.on('text-change', () => {
+                        onChange(quillRef.current.root.innerHTML);
+                    });
+                    if (value) {
+                        quillRef.current.root.innerHTML = value;
+                    }
+                }
+            }, []);
+
+            useEffect(() => {
+                if (quillRef.current && value !== quillRef.current.root.innerHTML) {
+                    if (!value || value === '<p><br></p>') {
+                        quillRef.current.root.innerHTML = '';
+                    } else if (quillRef.current.root.innerHTML === '<p><br></p>' || quillRef.current.root.innerHTML === '') {
+                        quillRef.current.root.innerHTML = value;
+                    }
+                }
+            }, [value]);
+
+            return (
+                <div className="bg-white rounded-xl border border-gray-300 overflow-hidden">
+                    <div ref={editorRef} />
+                </div>
+            );
+        };
 
         // --- Helper Functions ---
         const englishToBengaliNumber = (engStr) => {
@@ -132,18 +191,23 @@
         };
 
         const shareEvent = async (ev, showToast) => {
+            // Strip HTML for plain text sharing
+            const tempDiv = document.createElement("div");
+            tempDiv.innerHTML = ev.description;
+            const plainDescription = tempDiv.textContent || tempDiv.innerText || "";
+
             const shareData = {
                 title: ev.title,
-                text: `${ev.title}\n\n${ev.description}\n\nতারিখ: ${formatDateToBengali(ev.date)}\n\nবিস্তারিত জানতে ভিজিট করুন: `,
+                text: `${ev.title}\n\n${plainDescription}\n\nতারিখ: ${formatDateToBengali(ev.date)}\n\nবিস্তারিত জানতে ভিজিট করুন: `,
                 url: window.location.origin + window.location.pathname + '#event'
             };
-            
+
             try {
                 if (navigator.share) {
                     await navigator.share(shareData);
                 } else {
                     await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
-                    showToast('ইভেন্টের তথ্য কপি করা হয়েছে!');
+                    showToast('ইভেন্টের তথ্য কপি করা হয়েছে!');
                 }
             } catch (err) {
                 console.log('Share canceled or failed', err);
@@ -252,7 +316,7 @@
         const Home = ({ dbError, marqueeText, testimonials, featuredTestimonialIds, committeeMembers, events, notices, navigateTo, showToast }) => {
           const [currentImg, setCurrentImg] = useState(0);
           const [testIdx, setTestIdx] = useState(0);
-          
+
           const featuredTests = testimonials.filter(t => featuredTestimonialIds.includes(t.id));
           const displayTests = featuredTests.length > 0 ? featuredTests : testimonials.slice(0, 3);
 
@@ -278,10 +342,10 @@
             <div className="bg-orange-50 min-h-screen">
               {dbError && (
                 <div className="bg-red-600 text-white text-center py-2 text-sm font-bold shadow-md relative z-50">
-                   ⚠ Database error fetching data.
+                  ⚠ Database error fetching data.
                 </div>
               )}
-            
+
               {/* CSS Marquee */}
               <div className="bg-orange-800 text-yellow-200 py-2 border-b-2 border-yellow-500 marquee-wrapper shadow-inner">
                 <div className="marquee-text font-medium text-sm md:text-base">
@@ -295,9 +359,9 @@
                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/60 z-10"></div>
                    <img src="ma manasa mondir goila.jpg" alt="Ma Manasa" className="w-full h-full object-cover" />
                 </div>
-                
+
                 <div className="container mx-auto px-4 py-16 relative z-20 text-center flex flex-col items-center">
-                  
+
                   {/* Spiritual Profile Picture */}
                   <div className="w-56 h-56 md:w-56 md:h-56 mb-6 rounded-full p-1 spiritual-avatar bg-gradient-to-tr from-yellow-300 to-orange-500 relative">
                      <div className="absolute inset-0 rounded-full border-2 border-white/50 mix-blend-overlay"></div>
@@ -319,7 +383,7 @@
                     </button>
                   </div>
                 </div>
-                
+
                 {/* Unique Straight Bottom Edge */}
                 <div className="absolute bottom-0 w-full flex flex-col z-20">
                     <div className="h-[2px] bg-yellow-300 w-full opacity-70"></div>
@@ -336,21 +400,21 @@
                   <h2 className="text-3xl md:text-4xl font-bold text-orange-900 mb-4 font-serif">ফটো গ্যালারি</h2>
                   <div className="h-1.5 w-24 bg-yellow-500 mx-auto rounded-full"></div>
                 </div>
-                
+
                 <div className="relative w-full max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-2xl aspect-video bg-gray-900 group border-4 border-white">
                    {galleryImages.map((img, index) => (
                       <div key={index} className={`absolute inset-0 w-full h-full transition-opacity duration-1000 flex items-center justify-center text-gray-400 bg-gray-800 ${index === currentImg ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}>
                          <img src={img} alt={`Gallery ${index}`} className="w-full h-full object-cover" />
                       </div>
                    ))}
-                   
+
                    <button onClick={prevImg} className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-orange-600 text-white w-12 h-12 rounded-full opacity-0 group-hover:opacity-100 transition-all z-20 flex items-center justify-center">
                       <i className="fas fa-chevron-left"></i>
                    </button>
                    <button onClick={nextImg} className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-orange-600 text-white w-12 h-12 rounded-full opacity-0 group-hover:opacity-100 transition-all z-20 flex items-center justify-center">
                       <i className="fas fa-chevron-right"></i>
                    </button>
-                   
+
                    <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-3 z-20">
                       {galleryImages.map((_, i) => (
                          <div key={i} onClick={() => setCurrentImg(i)} className={`w-3 h-3 rounded-full cursor-pointer transition-all shadow-md ${i === currentImg ? 'bg-yellow-400 scale-150' : 'bg-white/60 hover:bg-white'}`}></div>
@@ -365,7 +429,7 @@
                   <div className="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-3xl shadow-lg p-8 md:p-12 flex flex-col md:flex-row items-center gap-10 border border-orange-100 relative overflow-hidden">
                     <div className="absolute -right-20 -top-20 w-64 h-64 bg-orange-200 rounded-full opacity-40 blur-3xl"></div>
                     <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-yellow-200 rounded-full opacity-40 blur-2xl"></div>
-                    
+
                     <div className="w-full md:w-1/3 flex justify-center relative z-10">
                       <div className="w-48 h-48 md:w-64 md:h-64 bg-white rounded-full flex items-center justify-center border-[6px] border-orange-300 shadow-xl overflow-hidden">
                         <img 
@@ -415,7 +479,7 @@
                                       <i className="fas fa-calendar-day"></i> {formatDateToBengali(n.date)}
                                    </span>
                                 </div>
-                                <p className="text-gray-600 text-sm line-clamp-2 mt-2">{n.text}</p>
+                                <div className="text-gray-600 text-sm line-clamp-2 mt-2 rich-text" dangerouslySetInnerHTML={{ __html: n.text }}></div>
                              </div>
                           ))}
                           {notices.length === 0 && <p className="text-gray-500 p-6 text-center">কোনো নোটিশ নেই।</p>}
@@ -432,15 +496,14 @@
                   <h2 className="text-3xl md:text-4xl font-bold text-orange-900 mb-4 font-serif">পুণ্যার্থীদের মতামত</h2>
                   <div className="h-1.5 w-24 bg-yellow-500 mx-auto rounded-full"></div>
                 </div>
-                
+
                 <div className="max-w-4xl mx-auto bg-gradient-to-b from-white to-orange-50 rounded-3xl shadow-xl p-8 md:p-14 text-center border border-orange-100 relative overflow-hidden transition-all duration-500">
                    <i className="fas fa-quote-left text-6xl text-orange-200/50 absolute top-6 left-6 md:left-10"></i>
                    <i className="fas fa-quote-right text-6xl text-orange-200/50 absolute bottom-6 right-6 md:right-10"></i>
-                   
+
                    <div className="relative z-10 min-h-[160px] flex flex-col justify-center items-center">
-                       <p className="text-gray-800 italic text-xl md:text-2xl leading-relaxed mb-8 max-w-2xl">
-                         "{displayTests[testIdx] ? displayTests[testIdx].text : ''}"
-                       </p>
+                       <div className="text-gray-800 italic text-xl md:text-2xl leading-relaxed mb-8 max-w-2xl rich-text" dangerouslySetInnerHTML={{ __html: displayTests[testIdx] ? displayTests[testIdx].text : '' }}>
+                       </div>
                        {displayTests[testIdx] && (
                        <div className="bg-white px-6 py-3 rounded-xl shadow-sm border border-orange-100 inline-block">
                           <h4 className="font-bold text-orange-900 text-lg">{displayTests[testIdx].name}</h4>
@@ -448,17 +511,17 @@
                        </div>
                        )}
                    </div>
-                   
+
                    <div className="flex justify-center gap-3 mt-10 relative z-10">
                       {displayTests.map((_, i) => (
                          <div key={i} onClick={() => setTestIdx(i)} className={`h-2.5 rounded-full cursor-pointer transition-all ${i === testIdx ? 'w-8 bg-orange-600' : 'w-2.5 bg-orange-300 hover:bg-orange-400'}`}></div>
                       ))}
                    </div>
                 </div>
-                
+
                 <div className="text-center mt-12">
                     <button onClick={() => navigateTo('testimonials')} className="bg-white border-[3px] border-orange-500 text-orange-600 px-10 py-3 rounded-full font-bold hover:bg-orange-50 hover:text-orange-700 transition-all shadow-md hover:shadow-lg inline-flex items-center gap-2">
-                      বিস্তারিত পড়ুন <i className="fas fa-arrow-right"></i>
+                      বিস্তারিত পড়ুন <i className="fas fa-arrow-right"></i>
                     </button>
                 </div>
               </section>
@@ -521,11 +584,11 @@
                             <span className="font-bold text-lg leading-tight">{formatDateToBengali(event.date)}</span>
                           </div>
                       )}
-                      
+
                       <div className="p-6 flex flex-col flex-grow bg-orange-50/30">
                         <h3 className="text-xl font-bold text-gray-800 mb-3 line-clamp-2">{event.title}</h3>
-                        <p className="text-gray-600 text-sm line-clamp-3 leading-relaxed flex-grow">{event.description}</p>
-                        
+                        <div className="text-gray-600 text-sm line-clamp-3 leading-relaxed flex-grow rich-text" dangerouslySetInnerHTML={{ __html: event.description }}></div>
+
                         <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
                             <button onClick={() => shareEvent(event, showToast)} className="text-gray-500 hover:text-blue-600 transition-colors flex items-center gap-1.5 text-sm font-medium">
                                 <i className="fas fa-share-alt"></i> শেয়ার
@@ -559,7 +622,7 @@
                 <p className="text-orange-700">কমিটির মেয়াদ: ২৯-০৮-২০২৪ হইতে ২৮-০৮-২০২৬ পর্যন্ত</p>
                 <div className="h-1 w-24 bg-yellow-500 mx-auto rounded-full mt-4"></div>
               </div>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {committeeMembers.map((member) => (
                   <div key={member.id} className="bg-white rounded-xl overflow-hidden shadow-md border border-orange-100 flex flex-col items-center p-6 hover:shadow-xl transition-shadow">
@@ -602,7 +665,7 @@
                      </div>
                      <div className="flex-grow">
                        <i className="fas fa-quote-left text-orange-200 mb-2 text-3xl"></i>
-                       <p className="text-gray-700 text-lg leading-relaxed mb-4">"{t.text}"</p>
+                       <div className="text-gray-700 text-lg leading-relaxed mb-4 rich-text" dangerouslySetInnerHTML={{ __html: t.text }}></div>
                        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-t border-gray-50 pt-4 mt-2">
                          <div>
                            <h4 className="font-bold text-orange-900 text-lg">{t.name}</h4>
@@ -653,8 +716,8 @@
                            </span>
                        </div>
                        <h3 className="text-2xl font-bold text-gray-800 mb-4">{event.title}</h3>
-                       <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-wrap mb-4">{event.description}</p>
-                       
+                       <div className="text-gray-700 leading-relaxed text-justify mb-4 rich-text" dangerouslySetInnerHTML={{ __html: event.description }}></div>
+
                        <div className="mt-auto pt-4 border-t border-gray-100 flex justify-end">
                            <button onClick={() => shareEvent(event, showToast)} className="text-blue-600 hover:text-white hover:bg-blue-600 bg-blue-50 border border-blue-200 px-4 py-2 rounded-lg transition-colors shadow-sm flex items-center gap-2 font-bold">
                                <i className="fas fa-share-alt"></i> শেয়ার করুন
@@ -693,7 +756,7 @@
                          <i className="fas fa-calendar-day text-xs"></i> {formatDateToBengali(notice.date)}
                        </span>
                      </div>
-                     <p className="text-gray-700 leading-relaxed">{notice.text}</p>
+                     <div className="text-gray-700 leading-relaxed rich-text" dangerouslySetInnerHTML={{ __html: notice.text }}></div>
                    </div>
                  ))}
                  {notices.length === 0 && (
@@ -738,19 +801,15 @@
                        <i className="fas fa-mobile-alt text-yellow-600"></i> মোবাইল ব্যাংকিং
                     </h3>
                     <div className="space-y-6">
-                      <div className="flex items-center gap-5 bg-pink-50 p-5 rounded-xl border border-pink-200 shadow-sm">
-                        <div className="w-14 h-14 bg-pink-600 text-white font-bold rounded-xl flex items-center justify-center text-sm shadow-md">bKash</div>
-                        <div>
-                          <p className="text-sm text-gray-500 font-semibold mb-1">বিকাশ (মার্চেন্ট)</p>
-                          <p className="text-2xl font-bold text-gray-800 tracking-wider">০১৭XX-XXXXXX</p>
+                      <div className="flex items-center gap-5 bg-pink-50 p-5 rounded-xl border border-pink-200 shadow-sm flex-wrap sm:flex-nowrap">
+                        <div className="w-14 h-14 bg-pink-600 text-white font-bold rounded-xl flex items-center justify-center text-sm shadow-md shrink-0">bKash</div>
+                        <div className="flex-grow">
+                          <p className="text-sm text-gray-600 font-semibold mb-1">বিকাশ (পার্সোনাল অ্যাকাউন্ট, সেন্ড মানি করবেন)</p>
+                          <p className="text-2xl font-bold text-gray-800 tracking-wider">০১৭২২৪২৮৩৩৪</p>
                         </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-5 bg-orange-50 p-5 rounded-xl border border-orange-200 shadow-sm">
-                        <div className="w-14 h-14 bg-orange-600 text-white font-bold rounded-xl flex items-center justify-center text-sm shadow-md">Nagad</div>
-                        <div>
-                          <p className="text-sm text-gray-500 font-semibold mb-1">নগদ (মার্চেন্ট)</p>
-                          <p className="text-2xl font-bold text-gray-800 tracking-wider">০১৭XX-XXXXXX</p>
+                        {/* QR Code Section */}
+                        <div className="shrink-0 mt-3 sm:mt-0">
+                           <img src="bkash_qr.png" alt="bKash QR Code" className="w-24 h-24 border-2 border-pink-300 rounded-lg shadow-sm bg-white p-1" />
                         </div>
                       </div>
                     </div>
@@ -798,7 +857,7 @@
                       </div>
                    </div>
                 </div>
-                
+
                 <div className="bg-gradient-to-r from-orange-800 to-orange-900 text-white p-8 rounded-2xl text-center shadow-xl border border-orange-700">
                    <p className="text-xl italic font-medium">"আপনার প্রদানকৃত অনুদানের সঠিক ব্যবহারে আমরা প্রতিজ্ঞাবদ্ধ। মা মনসা আপনার সহায় হোক।"</p>
                 </div>
@@ -813,12 +872,12 @@
                <BackButton navigateTo={navigateTo} />
                <div className="bg-white p-8 md:p-14 rounded-3xl shadow-xl border border-orange-100">
                   <h1 className="text-4xl md:text-5xl font-bold text-orange-900 mb-8 text-center border-b-2 border-yellow-500 pb-4 font-serif">ইতিহাস ও ঐতিহ্য</h1>
-                  
+
                   <div className="text-gray-700 text-justify leading-loose text-lg space-y-6">
                     <p>
                       মধ্যযুগের অন্যতম শ্রেষ্ঠ বাঙালি কবি বিজয় গুপ্ত। তিনি বরিশাল জেলার আগৈলঝাড়া উপজেলার গৈলা (তকালীন ফুল্লশ্রী) গ্রামে জন্মগ্রহণ করেন। তাঁর রচিত "পদ্মাপুরাণ" বা "মনসামঙ্গল" কাব্য বাংলা সাহিত্যের এক অমূল্য সম্পদ।
                     </p>
-                    
+
                     <p>
                       কিংবদন্তি ও ইতিহাস অনুযায়ী, কবি বিজয় গুপ্ত স্বয়ং দেবী মনসার স্বপ্নাদিষ্ট হয়ে এই স্থানে মনসা মন্দির প্রতিষ্ঠা করেছিলেন। পঞ্চদশ শতাব্দীতে প্রতিষ্ঠিত এই মন্দিরটি শুধু একটি উপাসনালয় নয়, বরং বাঙালির প্রাচীন সংস্কৃতির এক জীবন্ত সাক্ষী।
                     </p>
@@ -876,7 +935,7 @@
             e.preventDefault();
             setIsSaving(true);
             setErrorMsg('');
-            
+
             const { data, error } = await supabaseClient.auth.signInWithPassword({
               email: loginEmail,
               password: loginPass,
@@ -929,7 +988,7 @@
             e.preventDefault();
             if(!newMember.name || !newMember.role) return;
             setIsSaving(true);
-            
+
             const memberData = { 
                 name: newMember.name, 
                 role: newMember.role, 
@@ -941,7 +1000,7 @@
                 if(editingCommitteeId) {
                     const { error } = await supabaseClient.from('committee').update(memberData).eq('id', editingCommitteeId);
                     if (error) throw error;
-                    
+
                     setCommitteeMembers(committeeMembers.map(m => m.id === editingCommitteeId ? { ...m, ...memberData } : m));
                     showToast('সদস্যের তথ্য আপডেট করা হয়েছে!');
                     setEditingCommitteeId(null);
@@ -996,7 +1055,7 @@
                       id: m.id, name: m.name, role: m.role, phone: m.phone, image: m.image, order_idx: m.order_idx
                   }));
                   await supabaseClient.from('committee').upsert(updates);
-                  showToast('অর্ডার সেভ হয়েছে!');
+                  showToast('অর্ডার সেভ হয়েছে!');
               } catch (e) {
                   setErrorMsg("Order save failed.");
               }
@@ -1011,7 +1070,7 @@
                   if (editingTestimonialId) {
                       const { error } = await supabaseClient.from('testimonials').update(newTestimonial).eq('id', editingTestimonialId);
                       if(error) throw error;
-                      
+
                       let updatedList = testimonials.map(t => t.id === editingTestimonialId ? { ...t, ...newTestimonial } : t);
                       updatedList.sort((a,b) => new Date(b.date) - new Date(a.date));
                       setTestimonials(updatedList);
@@ -1042,14 +1101,14 @@
                   const { error } = await supabaseClient.from('testimonials').delete().eq('id', id);
                   if(error) throw error;
                   setTestimonials(testimonials.filter(item => item.id !== id));
-                  
+
                   if (featuredTestimonialIds.includes(id)) {
                       const updatedIds = featuredTestimonialIds.filter(x => x !== id);
                       setFeaturedTestimonialIds(updatedIds);
                       const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'featured_test_ids').maybeSingle();
                       if(existing) await supabaseClient.from('settings').update({ value: JSON.stringify(updatedIds) }).eq('id', existing.id);
                   }
-                  
+
                   showToast('মতামত মুছে ফেলা হয়েছে!');
               } catch (err) {
                   setErrorMsg("Error deleting testimonial.");
@@ -1057,7 +1116,7 @@
                   setIsSaving(false);
               }
           };
-          
+
           const handleToggleFeaturedTestimonial = async (id) => {
               setIsSaving(true);
               try {
@@ -1067,14 +1126,14 @@
                   } else {
                       updatedIds.push(id);
                   }
-                  
+
                   const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'featured_test_ids').maybeSingle();
                   if (existing) {
                       await supabaseClient.from('settings').update({ value: JSON.stringify(updatedIds) }).eq('id', existing.id);
                   } else {
                       await supabaseClient.from('settings').insert({ key: 'featured_test_ids', value: JSON.stringify(updatedIds) });
                   }
-                  
+
                   setFeaturedTestimonialIds(updatedIds);
                   showToast('হোমপেজ ফিচার্ড লিস্ট আপডেট হয়েছে!');
               } catch (err) {
@@ -1083,7 +1142,7 @@
                   setIsSaving(false);
               }
           };
-          
+
           // -- Notices --
           const handleSaveNotice = async (e) => {
               e.preventDefault();
@@ -1092,7 +1151,7 @@
                   if (editingNoticeId) {
                       const { error } = await supabaseClient.from('notices').update(newNotice).eq('id', editingNoticeId);
                       if(error) throw error;
-                      
+
                       let updatedNotices = notices.map(n => n.id === editingNoticeId ? { ...n, ...newNotice } : n);
                       updatedNotices.sort((a, b) => new Date(b.date) - new Date(a.date));
                       setNotices(updatedNotices);
@@ -1115,7 +1174,7 @@
                   setIsSaving(false);
               }
           };
-          
+
           const handleDeleteNotice = async (id) => {
               if(!confirm('নোটিশটি মুছে ফেলতে চান?')) return;
               setIsSaving(true);
@@ -1139,7 +1198,7 @@
                   if (editingEventId) {
                       const { error } = await supabaseClient.from('events').update(newEvent).eq('id', editingEventId);
                       if(error) throw error;
-                      
+
                       let updatedEvents = events.map(ev => ev.id === editingEventId ? { ...ev, ...newEvent } : ev);
                       updatedEvents.sort((a, b) => new Date(b.date) - new Date(a.date));
                       setEvents(updatedEvents);
@@ -1162,7 +1221,7 @@
                   setIsSaving(false);
               }
           };
-          
+
           const handleDeleteEvent = async (id) => {
               if(!confirm('ইভেন্টটি মুছে ফেলতে চান?')) return;
               setIsSaving(true);
@@ -1186,7 +1245,7 @@
                   if (editingDonationId) {
                       const { error } = await supabaseClient.from('donations').update(newDonation).eq('id', editingDonationId);
                       if(error) throw error;
-                      
+
                       let updatedD = donations.map(d => d.id === editingDonationId ? { ...d, ...newDonation } : d);
                       updatedD.sort((a, b) => b.id - a.id);
                       setDonations(updatedD);
@@ -1252,7 +1311,7 @@
                     <p className="text-sm text-gray-500 mt-1">অ্যাক্সেস করতে লগইন করুন</p>
                   </div>
                   {errorMsg && <div className="bg-red-50 text-red-600 p-3 rounded mb-4 text-sm text-center border border-red-100 font-medium">{errorMsg}</div>}
-                  
+
                   <form onSubmit={handleLogin} className="space-y-5">
                     <div>
                       <label className="block text-sm font-bold text-gray-700 mb-1">ইমেইল (Email)</label>
@@ -1371,17 +1430,18 @@
                           <input type="text" value={newMember.phone} onChange={e=>setNewMember({...newMember, phone: e.target.value})} className="w-full px-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-orange-500" placeholder="উদা: ০১৭১..." />
                         </div>
                         <div>
-                          <label className="block text-sm font-bold text-gray-700 mb-1">ছবি (ঐচ্ছিক)</label>
-                          <div className="flex gap-2 items-center">
+                          <label className="block text-sm font-bold text-gray-700 mb-1">ছবি (আপলোড বা লিংক)</label>
+                          <div className="flex flex-col gap-2">
                              <label className="flex-grow cursor-pointer bg-white border border-gray-300 px-4 py-2.5 rounded-xl text-sm hover:bg-gray-50 flex items-center justify-center gap-2 overflow-hidden shadow-sm">
-                               <i className="fas fa-image text-gray-500"></i>
-                               <span className="text-gray-600 truncate font-medium">{newMember.image ? 'ছবি যুক্ত' : 'আপলোড করুন'}</span>
+                               <i className="fas fa-upload text-gray-500"></i>
+                               <span className="text-gray-600 truncate font-medium">{(newMember.image && newMember.image.startsWith('data:')) ? 'ছবি আপলোড করা হয়েছে' : 'ডিভাইস থেকে আপলোড'}</span>
                                <input type="file" accept="image/*" onChange={(e) => handleImageChange(e, setNewMember, newMember)} className="hidden" />
                              </label>
-                             {newMember.image && (
-                               <img src={newMember.image} alt="Preview" className="w-10 h-10 object-cover rounded-lg border border-gray-300 shadow-sm shrink-0" />
-                             )}
+                             <input type="text" value={(!newMember.image || newMember.image.startsWith('data:')) ? '' : newMember.image} onChange={(e) => setNewMember({...newMember, image: e.target.value})} className="w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-orange-500" placeholder="অথবা ড্রাইভ লিংক দিন..." />
                           </div>
+                          {newMember.image && (
+                             <img src={newMember.image} alt="Preview" className="w-16 h-16 object-cover rounded-lg border border-gray-300 shadow-sm mt-2" />
+                          )}
                         </div>
                         <div className="lg:col-span-4 mt-2 flex gap-3">
                            <button type="submit" disabled={isSaving} className="w-full bg-green-600 text-white px-6 py-3 rounded-xl hover:bg-green-700 flex items-center justify-center gap-2 font-bold disabled:opacity-50 shadow-md">
@@ -1394,8 +1454,8 @@
                       </form>
 
                       <h3 className="text-xl font-bold text-gray-800 mb-4 border-b pb-3 flex items-center justify-between">
-                          <span><i className="fas fa-list text-orange-500 mr-2"></i> বর্তমান কমিটি লিস্ট</span>
-                          <span className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">{committeeMembers.length} জন</span>
+                         <span><i className="fas fa-list text-orange-500 mr-2"></i> বর্তমান কমিটি লিস্ট</span>
+                         <span className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">{committeeMembers.length} জন</span>
                       </h3>
                       <div className="overflow-x-auto rounded-xl border border-gray-200">
                         <table className="w-full text-left border-collapse bg-white">
@@ -1462,7 +1522,7 @@
                           </div>
                           <div className="md:col-span-2">
                               <label className="block text-sm font-bold text-gray-700 mb-1">মতামত <span className="text-red-500">*</span></label>
-                              <textarea value={newTestimonial.text} onChange={e=>setNewTestimonial({...newTestimonial, text: e.target.value})} required className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500 min-h-[100px]" placeholder="মতামত লিখুন..."></textarea>
+                              <QuillEditor value={newTestimonial.text} onChange={val => setNewTestimonial({...newTestimonial, text: val})} placeholder="মতামত লিখুন..." />
                           </div>
                           <div className="md:col-span-2 mt-2 flex gap-3">
                            <button type="submit" disabled={isSaving} className="w-full bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 flex items-center justify-center gap-2 font-bold disabled:opacity-50 shadow-md">
@@ -1487,7 +1547,7 @@
                                   {featuredTestimonialIds.includes(t.id) && <span className="text-yellow-600 bg-yellow-50 border border-yellow-200 text-[10px] px-2 py-0.5 rounded-full"><i className="fas fa-star"></i> হোমপেজ</span>}
                               </p>
                               <p className="text-sm text-orange-600 mb-3 font-semibold">{t.designation}</p>
-                              <p className="text-gray-600 italic bg-gray-50 p-3 rounded-lg border-l-4 border-gray-300">"{t.text}"</p>
+                              <div className="text-gray-600 italic bg-gray-50 p-3 rounded-lg border-l-4 border-gray-300 rich-text" dangerouslySetInnerHTML={{ __html: t.text }}></div>
                             </div>
                             <div className="flex gap-2 self-end md:self-start bg-gray-50 p-2 rounded-xl border border-gray-100">
                               <button type="button" onClick={() => handleToggleFeaturedTestimonial(t.id)} className={`p-2.5 rounded-lg transition-colors shadow-sm border ${featuredTestimonialIds.includes(t.id) ? 'bg-yellow-100 text-yellow-600 border-yellow-200 hover:bg-yellow-200' : 'bg-white text-gray-400 border-gray-200 hover:text-yellow-500'}`} title={featuredTestimonialIds.includes(t.id) ? "হোমপেজ থেকে সরান" : "হোমপেজে দেখান"}>
@@ -1505,7 +1565,7 @@
                       </div>
                     </div>
                   )}
-                  
+
                   {activeTab === 'notices' && (
                     <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
                       <h3 className="text-xl font-bold text-gray-800 mb-6 border-b pb-3 flex items-center gap-2"><i className="fas fa-bullhorn text-orange-500"></i> {editingNoticeId ? 'নোটিশ আপডেট করুন' : 'নতুন নোটিশ যোগ করুন'}</h3>
@@ -1520,7 +1580,7 @@
                           </div>
                           <div className="md:col-span-2">
                               <label className="block text-sm font-bold text-gray-700 mb-1">নোটিশের বিবরণ <span className="text-red-500">*</span></label>
-                              <textarea value={newNotice.text} onChange={e=>setNewNotice({...newNotice, text: e.target.value})} required className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500 min-h-[100px]" placeholder="বিস্তারিত লিখুন..."></textarea>
+                              <QuillEditor value={newNotice.text} onChange={val => setNewNotice({...newNotice, text: val})} placeholder="বিস্তারিত লিখুন..." />
                           </div>
                           <div className="md:col-span-2 mt-2 flex gap-3">
                            <button type="submit" disabled={isSaving} className="w-full bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 flex items-center justify-center gap-2 font-bold disabled:opacity-50 shadow-md">
@@ -1531,7 +1591,7 @@
                            )}
                         </div>
                       </form>
-                      
+
                       <div className="flex justify-between items-center mb-6 border-b pb-3 mt-8">
                          <h3 className="text-xl font-bold text-gray-800"><i className="fas fa-list text-orange-500 mr-2"></i> বর্তমান নোটিশসমূহ</h3>
                          <span className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full font-bold">Total: {notices.length}</span>
@@ -1546,7 +1606,7 @@
                                       <i className="fas fa-calendar-day"></i> {formatDateToBengali(n.date)}
                                     </span>
                                   </div>
-                                  <p className="text-gray-600 leading-relaxed bg-gray-50 p-3 rounded-lg border border-gray-100">{n.text}</p>
+                                  <div className="text-gray-600 leading-relaxed bg-gray-50 p-3 rounded-lg border border-gray-100 rich-text" dangerouslySetInnerHTML={{ __html: n.text }}></div>
                                 </div>
                                 <div className="flex gap-2 self-end md:self-start bg-gray-50 p-2 rounded-xl border border-gray-100">
                                   <button type="button" onClick={() => {setNewNotice(n); setEditingNoticeId(n.id); window.scrollTo(0,0);}} className="text-blue-600 hover:text-white hover:bg-blue-600 bg-white border border-blue-200 p-2.5 rounded-lg transition-colors shadow-sm" title="এডিট">
@@ -1559,7 +1619,7 @@
                               </div>
                           ))}
                           {notices.length === 0 && (
-                              <p className="text-center text-gray-500 p-10 bg-white rounded-xl shadow-sm border border-gray-100">এখনো কোনো নোটিশ যোগ করা হয়নি。</p>
+                              <p className="text-center text-gray-500 p-10 bg-white rounded-xl shadow-sm border border-gray-100">এখনো কোনো নোটিশ যোগ করা হয়নি।</p>
                           )}
                       </div>
                     </div>
@@ -1578,21 +1638,22 @@
                               <input type="date" value={newEvent.date} onChange={e=>setNewEvent({...newEvent, date: e.target.value})} required className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm text-gray-700 focus:ring-2 focus:ring-orange-500" />
                           </div>
                           <div className="lg:col-span-1">
-                              <label className="block text-sm font-bold text-gray-700 mb-1">ছবি (ঐচ্ছিক)</label>
-                              <div className="flex gap-2 items-center">
+                              <label className="block text-sm font-bold text-gray-700 mb-1">ছবি (আপলোড বা লিংক)</label>
+                              <div className="flex flex-col gap-2">
                                  <label className="flex-grow cursor-pointer bg-white border border-gray-300 px-4 py-2.5 rounded-xl text-sm hover:bg-gray-50 flex items-center justify-center gap-2 overflow-hidden shadow-sm">
-                                   <i className="fas fa-image text-gray-500"></i>
-                                   <span className="text-gray-600 truncate font-medium">{newEvent.image ? 'ছবি যুক্ত' : 'আপলোড করুন'}</span>
+                                   <i className="fas fa-upload text-gray-500"></i>
+                                   <span className="text-gray-600 truncate font-medium">{(newEvent.image && newEvent.image.startsWith('data:')) ? 'ছবি আপলোড করা হয়েছে' : 'ডিভাইস থেকে আপলোড'}</span>
                                    <input type="file" accept="image/*" onChange={(e) => handleImageChange(e, setNewEvent, newEvent)} className="hidden" />
                                  </label>
-                                 {newEvent.image && (
-                                   <img src={newEvent.image} alt="Preview" className="w-10 h-10 object-cover rounded-lg border border-gray-300 shadow-sm shrink-0" />
-                                 )}
+                                 <input type="text" value={(!newEvent.image || newEvent.image.startsWith('data:')) ? '' : newEvent.image} onChange={(e) => setNewEvent({...newEvent, image: e.target.value})} className="w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-orange-500" placeholder="অথবা গুগ্‌ল ড্রাইভ লিংক দিন..." />
                               </div>
+                              {newEvent.image && (
+                                 <img src={newEvent.image} alt="Preview" className="w-16 h-16 object-cover rounded-lg border border-gray-300 shadow-sm mt-2" />
+                              )}
                           </div>
                           <div className="md:col-span-2 lg:col-span-3">
                               <label className="block text-sm font-bold text-gray-700 mb-1">ইভেন্টের বিস্তারিত <span className="text-red-500">*</span></label>
-                              <textarea value={newEvent.description} onChange={e=>setNewEvent({...newEvent, description: e.target.value})} required className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500 min-h-[100px]" placeholder="বিস্তারিত লিখুন..."></textarea>
+                              <QuillEditor value={newEvent.description} onChange={val => setNewEvent({...newEvent, description: val})} placeholder="বিস্তারিত লিখুন..." />
                           </div>
                           <div className="md:col-span-2 lg:col-span-3 mt-2 flex gap-3">
                            <button type="submit" disabled={isSaving} className="w-full bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 flex items-center justify-center gap-2 font-bold disabled:opacity-50 shadow-md">
@@ -1603,7 +1664,7 @@
                            )}
                         </div>
                       </form>
-                      
+
                       <div className="flex justify-between items-center mb-6 border-b pb-3 mt-8">
                          <h3 className="text-xl font-bold text-gray-800"><i className="fas fa-list text-orange-500 mr-2"></i> বর্তমান ইভেন্টসমূহ</h3>
                          <span className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full font-bold">Total: {events.length}</span>
@@ -1623,7 +1684,7 @@
                                       <i className="fas fa-calendar-alt"></i> {formatDateToBengali(ev.date)}
                                     </span>
                                   </div>
-                                  <p className="text-gray-600 leading-relaxed bg-gray-50 p-3 rounded-lg border border-gray-100">{ev.description}</p>
+                                  <div className="text-gray-600 leading-relaxed bg-gray-50 p-3 rounded-lg border border-gray-100 rich-text" dangerouslySetInnerHTML={{ __html: ev.description }}></div>
                                 </div>
                                 <div className="flex gap-2 self-end md:self-start bg-gray-50 p-2 rounded-xl border border-gray-100 shrink-0">
                                   <button type="button" onClick={() => {setNewEvent(ev); setEditingEventId(ev.id); window.scrollTo(0,0);}} className="text-blue-600 hover:text-white hover:bg-blue-600 bg-white border border-blue-200 p-2.5 rounded-lg transition-colors shadow-sm" title="এডিট">
@@ -1676,7 +1737,7 @@
                            )}
                         </div>
                       </form>
-                      
+
                       <div className="flex justify-between items-center mb-6 border-b pb-3 mt-8">
                          <h3 className="text-xl font-bold text-gray-800"><i className="fas fa-list text-orange-500 mr-2"></i> বর্তমান দাতাদের তালিকা</h3>
                          <span className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full font-bold">Total: {donations ? donations.length : 0}</span>
@@ -1738,11 +1799,11 @@
           const [currentPage, setCurrentPage] = useState(() => {
               return window.location.hash.replace('#', '') || 'home';
           });
-          
+
           const [isMenuOpen, setIsMenuOpen] = useState(false);
           const [isLoading, setIsLoading] = useState(true);
           const [dbError, setDbError] = useState(false);
-          
+
           const [marqueeText, setMarqueeText] = useState('মন্দিরে স্বাগতম ✦ মায়ের আশীর্বাদ আপনার সহায় হোক ✦ ঐশ্বরিক উপস্থিতি অনুভব করুন');
           const [featuredTestimonialIds, setFeaturedTestimonialIds] = useState([]);
           const [committeeMembers, setCommitteeMembers] = useState([]);
@@ -1750,9 +1811,9 @@
           const [events, setEvents] = useState([]);
           const [notices, setNotices] = useState([]);
           const [donations, setDonations] = useState([]);
-          
+
           const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
-          
+
           // Global Toast State
           const [toastMsg, setToastMsg] = useState('');
 
@@ -1801,10 +1862,10 @@
 
                 const { data: eventsData } = await supabaseClient.from('events').select('*').order('date', { ascending: false }).order('id', { ascending: false });
                 if(eventsData) setEvents(eventsData);
-                
+
                 const { data: noticesData } = await supabaseClient.from('notices').select('*').order('date', { ascending: false }).order('id', { ascending: false });
                 if(noticesData) setNotices(noticesData);
-                
+
                 const { data: dData } = await supabaseClient.from('donations').select('*').order('id', { ascending: false });
                 if(dData) setDonations(dData);
 
@@ -1848,7 +1909,7 @@
 
           return (
             <div className="font-sans text-gray-900 selection:bg-yellow-300 selection:text-orange-900 overflow-x-hidden relative">
-              
+
               {/* Global Toast Message */}
               {toastMsg && (
                 <div className="fixed bottom-10 right-10 z-[100] bg-green-600 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 font-bold text-lg toast-animate border border-green-500">
