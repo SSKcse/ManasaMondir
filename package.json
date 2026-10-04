@@ -15,5 +15,8 @@
     "goila"
   ],
   "author": "Arpon Chakraborty",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
 }
