@@ -1844,7 +1844,7 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
 
           {/* Card 3: Donation & Receipt */}
           <div
-            onClick={() => navigateTo('donation')}
+            onClick={() => navigateTo('receipt')}
             className="cursor-pointer bg-white p-6 sm:p-7 rounded-3xl shadow-xl hover:shadow-2xl border-2 border-yellow-300/80 hover:border-yellow-500 transition-all duration-300 hover:-translate-y-2 relative overflow-hidden group card-hover-glow"
           >
             <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-amber-400 via-yellow-400 to-orange-500"></div>
@@ -3973,8 +3973,15 @@ const NoticeBoardPage = ({ notices, navigateTo, lang }) => (
   </div>
 );
 
-const DonationPage = ({ donations, navigateTo, showToast, lang }) => {
-  const [activeTab, setActiveTab] = useState('methods'); // 'methods' or 'receipt'
+const DonationPage = ({ donations, navigateTo, showToast, lang, defaultTab = 'methods' }) => {
+  const [activeTab, setActiveTab] = useState(defaultTab); // 'methods' or 'receipt'
+
+  useEffect(() => {
+    if (defaultTab) {
+      setActiveTab(defaultTab);
+    }
+  }, [defaultTab]);
+
   const [receiptForm, setReceiptForm] = useState({
     name: '',
     phone: '',
@@ -6903,7 +6910,8 @@ function App() {
       case 'mantras': return <MantrasPage mantras={mantras} navigateTo={navigateTo} lang={lang} showToast={showToast} />;
       case 'committee': return <CommitteePage committeeMembers={committeeMembers} navigateTo={navigateTo} lang={lang} />;
       case 'testimonials': return <TestimonialsPage testimonials={testimonials} navigateTo={navigateTo} lang={lang} />;
-      case 'donation': return <DonationPage donations={donations} navigateTo={navigateTo} showToast={showToast} lang={lang} />;
+      case 'donation': return <DonationPage donations={donations} navigateTo={navigateTo} showToast={showToast} lang={lang} defaultTab="methods" />;
+      case 'receipt': return <DonationPage donations={donations} navigateTo={navigateTo} showToast={showToast} lang={lang} defaultTab="receipt" />;
       case 'history': return <HistoryPage navigateTo={navigateTo} lang={lang} />;
       case 'booking': return <BookingPage navigateTo={navigateTo} showToast={showToast} lang={lang} />;
       case 'royani': return <RoyaniPage navigateTo={navigateTo} showToast={showToast} lang={lang} />;
