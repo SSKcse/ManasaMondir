@@ -2,7 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const PORT = 5173;
+let PORT = parseInt(process.env.PORT || '3000', 10);
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
   '.css': 'text/css',
@@ -45,6 +45,22 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}/`);
-});
+function startServer(port) {
+  server.listen(port, () => {
+    console.log(`\n========================================`);
+    console.log(` Shree Shree Maa Manasa Mandir Server`);
+    console.log(` Local:   http://localhost:${port}/`);
+    console.log(`========================================\n`);
+  });
+
+  server.once('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.log(`Port ${port} is in use, trying port ${port + 1}...`);
+      startServer(port + 1);
+    } else {
+      console.error(err);
+    }
+  });
+}
+
+startServer(PORT);

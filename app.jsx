@@ -384,10 +384,22 @@ const galleryImages = [
   'ma manasa mondir lake dighi view.jpg'
 ];
 
+const galleryCaptions = [
+  { bn: 'শ্রীশ্রী মা মনসা মন্দির তোরণ ও মূল প্রাঙ্গণ', en: 'Temple Entrance & Main Courtyard' },
+  { bn: 'ঐতিহাসিক শ্রীশ্রী মা মনসা মন্দির নাটমন্দির', en: 'Historic Natmandir of Manasa Temple' },
+  { bn: 'শ্রীশ্রী মা মনসা মন্দিরের পবিত্র সম্মুখভাগ', en: 'Front Façade of Sacred Sanctum' },
+  { bn: 'মনসা মন্দিরের পবিত্র ঘটের দীঘি ও মনোরম পরিবেশ', en: 'Sacred Temple Lake (Ghoter Dighi)' }
+];
+
 // --- Rich Text Editor Component ---
 const QuillEditor = ({ value, onChange, placeholder }) => {
   const editorRef = useRef(null);
   const quillRef = useRef(null);
+  const onChangeRef = useRef(onChange);
+
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  });
 
   useEffect(() => {
     if (editorRef.current && !quillRef.current && window.Quill) {
@@ -404,7 +416,9 @@ const QuillEditor = ({ value, onChange, placeholder }) => {
         }
       });
       quillRef.current.on('text-change', () => {
-        onChange(quillRef.current.root.innerHTML);
+        if (onChangeRef.current) {
+          onChangeRef.current(quillRef.current.root.innerHTML);
+        }
       });
       if (value) {
         quillRef.current.root.innerHTML = value;
@@ -467,6 +481,9 @@ const I18N = {
     allCategory: "সকল",
     copyMantra: "মন্ত্র কপি করুন",
     playChime: "পবিত্র ঘণ্টা",
+    playShankh: "পবিত্র শঙ্খধ্বনি",
+    bellRungToast: "পবিত্র ঘণ্টা ধ্বনি বাজানো হয়েছে 🔔",
+    shankhBlownToast: "পবিত্র শঙ্খধ্বনি বাজানো হয়েছে 🐚",
     shareMantra: "শেয়ার করুন",
     mantraCopied: "মন্ত্রটি ক্লিপবোর্ডে কপি করা হয়েছে!",
     liveStatusLabel: "লাইভ দর্শন স্ট্যাটাস",
@@ -601,7 +618,7 @@ const I18N = {
     adminLogin: "এডমিন লগইন",
     contact: "যোগাযোগ",
     locationValue: "গৈলা, আগৈলঝাড়া, বরিশাল, বাংলাদেশ",
-    presidentPhone: "০১৭১৭৫০৩৬৫৭ (সভাপতি)",
+    presidentPhone: "০১৭১৭-৫০৩৬৫৭ (সভাপতি)",
     copyright: "মনসা মন্দির গৈলা। সর্বস্বত্ব সংরক্ষিত।",
     developedBy: "ওয়েবসাইট নির্মাণে:"
   },
@@ -638,6 +655,9 @@ const I18N = {
     allCategory: "All",
     copyMantra: "Copy Mantra",
     playChime: "Sacred Bell",
+    playShankh: "Sacred Conch",
+    bellRungToast: "Sacred temple bell rung 🔔",
+    shankhBlownToast: "Sacred conch shell blown 🐚",
     shareMantra: "Share",
     mantraCopied: "Mantra copied to clipboard!",
     liveStatusLabel: "Live Darshan Status",
@@ -772,7 +792,7 @@ const I18N = {
     adminLogin: "Admin Login",
     contact: "Contact",
     locationValue: "Goila, Agailjhara, Barishal, Bangladesh",
-    presidentPhone: "01717503657 (President)",
+    presidentPhone: "01717-503657 (President)",
     copyright: "Manasa Mandir Goila. All rights reserved.",
     developedBy: "Site Developed by:"
   }
@@ -833,8 +853,33 @@ const translateRole = (role, lang = 'bn') => {
   return clean;
 };
 
-// Sleek Pill-Style Language Switcher Component
-
+// --- Reusable Sacred Section Header ---
+const SectionHeader = ({ tag, title, subtitle, icon = "fa-om", className = "text-center mb-10" }) => (
+  <div className={className}>
+    {tag && (
+      <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-amber-100 via-orange-100 to-amber-100 text-amber-900 border border-amber-300/80 shadow-xs mb-3">
+        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span>
+        <i className={`fas ${icon} text-amber-600 text-[11px]`}></i>
+        <span>{tag}</span>
+      </div>
+    )}
+    <h2 className="text-3xl sm:text-4xl font-extrabold font-serif text-transparent bg-clip-text bg-gradient-to-r from-amber-950 via-orange-900 to-red-950 tracking-tight leading-tight">
+      {title}
+    </h2>
+    <div className="flex items-center justify-center gap-2.5 mt-3.5 select-none">
+      <span className="h-[2px] w-10 sm:w-16 bg-gradient-to-r from-transparent via-amber-400 to-amber-500 rounded-full"></span>
+      <span className="w-2 h-2 rotate-45 bg-amber-500 border border-amber-300 shadow-xs"></span>
+      <span className="text-amber-600 text-xs px-1 font-serif">✦ ॐ ✦</span>
+      <span className="w-2 h-2 rotate-45 bg-amber-500 border border-amber-300 shadow-xs"></span>
+      <span className="h-[2px] w-10 sm:w-16 bg-gradient-to-l from-transparent via-amber-400 to-amber-500 rounded-full"></span>
+    </div>
+    {subtitle && (
+      <p className="mt-3 text-sm sm:text-base text-gray-600 max-w-2xl mx-auto font-medium leading-relaxed">
+        {subtitle}
+      </p>
+    )}
+  </div>
+);
 
 // --- Unified Matching Header Controls (Music + Language Capsule) ---
 const HeaderControls = ({ isMusicPlaying, toggleMusic, lang, setLang, isCompact = false }) => {
@@ -890,8 +935,8 @@ const HeaderControls = ({ isMusicPlaying, toggleMusic, lang, setLang, isCompact 
         title={isMusicPlaying ? t('musicTitleOn', lang) : t('musicTitleOff', lang)}
         aria-label="Toggle Theme Music"
         className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-300 active:scale-95 cursor-pointer ${isMusicPlaying
-            ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-orange-950 shadow-md'
-            : 'text-amber-100 hover:text-white hover:bg-white/10'
+          ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-orange-950 shadow-md'
+          : 'text-amber-100 hover:text-white hover:bg-white/10'
           }`}
       >
         <div className="flex items-center gap-0.5 h-3 justify-center">
@@ -939,8 +984,8 @@ const MusicToggle = ({ isMusicPlaying, toggleMusic, lang, className = "" }) => (
     title={isMusicPlaying ? t('musicTitleOn', lang) : t('musicTitleOff', lang)}
     aria-label="Toggle Theme Music"
     className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition-all duration-300 shadow-sm active:scale-95 cursor-pointer ${isMusicPlaying
-        ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-orange-950 border-yellow-200 shadow-yellow-500/30'
-        : 'bg-orange-800/80 hover:bg-orange-700 text-yellow-200 border-orange-500/50'
+      ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-orange-950 border-yellow-200 shadow-yellow-500/30'
+      : 'bg-orange-800/80 hover:bg-orange-700 text-yellow-200 border-orange-500/50'
       } ${className}`}
   >
     <div className="flex items-center gap-0.5 h-3 w-3 justify-center">
@@ -968,8 +1013,8 @@ const FloatingMusicWidget = ({ isMusicPlaying, toggleMusic, lang }) => (
       title={isMusicPlaying ? t('musicTitleOn', lang) : t('musicTitleOff', lang)}
       aria-label="Theme Music Player"
       className={`relative flex items-center gap-2.5 px-4 py-2.5 rounded-full shadow-2xl backdrop-blur-md border transition-all duration-300 active:scale-95 cursor-pointer group ${isMusicPlaying
-          ? 'bg-gradient-to-r from-orange-600 via-amber-600 to-yellow-500 text-white border-yellow-300 shadow-orange-500/50 ring-2 ring-yellow-400/40'
-          : 'bg-gray-900/90 hover:bg-gray-800 text-yellow-300 border-gray-700 hover:border-yellow-500/50 shadow-black/50'
+        ? 'bg-gradient-to-r from-orange-600 via-amber-600 to-yellow-500 text-white border-yellow-300 shadow-orange-500/50 ring-2 ring-yellow-400/40'
+        : 'bg-gray-900/90 hover:bg-gray-800 text-yellow-300 border-gray-700 hover:border-yellow-500/50 shadow-black/50'
         }`}
     >
       {isMusicPlaying ? (
@@ -1014,8 +1059,8 @@ const LanguageSwitcher = ({ lang, setLang, className = "" }) => {
       title={lang === 'bn' ? "Switch to English" : "বাংলায় পরিবর্তন করুন"}
       aria-label="Toggle Language"
       className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border transition-all duration-200 shadow-sm active:scale-95 cursor-pointer ${lang === 'bn'
-          ? 'bg-yellow-400 text-orange-950 border-yellow-300 hover:bg-yellow-300'
-          : 'bg-white text-orange-900 border-white hover:bg-yellow-50'
+        ? 'bg-yellow-400 text-orange-950 border-yellow-300 hover:bg-yellow-300'
+        : 'bg-white text-orange-900 border-white hover:bg-yellow-50'
         } ${className}`}
     >
       <i className="fas fa-globe text-xs"></i>
@@ -1064,6 +1109,107 @@ const formatDate = (dateStr, lang = 'bn') => {
 };
 
 const formatDateToBengali = (dateStr) => formatDate(dateStr, 'bn');
+
+const formatPhoneNumber = (val, lang = 'bn') => {
+  if (!val) return '';
+  const str = val.toString().trim();
+  const bnToEngDigits = { '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4', '৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9' };
+  const rawEng = str.replace(/[০-৯]/g, d => bnToEngDigits[d]);
+  const digitsOnly = rawEng.replace(/\D/g, '');
+
+  let formatted = str;
+  if (digitsOnly.length === 11 && !str.includes('-')) {
+    formatted = digitsOnly.slice(0, 5) + '-' + digitsOnly.slice(5);
+  }
+  return formatNumber(formatted, lang);
+};
+
+const translateMarqueeToEnglish = (text) => {
+  if (!text) return '';
+  const bnToEngDigits = { '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4', '৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9' };
+  const monthsMap = {
+    'জানুয়ারি': 'January', 'ফেব্রুয়ারি': 'February', 'মার্চ': 'March', 'এপ্রিল': 'April',
+    'মে': 'May', 'জুন': 'June', 'জুলাই': 'July', 'আগস্ট': 'August', 'সেপ্টেম্বর': 'September',
+    'অক্টোবর': 'October', 'নভেম্বর': 'November', 'ডিসেম্বর': 'December',
+    'বৈশাখ': 'Boishakh', 'জ্যৈষ্ঠ': 'Joishtho', 'আষাঢ়': 'Asharh', 'শ্রাবণ': 'Sravana',
+    'ভাদ্র': 'Bhadra', 'আশ্বিন': 'Ashwin', 'কার্তিক': 'Kartik', 'অগ্রহায়ণ': 'Agrahayana',
+    'পৌষ': 'Poush', 'মাঘ': 'Magh', 'ফাল্গুন': 'Falgun', 'চৈত্র': 'Chaitra'
+  };
+  const daysMap = {
+    'রবিবার': 'Sunday', 'সোমবার': 'Monday', 'মঙ্গলবার': 'Tuesday',
+    'বুধবার': 'Wednesday', 'বৃহস্পতিবার': 'Thursday', 'শুক্রবার': 'Friday', 'শনিবার': 'Saturday'
+  };
+
+  let res = text;
+  // Convert digits
+  res = res.replace(/[০-৯]/g, d => bnToEngDigits[d]);
+
+  // Convert months
+  for (const [bn, en] of Object.entries(monthsMap)) {
+    res = res.replace(new RegExp(bn, 'g'), en);
+  }
+
+  // Convert days
+  for (const [bn, en] of Object.entries(daysMap)) {
+    res = res.replace(new RegExp(bn, 'g'), en);
+  }
+
+  // Common high-level semantic translation for annual temple announcement
+  if (res.includes('প্রতি বছর') && (res.includes('পূজা ও উৎসব') || res.includes('পূজা')) && res.includes('অনুষ্ঠিত')) {
+    return "The Annual Puja & Festival is celebrated every year with due solemnity at the historic Shree Shree Maa Manasa Mandir of Goila; all devotees are cordially invited to this sacred celebration with family and friends.";
+  }
+
+  // Comprehensive phrase translations
+  const phraseReplacements = [
+    [/গৈলার\s*ঐতিহ্যবাহী\s*শ্রী\s*শ্রী\s*মা\s*[-–—]?\s*মনসা\s*মন্দিরে(তে)?/g, 'at the historic Shree Shree Maa Manasa Mandir of Goila'],
+    [/গৈলার\s*ঐতিহ্যবাহী\s*শ্রী\s*শ্রী\s*মা\s*[-–—]?\s*মনসা\s*মন্দিরের/g, 'of the historic Shree Shree Maa Manasa Mandir of Goila'],
+    [/গৈলার\s*ঐতিহ্যবাহী\s*শ্রী\s*শ্রী\s*মা\s*[-–—]?\s*মনসা\s*মন্দির/g, 'the historic Shree Shree Maa Manasa Mandir of Goila'],
+    [/শ্রী\s*শ্রী\s*মা\s*[-–—]?\s*মনসা\s*মন্দিরে(তে)?/g, 'at Shree Shree Maa Manasa Mandir of Goila'],
+    [/শ্রী\s*শ্রী\s*মা\s*[-–—]?\s*মনসা\s*মন্দিরের/g, 'of Shree Shree Maa Manasa Mandir of Goila'],
+    [/শ্রী\s*শ্রী\s*মা\s*[-–—]?\s*মনসা\s*মন্দির/g, 'Shree Shree Maa Manasa Mandir of Goila'],
+    [/উদ্ধার ঐতিহ্যবাহী|গৈলার ঐতিহ্যবাহী|ঐতিহ্যবাহী/g, 'the historic'],
+    [/গৈলা(তে)?/g, 'Goila'],
+    [/মন্দিরে(তে)?/g, 'at the temple'],
+    [/মন্দিরের/g, 'of the temple'],
+    [/প্রতি\s*বছর/g, 'every year'],
+    [/যথাযোগ্য\s*মর্যাদায়/g, 'with due solemnity'],
+    [/বাৎসরিক\s*পূজা\s*ও\s*উৎসব[-–—]?\s*/g, 'Annual Puja & Festival '],
+    [/বাৎসরিক\s*মহোৎসব/g, 'Annual Grand Festival'],
+    [/আগামী/g, 'will be held on'],
+    [/অনুষ্ঠিত\s*হতে\s*যাচ্ছে|অনুষ্ঠিত\s*হবে/g, 'will be held'],
+    [/অনুষ্ঠিত\s*হয়|অনুষ্ঠিত\s*হয়ে\s*থাকে/g, 'is celebrated'],
+    [/পবিত্র\s*এই\s*উৎসবে/g, 'in this sacred celebration'],
+    [/উক্ত\s*অনুষ্ঠানে/g, 'in the ceremony'],
+    [/সকল\s*ভক্তবৃন্দকে|সকল\s*ভক্তবৃন্দ|সকল\s*পুণ্যার্থীদের/g, 'all devotees'],
+    [/আপনাদের\s*সকলকে/g, 'all of you'],
+    [/সবান্ধবে\s*সাদর\s*আমন্ত্রণ।?/g, 'are cordially invited with family and friends.'],
+    [/সাদর\s*আমন্ত্রণ।?/g, 'are cordially invited.'],
+    [/সবান্ধবে\s*আমন্ত্রণ\s*জানাচ্ছি।?/g, 'are cordially invited with family and friends.'],
+    [/সবান্ধবে\s*আমন্ত্রণ/g, 'cordially invited with family and friends'],
+    [/আমন্ত্রণ\s*জানাচ্ছি।?/g, 'are cordially invited.'],
+    [/আমন্ত্রণ\s*জানানো\s*হচ্ছে।?/g, 'are warmly invited.'],
+    [/সবাইকে\s*আমন্ত্রণ।?/g, 'All are welcome.'],
+    [/মন্দিরে\s*স্বাগতম/g, 'Welcome to the Temple'],
+    [/মায়ের\s*আশীর্বাদ\s*আপনার\s*সহায়\s*হোক/g, "May Mother's blessings be with you"],
+    [/ঐশ্বরিক\s*উপস্থিতি\s*অনুভব\s*করুন/g, 'Feel the divine presence']
+  ];
+
+  for (const [regex, rep] of phraseReplacements) {
+    res = res.replace(regex, rep);
+  }
+
+  // Clean quotation marks, double punctuation, and stray symbols
+  res = res.replace(/["'“”]/g, '')
+    .replace(/,\s*,/g, ',')
+    .replace(/;\s*;/g, ';')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+
+  // Strip any remaining Bengali characters so English output is 100% clean
+  res = res.replace(/[\u0980-\u09FF]+/g, '').replace(/\s{2,}/g, ' ').trim();
+  if (res.length > 0) res = res.charAt(0).toUpperCase() + res.slice(1);
+  return res;
+};
 
 const shareEvent = async (ev, showToast, lang = 'bn') => {
   const tempDiv = document.createElement("div");
@@ -1216,7 +1362,7 @@ const Footer = ({ navigateTo, lang, setLang }) => (
         </h3>
         <p className="mb-4 text-gray-400">{t('footerAbout', lang)}</p>
         <div className="flex items-center gap-4">
-          <a href="https://www.facebook.com" target="_blank" rel="noreferrer" className="w-10 h-10 bg-orange-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors">
+          <a href="http://facebook.com/manasamondirgoila" target="_blank" rel="noreferrer" className="w-10 h-10 bg-orange-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors shadow-sm" title="Facebook Page">
             <i className="fab fa-facebook-f"></i>
           </a>
           <LanguageSwitcher lang={lang} setLang={setLang} className="!border-gray-700 !bg-gray-800 !text-yellow-400 hover:!bg-gray-700" />
@@ -1238,9 +1384,19 @@ const Footer = ({ navigateTo, lang, setLang }) => (
       <div>
         <h4 className="text-lg font-bold text-white mb-4 border-b border-gray-700 pb-2">{t('contact', lang)}</h4>
         <ul className="space-y-3">
-          <li className="flex items-start gap-3"><i className="fas fa-map-marker-alt text-orange-500 mt-1"></i> <span>{t('locationValue', lang)}</span></li>
-          <li className="flex items-center gap-3"><i className="fas fa-phone text-orange-500"></i> <span>{t('presidentPhone', lang)}</span></li>
-          <li className="flex items-center gap-3"><i className="fas fa-envelope text-orange-500"></i> <span>info@manasamondirgoila.com</span></li>
+          <li className="flex items-start gap-3"><i className="fas fa-map-marker-alt text-orange-500 mt-1 shrink-0"></i> <span>{t('locationValue', lang)}</span></li>
+          <li className="flex items-center gap-3">
+            <i className="fas fa-phone text-orange-500 shrink-0"></i>
+            <a href="tel:01717503657" className="hover:text-yellow-400 transition-colors bengali-num">
+              {t('presidentPhone', lang)}
+            </a>
+          </li>
+          <li className="flex items-center gap-3">
+            <i className="fas fa-envelope text-orange-500 shrink-0"></i>
+            <a href="mailto:info@manasamondirgoila.com" className="hover:text-yellow-400 transition-colors">
+              info@manasamondirgoila.com
+            </a>
+          </li>
         </ul>
       </div>
     </div>
@@ -1251,8 +1407,8 @@ const Footer = ({ navigateTo, lang, setLang }) => (
   </footer>
 );
 
-// --- Helper: Play Sacred Temple Bell Chime (Web Audio API) ---
-const playSacredBellSound = () => {
+// --- Helper: Play Sacred Temple Ghanta / Bell Sound ---
+const playSyntheticBellSound = () => {
   try {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     if (!AudioContext) return;
@@ -1273,7 +1429,34 @@ const playSacredBellSound = () => {
       osc.stop(now + 3.2);
     });
   } catch (e) {
-    console.log("Audio chime not supported", e);
+    console.log("Synthetic bell sound error:", e);
+  }
+};
+
+const playSacredBellSound = () => {
+  try {
+    const audio = new Audio('music/ghanta.mp3');
+    audio.volume = 0.9;
+    const p = audio.play();
+    if (p !== undefined) {
+      p.catch(() => playSyntheticBellSound());
+    }
+  } catch (e) {
+    playSyntheticBellSound();
+  }
+};
+
+// --- Helper: Play Authentic Sacred Shonkho / Shankhanaad Sound ---
+const playSacredShankhSound = () => {
+  try {
+    const audio = new Audio('music/shankh.mp3');
+    audio.volume = 0.95;
+    const p = audio.play();
+    if (p !== undefined) {
+      p.catch((err) => console.log("Shankh audio play error:", err));
+    }
+  } catch (e) {
+    console.error("Shankh sound error:", e);
   }
 };
 
@@ -1367,7 +1550,7 @@ const getLiveStatus = (timings, lang = 'bn') => {
 };
 
 // --- Home Component ---
-const Home = ({ dbError, marqueeText, testimonials, featuredTestimonialIds, committeeMembers, events, notices, timings, travelInfo, mantras, navigateTo, showToast, lang }) => {
+const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTestimonialIds, committeeMembers, events, notices, timings, travelInfo, mantras, navigateTo, showToast, lang }) => {
   const [currentImg, setCurrentImg] = useState(0);
   const [testIdx, setTestIdx] = useState(0);
 
@@ -1392,13 +1575,11 @@ const Home = ({ dbError, marqueeText, testimonials, featuredTestimonialIds, comm
   const nextImg = () => setCurrentImg((prev) => (prev + 1) % galleryImages.length);
   const prevImg = () => setCurrentImg((prev) => (prev === 0 ? galleryImages.length - 1 : prev - 1));
 
-  // Determine marquee translation
+  // Determine marquee translation (auto-translate from admin Bengali or use custom English)
   const displayMarquee = lang === 'en'
-    ? (marqueeText && marqueeText.includes('বাৎসরিক পূজা ও উৎসব')
-      ? "Annual Puja & Festival 2026 of the historic Shree Shree Maa Manasa Mandir of Goila will be held on Tuesday, 18 August 2026. Everyone is cordially invited with family and friends."
-      : (marqueeText && marqueeText.includes('মন্দিরে স্বাগতম')
-        ? "Welcome to the Temple ✦ May Mother's blessings be with you ✦ Experience the Divine Presence"
-        : marqueeText))
+    ? (marqueeTextEn && marqueeTextEn.trim() !== ''
+      ? marqueeTextEn
+      : translateMarqueeToEnglish(marqueeText))
     : marqueeText;
 
   return (
@@ -1552,52 +1733,127 @@ const Home = ({ dbError, marqueeText, testimonials, featuredTestimonialIds, comm
             </div>
           </div>
 
-          {/* Card 4: Pronami */}
+          {/* Card 4: Events & Festivals (Replaces duplicate Pronami card) */}
           <div
-            onClick={() => navigateTo('donation')}
-            className="cursor-pointer bg-white/95 backdrop-blur-md p-4 sm:p-5 rounded-2xl shadow-lg hover:shadow-2xl border border-orange-100 hover:border-red-400/80 transition-all duration-300 hover:-translate-y-1.5 flex items-center gap-3.5 group relative overflow-hidden"
+            onClick={() => navigateTo('event')}
+            className="cursor-pointer bg-white/95 backdrop-blur-md p-4 sm:p-5 rounded-2xl shadow-lg hover:shadow-2xl border border-orange-100 hover:border-amber-400/80 transition-all duration-300 hover:-translate-y-1.5 flex items-center gap-3.5 group relative overflow-hidden"
           >
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 to-rose-500"></div>
-            <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 border border-rose-200/70 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 group-hover:bg-rose-600 group-hover:text-white transition-all duration-300 shrink-0">
-              <i className="fas fa-heart"></i>
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-rose-500"></div>
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 border border-amber-200/70 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 group-hover:bg-amber-600 group-hover:text-white transition-all duration-300 shrink-0">
+              <i className="fas fa-calendar-alt"></i>
             </div>
             <div className="flex-grow min-w-0">
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-gray-900 font-serif text-base group-hover:text-rose-600 transition-colors truncate">
-                  {t('donation', lang)}
+                <h3 className="font-bold text-gray-900 font-serif text-base group-hover:text-amber-700 transition-colors truncate">
+                  {t('events', lang)}
                 </h3>
-                <i className="fas fa-arrow-right text-[11px] text-gray-300 group-hover:text-rose-500 group-hover:translate-x-1 transition-all ml-1.5 shrink-0"></i>
+                <i className="fas fa-arrow-right text-[11px] text-gray-300 group-hover:text-amber-600 group-hover:translate-x-1 transition-all ml-1.5 shrink-0"></i>
               </div>
-              <p className="text-xs text-gray-500 font-medium truncate mt-0.5">{lang === 'en' ? 'Offer Pronami Online' : 'মায়ের চরণে অনুদান দিন'}</p>
+              <p className="text-xs text-gray-500 font-medium truncate mt-0.5">{lang === 'en' ? 'Annual Festivals & Calendar' : 'বাৎসরিক মহোৎসব ও নির্ঘণ্ট'}</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Photo Gallery Section */}
-      <section className="py-16 container mx-auto px-4 mt-4">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl md:text-4xl font-bold text-orange-900 mb-4 font-serif">{t('photoGallery', lang)}</h2>
-          <div className="h-1.5 w-24 bg-yellow-500 mx-auto rounded-full"></div>
-        </div>
+      <section className="py-16 container mx-auto px-4 mt-2">
+        <SectionHeader
+          tag={lang === 'en' ? 'Temple Visuals' : 'আলোকচিত্র সংকলন'}
+          title={t('photoGallery', lang)}
+          subtitle={lang === 'en' ? 'Explore the historic architecture, serene pond, and sacred ambiance of Maa Manasa Temple.' : 'ঐতিহাসিক শ্রীশ্রী মা মনসা মন্দিরের পবিত্র প্রাঙ্গণ, নাটমন্দির ও সুপ্রাচীন ঐতিহ্যের এক ঝলক।'}
+          icon="fa-images"
+        />
 
-        <div className="relative w-full max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-2xl aspect-video bg-gray-900 group border-4 border-white select-none">
-          {galleryImages.map((img, index) => (
-            <div key={index} className={`absolute inset-0 w-full h-full transition-opacity duration-1000 flex items-center justify-center text-gray-400 bg-gray-800 ${index === currentImg ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}>
-              <img src={img} alt={`Gallery ${index}`} className="w-full h-full object-cover pointer-events-none" />
+        <div className="max-w-4xl mx-auto">
+          {/* Main Showcase Frame with Gold Rim & Ambient Glow */}
+          <div className="relative p-2.5 sm:p-3.5 bg-gradient-to-br from-amber-200 via-amber-400/50 to-orange-300 rounded-[2rem] shadow-[0_20px_50px_-15px_rgba(234,88,12,0.25)] border border-amber-300/80 group">
+            <div className="relative w-full aspect-video rounded-[1.4rem] overflow-hidden bg-gray-950 select-none shadow-inner">
+              {galleryImages.map((img, index) => (
+                <div
+                  key={index}
+                  className={`absolute inset-0 w-full h-full transition-opacity duration-1000 flex items-center justify-center bg-gray-900 ${index === currentImg ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+                >
+                  <img
+                    src={img}
+                    alt={`Gallery ${index}`}
+                    className="w-full h-full object-cover transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
+                  />
+                  {/* Bottom Vignette Gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none"></div>
+                </div>
+              ))}
+
+              {/* Floating Top Badge */}
+              <div className="absolute top-3.5 left-3.5 z-20 flex items-center gap-2 bg-black/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-amber-400/30 text-amber-200 text-xs font-semibold shadow-md">
+                <i className="fas fa-camera text-amber-400 text-xs"></i>
+                <span className="truncate max-w-[160px] sm:max-w-none">{lang === 'en' ? 'Historic Manasa Temple' : 'ঐতিহাসিক মনসা মন্দির'}</span>
+              </div>
+
+              {/* Floating Counter Badge */}
+              <div className="absolute top-3.5 right-3.5 z-20 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20 text-white text-xs font-mono font-bold tracking-widest shadow-md flex items-center gap-1.5">
+                <span className="text-amber-400 font-bold">{toBengaliDigits(currentImg + 1)}</span>
+                <span className="text-white/40">/</span>
+                <span>{toBengaliDigits(galleryImages.length)}</span>
+              </div>
+
+              {/* Bottom Caption Pill */}
+              <div className="absolute bottom-14 sm:bottom-16 left-4 right-4 z-20 text-center pointer-events-none">
+                <span className="inline-block bg-black/65 backdrop-blur-md text-amber-100 text-xs sm:text-sm font-medium px-4 py-1.5 rounded-full border border-amber-400/25 shadow-lg max-w-xl truncate">
+                  {galleryCaptions[currentImg] ? (lang === 'en' ? galleryCaptions[currentImg].en : galleryCaptions[currentImg].bn) : ''}
+                </span>
+              </div>
+
+              {/* Prev / Next Chevrons */}
+              <button
+                onClick={prevImg}
+                aria-label={t('prevPhoto', lang)}
+                className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/45 hover:bg-amber-500 text-white hover:text-orange-950 backdrop-blur-md border border-white/30 hover:border-amber-300 w-10 h-10 sm:w-12 sm:h-12 rounded-full opacity-85 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 z-20 flex items-center justify-center shadow-xl active:scale-90 cursor-pointer"
+              >
+                <i className="fas fa-chevron-left text-sm sm:text-base"></i>
+              </button>
+              <button
+                onClick={nextImg}
+                aria-label={t('nextPhoto', lang)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/45 hover:bg-amber-500 text-white hover:text-orange-950 backdrop-blur-md border border-white/30 hover:border-amber-300 w-10 h-10 sm:w-12 sm:h-12 rounded-full opacity-85 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 z-20 flex items-center justify-center shadow-xl active:scale-90 cursor-pointer"
+              >
+                <i className="fas fa-chevron-right text-sm sm:text-base"></i>
+              </button>
+
+              {/* Refined Pill Indicator */}
+              <div className="absolute bottom-4 left-0 right-0 flex justify-center items-center gap-2 z-20">
+                <div className="flex items-center gap-2 bg-black/50 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15 shadow-lg">
+                  {galleryImages.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setCurrentImg(i)}
+                      aria-label={`Photo ${i + 1}`}
+                      className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${i === currentImg
+                          ? 'w-7 bg-gradient-to-r from-amber-300 to-yellow-400 shadow-xs shadow-amber-400/50'
+                          : 'w-2 bg-white/45 hover:bg-white/80'
+                        }`}
+                    ></button>
+                  ))}
+                </div>
+              </div>
             </div>
-          ))}
+          </div>
 
-          <button onClick={prevImg} aria-label={t('prevPhoto', lang)} className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-orange-600 text-white w-10 h-10 md:w-12 md:h-12 rounded-full opacity-75 md:opacity-0 md:group-hover:opacity-100 transition-all z-20 flex items-center justify-center shadow-lg active:scale-95 cursor-pointer">
-            <i className="fas fa-chevron-left"></i>
-          </button>
-          <button onClick={nextImg} aria-label={t('nextPhoto', lang)} className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-orange-600 text-white w-10 h-10 md:w-12 md:h-12 rounded-full opacity-75 md:opacity-0 md:group-hover:opacity-100 transition-all z-20 flex items-center justify-center shadow-lg active:scale-95 cursor-pointer">
-            <i className="fas fa-chevron-right"></i>
-          </button>
-
-          <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-3 z-20">
-            {galleryImages.map((_, i) => (
-              <div key={i} onClick={() => setCurrentImg(i)} className={`w-3 h-3 rounded-full cursor-pointer transition-all shadow-md ${i === currentImg ? 'bg-yellow-400 scale-150' : 'bg-white/60 hover:bg-white'}`}></div>
+          {/* Interactive Thumbnail Strip */}
+          <div className="grid grid-cols-4 gap-2.5 sm:gap-4 mt-4 px-1">
+            {galleryImages.map((img, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentImg(i)}
+                className={`relative aspect-[16/10] rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-300 cursor-pointer border-2 ${i === currentImg
+                    ? 'border-amber-500 ring-2 ring-amber-400/40 shadow-md scale-[1.02]'
+                    : 'border-white/80 hover:border-amber-300 opacity-70 hover:opacity-100'
+                  }`}
+              >
+                <img src={img} alt={`Thumb ${i}`} className="w-full h-full object-cover" />
+                {i === currentImg && (
+                  <div className="absolute inset-0 bg-amber-500/15 pointer-events-none"></div>
+                )}
+              </button>
             ))}
           </div>
         </div>
@@ -1643,14 +1899,12 @@ const Home = ({ dbError, marqueeText, testimonials, featuredTestimonialIds, comm
       {/* Daily Puja & Aarti Schedule Preview Section */}
       {timings && (
         <section className="py-16 container mx-auto px-4 bg-gradient-to-b from-orange-50 via-amber-50/40 to-orange-50 border-b border-orange-100">
-          <div className="text-center mb-10">
-            <span className="text-xs font-bold uppercase tracking-wider text-orange-700 bg-orange-100 px-3.5 py-1.5 rounded-full inline-block mb-3 border border-orange-200">
-              <i className="fas fa-bell text-xs text-amber-600 mr-1.5 animate-bounce"></i> {t('dailyTimingsTitle', lang)}
-            </span>
-            <h2 className="text-3xl md:text-4xl font-bold text-orange-900 mb-3 font-serif">{t('dailyTimingsTitle', lang)}</h2>
-            <p className="text-gray-600 max-w-xl mx-auto text-sm sm:text-base">{t('dailyTimingsSubtitle', lang)}</p>
-            <div className="h-1.5 w-24 bg-yellow-500 mx-auto rounded-full mt-3"></div>
-          </div>
+          <SectionHeader
+            tag={lang === 'en' ? 'Daily Rituals & Hours' : 'নিত্য সময়সূচী ও পূজা'}
+            title={t('dailyTimingsTitle', lang)}
+            subtitle={t('dailyTimingsSubtitle', lang)}
+            icon="fa-clock"
+          />
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {/* Morning */}
@@ -1708,81 +1962,187 @@ const Home = ({ dbError, marqueeText, testimonials, featuredTestimonialIds, comm
       )}
 
       {/* Notice Board Overview Snippet */}
-      <section className="py-16 bg-gray-50 border-b border-gray-200 relative">
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-blue-600"></div>
+      <section className="py-16 sm:py-20 bg-gradient-to-b from-amber-50/40 via-orange-50/20 to-white border-y border-amber-200/70 relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-orange-500 via-amber-400 to-red-600"></div>
         <div className="container mx-auto px-4 max-w-6xl">
-          <div className="flex flex-col md:flex-row gap-8 items-center">
-            <div className="md:w-1/3 text-center md:text-left">
-              <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto md:mx-0 mb-4 text-2xl shadow-sm">
-                <i className="fas fa-bullhorn"></i>
+          <div className="flex flex-col md:flex-row gap-8 lg:gap-12 items-center">
+
+            {/* Left Herald Column */}
+            <div className="md:w-1/3 text-center md:text-left bg-gradient-to-b from-white/95 via-amber-50/60 to-orange-50/40 p-7 sm:p-9 rounded-[2.2rem] border-2 border-amber-200/90 shadow-[0_15px_35px_-10px_rgba(234,88,12,0.18)] relative overflow-hidden backdrop-blur-sm">
+              {/* Background Ambient Glow */}
+              <div className="absolute -right-8 -top-8 w-32 h-32 bg-amber-300/20 rounded-full blur-2xl pointer-events-none"></div>
+
+              {/* Animated Soundwave Herald Emblem */}
+              <div className="relative w-20 h-20 mx-auto md:mx-0 mb-5 flex items-center justify-center">
+                <div className="absolute inset-0 rounded-2xl bg-amber-400/30 animate-soundwave"></div>
+                <div className="absolute inset-0 rounded-2xl bg-orange-500/25 animate-soundwave-delayed"></div>
+                <div className="relative w-16 h-16 bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 text-white rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-orange-500/35 border-2 border-amber-200 animate-divine-float">
+                  <i className="fas fa-bullhorn animate-horn"></i>
+                </div>
               </div>
-              <h2 className="text-3xl font-bold text-gray-800 mb-2 font-serif flex items-center justify-center md:justify-start gap-2">{t('noticeBoard', lang)} <span className="relative flex h-3 w-3"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span></span></h2>
-              <div className="h-1 w-16 bg-blue-500 mx-auto md:mx-0 mb-4 rounded-full"></div>
-              <p className="text-gray-600 mb-8 leading-relaxed">{t('noticeSectionDesc', lang)}</p>
-              <button onClick={() => navigateTo('notice')} className="bg-white border-2 border-blue-500 text-blue-600 font-bold px-6 py-2 rounded-full hover:bg-blue-50 transition-colors shadow-sm inline-flex items-center gap-2 mx-auto md:mx-0 cursor-pointer">
-                {t('allNotices', lang)} <i className="fas fa-arrow-right text-sm"></i>
+
+              {/* Live Status Badge with Notice Count */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-amber-100/90 text-amber-900 border border-amber-300 shadow-2xs mb-3">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-orange-500"></span>
+                </span>
+                <span>{lang === 'en' ? 'Live Bulletin' : 'অফিসিয়াল বার্তা'}</span>
+                <span className="w-1 h-1 rounded-full bg-amber-400"></span>
+                <span className="text-[11px] text-amber-800 font-semibold">{toBengaliDigits(notices.length)} {lang === 'en' ? 'Updates' : 'টি বিজ্ঞপ্তি'}</span>
+              </div>
+
+              {/* Title & Animated Pulse Divider */}
+              <h2 className="text-3xl sm:text-4xl font-extrabold font-serif text-gray-900 mb-2.5 tracking-tight leading-tight">
+                {t('noticeBoard', lang)}
+              </h2>
+              <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
+                <div className="h-1.5 w-16 bg-gradient-to-r from-orange-500 via-amber-400 to-orange-500 rounded-full"></div>
+                <div className="w-2 h-2 rounded-full bg-amber-500 animate-ping"></div>
+              </div>
+
+              {/* Description */}
+              <p className="text-gray-600 mb-6 leading-relaxed text-sm sm:text-base font-medium">
+                {t('noticeSectionDesc', lang)}
+              </p>
+
+              {/* Animated CTA Button */}
+              <button
+                onClick={() => navigateTo('notice')}
+                className="btn-shine bg-gradient-to-r from-orange-600 via-amber-600 to-orange-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold px-8 py-3.5 rounded-full hover:shadow-xl hover:shadow-orange-500/40 transition-all shadow-md inline-flex items-center gap-3 mx-auto md:mx-0 cursor-pointer hover:scale-105 active:scale-95 text-sm sm:text-base group"
+              >
+                <span>{t('allNotices', lang)}</span>
+                <i className="fas fa-arrow-right text-xs transition-transform duration-300 group-hover:translate-x-1.5"></i>
               </button>
             </div>
+
+            {/* Right Notices List */}
             <div className="md:w-2/3 w-full">
-              <div className="bg-white rounded-2xl shadow-lg border-l-[6px] border-blue-500 p-2 md:p-4">
+              <div className="bg-white rounded-3xl shadow-xl border-2 border-amber-200/80 p-2 sm:p-5 relative divide-y divide-amber-100/80">
                 {notices.slice(0, 3).map((n, i) => (
-                  <div key={n.id} className={`p-4 md:p-5 ${i !== notices.slice(0, 3).length - 1 ? "border-b border-gray-100" : ""} hover:bg-gray-50 transition-colors rounded-lg`}>
-                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 gap-2">
-                      <h4 className="font-bold text-gray-800 text-lg leading-tight">{n.title}</h4>
-                      <span className="text-xs bg-blue-50 text-blue-600 border border-blue-100 px-2.5 py-1 rounded-md font-semibold whitespace-nowrap flex items-center gap-1 shadow-sm w-fit">
-                        <i className="fas fa-calendar-day"></i> {formatDate(n.date, lang)}
+                  <div
+                    key={n.id}
+                    onClick={() => navigateTo('notice')}
+                    className="p-4 sm:p-5 rounded-2xl hover:bg-gradient-to-r hover:from-amber-50/80 hover:to-orange-50/40 transition-all duration-300 cursor-pointer group"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2.5 gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {i === 0 && (
+                          <span className="bg-red-50 text-red-600 border border-red-200 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                            {lang === 'en' ? 'Latest' : 'সাম্প্রতিক'}
+                          </span>
+                        )}
+                        <h4 className="font-bold text-gray-900 text-base sm:text-lg leading-snug group-hover:text-orange-600 transition-colors">
+                          {n.title}
+                        </h4>
+                      </div>
+                      <span className="text-xs bg-amber-50 text-amber-900 border border-amber-200/80 px-3 py-1 rounded-full font-semibold whitespace-nowrap flex items-center gap-1.5 shadow-2xs w-fit shrink-0">
+                        <i className="fas fa-calendar-day text-amber-600"></i> {formatDate(n.date, lang)}
                       </span>
                     </div>
-                    <div className="text-gray-600 text-sm line-clamp-2 mt-2 rich-text" dangerouslySetInnerHTML={{ __html: n.text }}></div>
+                    <div
+                      className="text-gray-600 text-xs sm:text-sm line-clamp-2 leading-relaxed rich-text"
+                      dangerouslySetInnerHTML={{ __html: n.text }}
+                    ></div>
+                    <div className="mt-2.5 flex items-center gap-1 text-xs font-bold text-orange-600 group-hover:translate-x-1 transition-transform">
+                      <span>{lang === 'en' ? 'Read full notice' : 'বিস্তারিত দেখুন'}</span>
+                      <i className="fas fa-chevron-right text-[10px]"></i>
+                    </div>
                   </div>
                 ))}
-                {notices.length === 0 && <p className="text-gray-500 p-6 text-center">{t('noNotices', lang)}</p>}
+                {notices.length === 0 && (
+                  <p className="text-gray-500 p-8 text-center font-medium">{t('noNotices', lang)}</p>
+                )}
               </div>
             </div>
+
           </div>
         </div>
       </section>
 
       {/* Sacred Mantra & Padmapuran Highlight Card */}
-      <section className="py-14 container mx-auto px-4">
-        <div className="max-w-4xl mx-auto bg-gradient-to-r from-orange-950 via-amber-950 to-red-950 text-white rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden border-2 border-yellow-400/40">
-          <div className="absolute -right-8 -bottom-8 opacity-10 text-9xl text-yellow-300 pointer-events-none">
-            <i className="fas fa-om"></i>
-          </div>
-          <div className="relative z-10 text-center">
-            <span className="text-xs font-bold uppercase tracking-wider text-yellow-300 bg-white/10 px-4 py-1.5 rounded-full inline-block mb-4 border border-yellow-400/30">
-              <i className="fas fa-om mr-1"></i> {lang === 'en' ? 'Sacred Devotion of the Day' : 'আজকের পবিত্র স্তোত্র'}
-            </span>
-            <h3 className="text-2xl md:text-3xl font-bold font-serif text-yellow-300 mb-4">
-              {lang === 'en' ? 'Shree Shree Maa Manasa Pranam Mantra' : 'মা মনসার পবিত্র প্রণাম মন্ত্র'}
-            </h3>
-            <div className="bg-black/35 backdrop-blur-md rounded-2xl p-6 border border-yellow-400/25 max-w-2xl mx-auto mb-6">
-              <p className="text-xl md:text-2xl font-serif text-yellow-200 leading-relaxed tracking-wide mb-3">
-                ওঁ আস্তীকস্য মুনের্মাতা ভগিনী বাসুকেস্তথা ।<br />
-                জরৎকারুমুনেঃ পত্নী মনসাদেবী নমোহস্তুতে ॥
-              </p>
-              <p className="text-sm text-orange-200/90 italic">
-                {lang === 'en'
-                  ? '"Salutations unto Goddess Manasa, Mother of sage Astika, sister of serpent king Vasuki, and devoted consort of sage Jaratkaru."'
-                  : '"হে মুনি আস্তীকের জননী, নাগরাজ বাসুকির ভগিনী এবং তপস্বী জরৎকারু মুনির ধর্মপত্নী দেবি মনসা, আপনাকে ভক্তিপূর্ণ প্রণাম জানাই।"'}
-              </p>
+      <section className="py-16 container mx-auto px-4">
+        <div className="relative max-w-4xl mx-auto rounded-[2.5rem] p-1 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 shadow-[0_20px_60px_-15px_rgba(217,119,6,0.4)]">
+          <div className="bg-gradient-to-br from-[#240606] via-[#331102] to-[#1a0404] text-white rounded-[2.35rem] p-8 sm:p-12 md:p-14 relative overflow-hidden border border-amber-300/30 text-center">
+
+            {/* Sacred Om Watermark & Background Glow */}
+            <div className="absolute -right-6 -bottom-8 opacity-10 text-9xl text-amber-300 pointer-events-none select-none">
+              <i className="fas fa-om"></i>
             </div>
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <button
-                onClick={() => {
-                  playSacredBellSound();
-                  if (showToast) showToast(lang === 'en' ? 'Sacred bell rung 🔔' : 'পবিত্র ঘণ্টা বাজানো হয়েছে 🔔');
-                }}
-                className="bg-yellow-400 hover:bg-yellow-300 text-orange-950 px-6 py-2.5 rounded-full font-bold transition-all shadow-md active:scale-95 inline-flex items-center gap-2 cursor-pointer text-sm"
-              >
-                <i className="fas fa-bell text-xs"></i> {t('playChime', lang)} 🔔
-              </button>
-              <button
-                onClick={() => navigateTo('mantras')}
-                className="bg-white/15 hover:bg-white/25 text-white border border-yellow-300/40 px-6 py-2.5 rounded-full font-bold transition-all active:scale-95 inline-flex items-center gap-2 cursor-pointer text-sm"
-              >
-                {t('viewMantrasBtn', lang)} <i className="fas fa-arrow-right text-xs"></i>
-              </button>
+            <div className="absolute -left-10 -top-10 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            {/* Corner Flourish Motifs */}
+            <span className="absolute top-4 left-5 text-amber-400/40 text-sm pointer-events-none select-none">❖</span>
+            <span className="absolute top-4 right-5 text-amber-400/40 text-sm pointer-events-none select-none">❖</span>
+            <span className="absolute bottom-4 left-5 text-amber-400/40 text-sm pointer-events-none select-none">❖</span>
+            <span className="absolute bottom-4 right-5 text-amber-400/40 text-sm pointer-events-none select-none">❖</span>
+
+            <div className="relative z-10">
+              {/* Devotional Top Badge */}
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest text-amber-200 bg-amber-400/15 border border-amber-400/40 backdrop-blur-md mb-4 shadow-xs">
+                <i className="fas fa-om text-amber-400"></i>
+                <span>{lang === 'en' ? 'Sacred Devotion of the Day' : 'আজকের পবিত্র স্তোত্র'}</span>
+                <i className="fas fa-om text-amber-400"></i>
+              </div>
+
+              {/* Title with Gold Foil Gradient */}
+              <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold font-serif bg-gradient-to-r from-yellow-200 via-amber-300 to-yellow-100 bg-clip-text text-transparent mb-5 tracking-tight drop-shadow-sm">
+                {lang === 'en' ? 'Shree Shree Maa Manasa Pranam Mantra' : 'মা মনসার পবিত্র প্রণাম মন্ত্র'}
+              </h3>
+
+              {/* Shloka Altar Sanctuary Box */}
+              <div className="bg-black/45 backdrop-blur-md rounded-2xl p-6 sm:p-8 border border-amber-400/35 max-w-2xl mx-auto mb-8 shadow-inner relative">
+                <p className="text-xl sm:text-2xl md:text-3xl font-serif text-amber-100 font-bold leading-relaxed tracking-wide mb-3 drop-shadow">
+                  ওঁ আস্তীকস্য মুনের্মাতা ভগিনী বাসুকেস্তথা ।<br />
+                  জরৎকারুমুনেঃ পত্নী মনসাদেবী নমোহস্তুতে ॥
+                </p>
+                <div className="h-[1px] w-24 bg-gradient-to-r from-transparent via-amber-400/60 to-transparent mx-auto my-3"></div>
+                <p className="text-xs sm:text-sm text-amber-200/90 italic font-medium leading-relaxed max-w-xl mx-auto">
+                  {lang === 'en'
+                    ? '"Salutations unto Goddess Manasa, Mother of sage Astika, sister of serpent king Vasuki, and devoted consort of sage Jaratkaru."'
+                    : '"হে মুনি আস্তীকের জননী, নাগরাজ বাসুকির ভগিনী এবং তপস্বী জরৎকারু মুনির ধর্মপত্নী দেবি মনসা, আপনাকে ভক্তিপূর্ণ প্রণাম জানাই।"'}
+                </p>
+              </div>
+
+              {/* Interactive Ghonta, Shonkho & Mantras Buttons */}
+              <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+                {/* Sacred Bell (Ghonta) Button */}
+                <button
+                  onClick={() => {
+                    playSacredBellSound();
+                    if (showToast) showToast(t('bellRungToast', lang));
+                  }}
+                  className="btn-shine bg-gradient-to-b from-amber-300 via-yellow-400 to-amber-500 hover:from-amber-200 hover:to-yellow-300 text-amber-950 font-extrabold px-6 py-3 rounded-full shadow-lg shadow-amber-500/30 hover:shadow-amber-400/50 hover:scale-105 active:scale-95 border-2 border-yellow-200 inline-flex items-center gap-2.5 transition-all cursor-pointer text-sm sm:text-base group"
+                >
+                  <i className="fas fa-bell text-amber-950 text-base group-hover:rotate-12 transition-transform"></i>
+                  <span>{t('playChime', lang)}</span>
+                  <span className="text-base">🔔</span>
+                </button>
+
+                {/* Sacred Conch (Shonkho) Button */}
+                <button
+                  onClick={() => {
+                    playSacredShankhSound();
+                    if (showToast) showToast(t('shankhBlownToast', lang));
+                  }}
+                  className="btn-shine bg-gradient-to-b from-white via-amber-50 to-orange-100 hover:from-white hover:to-amber-100 text-amber-950 font-extrabold px-6 py-3 rounded-full shadow-lg shadow-amber-300/30 hover:shadow-amber-200/50 hover:scale-105 active:scale-95 border-2 border-amber-300/80 inline-flex items-center gap-2.5 transition-all cursor-pointer text-sm sm:text-base group"
+                >
+                  <span className="text-xl leading-none group-hover:scale-110 transition-transform">🐚</span>
+                  <span>{t('playShankh', lang)}</span>
+                  <i className="fas fa-volume-up text-amber-800 text-xs"></i>
+                </button>
+
+                {/* Sacred Mantras Page Link */}
+                <button
+                  onClick={() => navigateTo('mantras')}
+                  className="bg-white/10 hover:bg-white/20 text-amber-100 hover:text-white border border-amber-400/40 hover:border-amber-300 px-6 py-3 rounded-full font-bold transition-all hover:scale-105 active:scale-95 inline-flex items-center gap-2.5 shadow-md cursor-pointer text-sm sm:text-base"
+                >
+                  <i className="fas fa-book-open text-amber-300 text-xs"></i>
+                  <span>{t('viewMantrasBtn', lang)}</span>
+                  <i className="fas fa-arrow-right text-xs"></i>
+                </button>
+              </div>
+
             </div>
           </div>
         </div>
@@ -1791,10 +2151,13 @@ const Home = ({ dbError, marqueeText, testimonials, featuredTestimonialIds, comm
       {/* Testimonials Slider Overview Snippet */}
       {displayTests.length > 0 && (
         <section className="py-20 container mx-auto px-4 relative">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-orange-900 mb-4 font-serif">{t('testimonialsTitle', lang)}</h2>
-            <div className="h-1.5 w-24 bg-yellow-500 mx-auto rounded-full"></div>
-          </div>
+          <SectionHeader
+            tag={lang === 'en' ? 'Devotee Voices' : 'ভক্তবৃন্দের অনুভূতি'}
+            title={t('testimonialsTitle', lang)}
+            subtitle={lang === 'en' ? 'Spiritual reflections and experiences shared by visiting devotees.' : 'শ্রীশ্রী মা মনসা মন্দিরে আগত দেশ-বিদেশের পুণ্যার্থীদের অনুভূতি ও ভক্তিগাথা।'}
+            icon="fa-heart"
+            className="text-center mb-12"
+          />
 
           <div className="max-w-4xl mx-auto bg-gradient-to-b from-white to-orange-50 rounded-3xl shadow-xl p-8 md:p-14 text-center border border-orange-100 relative overflow-hidden transition-all duration-500 select-none">
             <i className="fas fa-quote-left text-6xl text-orange-200/50 absolute top-6 left-6 md:left-10 animate-divine-float"></i>
@@ -1829,27 +2192,39 @@ const Home = ({ dbError, marqueeText, testimonials, featuredTestimonialIds, comm
       {/* Committee Snippet */}
       <section className="py-16 bg-gradient-to-b from-orange-100 to-white border-t border-orange-200">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-bold text-orange-900 mb-4 font-serif">{t('committeeTitle', lang)}</h2>
-            <div className="h-1.5 w-24 bg-yellow-500 mx-auto rounded-full"></div>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
+          <SectionHeader
+            tag={lang === 'en' ? 'Trust & Management' : 'মন্দির প্রশাসন'}
+            title={t('committeeTitle', lang)}
+            subtitle={lang === 'en' ? 'Dedicated guardians managing temple rituals, heritage preservation, and development.' : 'কবি বিজয় গুপ্তের স্মৃতি সংরক্ষণ ও শ্রীশ্রী মা মনসা মন্দির উন্নয়ন ও পরিচালনা পরিষদ।'}
+            icon="fa-users"
+            className="text-center mb-12"
+          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
             {committeeMembers.slice(0, 8).map((member) => (
-              <div key={member.id} className="bg-white rounded-2xl p-8 text-center shadow-lg border border-orange-100 card-hover-glow transition-all duration-300">
-                <div className="w-28 h-28 mx-auto bg-gradient-to-br from-orange-100 to-orange-200 rounded-full flex items-center justify-center mb-6 text-orange-500 border-4 border-white shadow-md overflow-hidden text-5xl">
+              <div key={member.id} className="bg-white rounded-3xl p-6 text-center shadow-md border-2 border-orange-100/80 card-hover-glow transition-all duration-300 flex flex-col h-full justify-between items-center group">
+                <div className="w-28 h-28 mx-auto bg-gradient-to-br from-amber-100 to-orange-200 rounded-full flex items-center justify-center mb-4 text-orange-400 border-4 border-yellow-300 shadow-md overflow-hidden text-5xl shrink-0 group-hover:scale-105 group-hover:border-orange-500 transition-all duration-300">
                   {member.image ? (
                     <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
                   ) : (
-                    <i className="fas fa-user text-orange-400"></i>
+                    <i className="fas fa-user"></i>
                   )}
                 </div>
-                <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-1">{member.name}</h3>
-                <p className="text-orange-600 font-bold mb-4 bg-orange-50 inline-block px-4 py-1 rounded-full text-sm">
-                  {translateRole(member.role, lang)}
-                </p>
-                <p className="text-gray-500 flex items-center justify-center gap-2 font-medium bg-gray-50 py-2 rounded-lg border border-gray-100 text-sm">
-                  <i className="fas fa-phone-alt text-green-600"></i> {formatNumber(member.phone, lang)}
-                </p>
+                <div className="w-full h-14 flex items-center justify-center mb-1">
+                  <h3 className="text-base sm:text-lg font-bold text-gray-800 text-center leading-snug group-hover:text-orange-600 transition-colors line-clamp-2 px-1">
+                    {member.name}
+                  </h3>
+                </div>
+                <div className="w-full min-h-[2.5rem] flex items-center justify-center mb-4">
+                  <span className="text-orange-600 font-bold text-xs sm:text-sm text-center bg-orange-50 px-3.5 py-1.5 rounded-full border border-orange-200/60 leading-tight">
+                    {translateRole(member.role, lang)}
+                  </span>
+                </div>
+                <div className="w-full mt-auto pt-3 border-t border-gray-100 flex justify-center items-center">
+                  <a href={`tel:${(member.phone || '').replace(/\s+/g, '')}`} className="w-full flex items-center justify-center gap-2 font-semibold text-gray-700 hover:text-green-600 bg-gray-50 hover:bg-green-50 py-2 px-3 rounded-xl border border-gray-200/80 transition-colors shadow-xs text-xs sm:text-sm">
+                    <i className="fas fa-phone-alt text-green-600 text-xs"></i>
+                    <span className="bengali-num">{formatPhoneNumber(member.phone, lang)}</span>
+                  </a>
+                </div>
               </div>
             ))}
           </div>
@@ -1864,10 +2239,13 @@ const Home = ({ dbError, marqueeText, testimonials, featuredTestimonialIds, comm
       {/* Events Overview Snippet */}
       {events.length > 0 && (
         <section className="py-16 container mx-auto px-4 bg-white border-t border-gray-100">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-orange-900 mb-4 font-serif">{t('latestEvents', lang)}</h2>
-            <div className="h-1.5 w-24 bg-yellow-500 mx-auto rounded-full"></div>
-          </div>
+          <SectionHeader
+            tag={lang === 'en' ? 'Sacred Ceremonies' : 'বাৎসরিক মহোৎসব'}
+            title={t('latestEvents', lang)}
+            subtitle={lang === 'en' ? 'Upcoming pujas, annual fairs, and religious gatherings at Goila Dham.' : 'বাৎসরিক পূজা, বৈশাখী মেলা ও মন্দিরের সকল ধর্মীয় কর্মসূচীর তালিকা।'}
+            icon="fa-calendar-alt"
+            className="text-center mb-12"
+          />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {events.slice(0, 3).map((event) => (
               <div key={event.id} className="bg-white rounded-2xl shadow-lg border border-gray-100 flex flex-col overflow-hidden card-hover-glow group">
@@ -1952,10 +2330,10 @@ const TimingsPage = ({ timings, navigateTo, lang }) => {
             </div>
 
             <div className={`px-5 py-2.5 rounded-2xl border backdrop-blur-md flex items-center gap-2.5 shadow-lg ${live.color === 'green' ? 'bg-green-950/70 border-green-400 text-green-200' :
-                (live.color === 'amber' ? 'bg-amber-950/70 border-amber-400 text-amber-200' : 'bg-gray-900/70 border-gray-500 text-gray-300')
+              (live.color === 'amber' ? 'bg-amber-950/70 border-amber-400 text-amber-200' : 'bg-gray-900/70 border-gray-500 text-gray-300')
               }`}>
               <span className={`w-3 h-3 rounded-full flex-shrink-0 ${live.color === 'green' ? 'bg-green-400 live-radar-green' :
-                  (live.color === 'amber' ? 'bg-amber-400 live-radar-amber' : 'bg-gray-400')
+                (live.color === 'amber' ? 'bg-amber-400 live-radar-amber' : 'bg-gray-400')
                 }`}></span>
               <span className="font-bold text-sm">{live.title}</span>
             </div>
@@ -2276,15 +2654,24 @@ const MantrasPage = ({ mantras, navigateTo, lang, showToast }) => {
             {t('mantrasSubtitle', lang)}
           </p>
 
-          <div className="mt-6 flex justify-center">
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <button
               onClick={() => {
                 playSacredBellSound();
-                if (showToast) showToast(lang === 'en' ? 'Sacred bell chime played 🔔' : 'পবিত্র ঘণ্টা ধ্বনি বাজানো হয়েছে 🔔');
+                if (showToast) showToast(t('bellRungToast', lang));
               }}
               className="bg-yellow-400 hover:bg-yellow-300 text-orange-950 px-6 py-2.5 rounded-full font-bold shadow-lg inline-flex items-center gap-2 cursor-pointer active:scale-95 transition-all text-sm"
             >
               <i className="fas fa-bell text-xs"></i> {t('playChime', lang)} 🔔
+            </button>
+            <button
+              onClick={() => {
+                playSacredShankhSound();
+                if (showToast) showToast(t('shankhBlownToast', lang));
+              }}
+              className="bg-amber-100 hover:bg-amber-200 text-amber-950 border border-amber-300/80 px-6 py-2.5 rounded-full font-bold shadow-lg inline-flex items-center gap-2 cursor-pointer active:scale-95 transition-all text-sm"
+            >
+              <span className="text-base leading-none">🐚</span> {t('playShankh', lang)} 🐚
             </button>
           </div>
         </div>
@@ -2296,8 +2683,8 @@ const MantrasPage = ({ mantras, navigateTo, lang, showToast }) => {
               key={cat.key}
               onClick={() => setSelectedCat(cat.key)}
               className={`px-5 py-2 rounded-full font-bold text-xs sm:text-sm transition-all cursor-pointer ${selectedCat === cat.key
-                  ? 'bg-orange-600 text-white shadow-md scale-105'
-                  : 'bg-white text-gray-700 hover:bg-orange-100 border border-orange-200'
+                ? 'bg-orange-600 text-white shadow-md scale-105'
+                : 'bg-white text-gray-700 hover:bg-orange-100 border border-orange-200'
                 }`}
             >
               {cat.label}
@@ -2323,12 +2710,22 @@ const MantrasPage = ({ mantras, navigateTo, lang, showToast }) => {
                   <button
                     onClick={() => {
                       playSacredBellSound();
-                      if (showToast) showToast(lang === 'en' ? 'Sacred chime 🔔' : 'পবিত্র ঘণ্টা ধ্বনি 🔔');
+                      if (showToast) showToast(t('bellRungToast', lang));
                     }}
                     title={t('playChime', lang)}
                     className="w-9 h-9 rounded-full bg-amber-50 hover:bg-amber-100 text-amber-700 flex items-center justify-center text-sm transition-all active:scale-90 cursor-pointer"
                   >
                     <i className="fas fa-bell"></i>
+                  </button>
+                  <button
+                    onClick={() => {
+                      playSacredShankhSound();
+                      if (showToast) showToast(t('shankhBlownToast', lang));
+                    }}
+                    title={t('playShankh', lang)}
+                    className="w-9 h-9 rounded-full bg-orange-50 hover:bg-orange-100 text-orange-700 flex items-center justify-center text-sm transition-all active:scale-90 cursor-pointer"
+                  >
+                    <span className="text-sm">🐚</span>
                   </button>
                   <button
                     onClick={() => copyMantraText(m)}
@@ -2412,22 +2809,28 @@ const CommitteePage = ({ committeeMembers, navigateTo, lang }) => (
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {committeeMembers.map((member) => (
-          <div key={member.id} className="bg-white rounded-3xl overflow-hidden shadow-md border-2 border-orange-100/80 flex flex-col items-center p-6 card-hover-glow transition-all duration-300 group">
-            <div className="w-28 h-28 bg-gradient-to-br from-amber-100 to-orange-200 rounded-full flex items-center justify-center border-4 border-yellow-300 shadow-md mb-4 text-orange-400 overflow-hidden text-5xl group-hover:scale-105 group-hover:border-orange-500 transition-all duration-300">
+          <div key={member.id} className="bg-white rounded-3xl overflow-hidden shadow-md border-2 border-orange-100/80 flex flex-col h-full justify-between items-center p-6 card-hover-glow transition-all duration-300 group">
+            <div className="w-28 h-28 bg-gradient-to-br from-amber-100 to-orange-200 rounded-full flex items-center justify-center border-4 border-yellow-300 shadow-md mb-4 text-orange-400 overflow-hidden text-5xl group-hover:scale-105 group-hover:border-orange-500 transition-all duration-300 shrink-0">
               {member.image ? (
                 <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
               ) : (
                 <i className="fas fa-user"></i>
               )}
             </div>
-            <h3 className="text-lg font-bold text-gray-800 text-center group-hover:text-orange-600 transition-colors">{member.name}</h3>
-            <p className="text-orange-600 font-bold text-xs text-center mb-4 bg-orange-50 px-3.5 py-1.5 rounded-full mt-2 border border-orange-200/60">
-              {translateRole(member.role, lang)}
-            </p>
+            <div className="w-full h-14 flex items-center justify-center mb-1">
+              <h3 className="text-base sm:text-lg font-bold text-gray-800 text-center leading-snug group-hover:text-orange-600 transition-colors line-clamp-2 px-1">
+                {member.name}
+              </h3>
+            </div>
+            <div className="w-full min-h-[2.5rem] flex items-center justify-center mb-4">
+              <span className="text-orange-600 font-bold text-xs sm:text-sm text-center bg-orange-50 px-3.5 py-1.5 rounded-full border border-orange-200/60 leading-tight">
+                {translateRole(member.role, lang)}
+              </span>
+            </div>
             <div className="w-full mt-auto border-t border-gray-100 pt-4 flex justify-center items-center text-gray-600 gap-2 bg-gradient-to-b from-gray-50 to-orange-50/30 rounded-b-2xl -mx-6 -mb-6 pb-4">
-              <a href={`tel:${member.phone}`} className="inline-flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-green-600 transition-colors py-1 px-3 rounded-lg hover:bg-green-50">
+              <a href={`tel:${(member.phone || '').replace(/\s+/g, '')}`} className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-gray-700 hover:text-green-600 transition-colors py-1.5 px-4 rounded-xl hover:bg-green-50 border border-gray-200/60 shadow-xs">
                 <i className="fas fa-phone-alt text-green-600 text-xs"></i>
-                <span>{formatNumber(member.phone, lang)}</span>
+                <span className="bengali-num">{formatPhoneNumber(member.phone, lang)}</span>
               </a>
             </div>
           </div>
@@ -2868,6 +3271,7 @@ const AdminPanel = ({
   supabaseClient, dbError, navigateTo,
   isAdminAuthenticated, setIsAdminAuthenticated,
   marqueeText, setMarqueeText,
+  marqueeTextEn, setMarqueeTextEn,
   committeeMembers, setCommitteeMembers,
   testimonials, setTestimonials,
   events, setEvents,
@@ -3112,9 +3516,15 @@ const AdminPanel = ({
     setIsSaving(true);
     setErrorMsg('');
     try {
-      const { error } = await supabaseClient.from('settings').upsert({ id: 1, key: 'marquee', value: marqueeText });
-      if (error) throw error;
-      showToast('স্ক্রলিং টেক্সট সফলভাবে আপডেট করা হয়েছে!');
+      const enVal = (marqueeTextEn && marqueeTextEn.trim() !== '') ? marqueeTextEn : translateMarqueeToEnglish(marqueeText);
+      const { error: errBn } = await supabaseClient.from('settings').upsert({ key: 'marquee', value: marqueeText }, { onConflict: 'key' });
+      if (errBn) throw errBn;
+
+      const { error: errEn } = await supabaseClient.from('settings').upsert({ key: 'marquee_en', value: enVal }, { onConflict: 'key' });
+      if (errEn) throw errEn;
+
+      if (setMarqueeTextEn) setMarqueeTextEn(enVal);
+      showToast('স্ক্রলিং নোটিশ (বাংলা ও ইংরেজি) সফলভাবে আপডেট করা হয়েছে!');
     } catch (err) {
       setErrorMsg("স্ক্রলিং টেক্সট আপডেট করতে সমস্যা হয়েছে।");
     } finally {
@@ -3793,16 +4203,71 @@ const AdminPanel = ({
 
           {activeTab === 'marquee' && (
             <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
-              <h3 className="text-xl font-bold text-gray-800 mb-6 border-b pb-3 flex items-center gap-2"><i className="fas fa-pen text-orange-500"></i> হোমপেজের চলমান টেক্সট (Marquee)</h3>
-              <form onSubmit={handleMarqueeUpdate}>
-                <textarea
-                  value={marqueeText}
-                  onChange={(e) => setMarqueeText(e.target.value)}
-                  className="w-full px-5 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:outline-none mb-6 min-h-[120px] text-lg bg-gray-50"
-                ></textarea>
-                <button type="submit" disabled={isSaving} className="bg-orange-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-orange-700 disabled:opacity-50 shadow-md">
-                  <i className="fas fa-save mr-2"></i> {isSaving ? 'সংরক্ষণ করা হচ্ছে...' : 'সংরক্ষণ করুন'}
-                </button>
+              <h3 className="text-xl font-bold text-gray-800 mb-6 border-b pb-3 flex items-center gap-2">
+                <i className="fas fa-bullhorn text-orange-500"></i> হোমপেজের চলমান বিজ্ঞপ্তি (Marquee)
+              </h3>
+              <form onSubmit={handleMarqueeUpdate} className="space-y-6">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-sm font-bold text-gray-700">
+                      <span className="bg-orange-100 text-orange-800 px-2.5 py-0.5 rounded-full text-xs mr-2 font-extrabold">বাংলা</span>
+                      বাংলা বিজ্ঞপ্তি টেক্সট <span className="text-red-500">*</span>
+                    </label>
+                    <span className="text-xs text-gray-500">হোমপেজে বাংলা মোডে এই টেক্সটটি স্ক্রোল করবে</span>
+                  </div>
+                  <textarea
+                    value={marqueeText}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setMarqueeText(val);
+                      if (setMarqueeTextEn) {
+                        setMarqueeTextEn(translateMarqueeToEnglish(val));
+                      }
+                    }}
+                    rows={3}
+                    className="w-full px-5 py-3.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:outline-none text-base bg-gray-50 font-medium"
+                    placeholder="বাংলায় নোটিশ লিখুন..."
+                    required
+                  ></textarea>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-sm font-bold text-gray-700">
+                      <span className="bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-full text-xs mr-2 font-extrabold">English</span>
+                      ইংরেজি বিজ্ঞপ্তি টেক্সট (Auto-translated from Bangla)
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (setMarqueeTextEn) setMarqueeTextEn(translateMarqueeToEnglish(marqueeText));
+                      }}
+                      className="text-xs bg-amber-50 hover:bg-amber-100 text-amber-900 font-bold py-1 px-3 rounded-lg border border-amber-300 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+                      title="বাংলা থেকে তাৎক্ষণিক নতুন অনুবাদ তৈরি করুন"
+                    >
+                      <i className="fas fa-sync-alt text-amber-600 text-xs"></i> রিফ্রেশ অনুবাদ
+                    </button>
+                  </div>
+                  <textarea
+                    value={marqueeTextEn || translateMarqueeToEnglish(marqueeText)}
+                    onChange={(e) => {
+                      if (setMarqueeTextEn) setMarqueeTextEn(e.target.value);
+                    }}
+                    rows={3}
+                    className="w-full px-5 py-3.5 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-base bg-blue-50/30 text-gray-800 font-medium"
+                    placeholder="English marquee notice (auto-translates from Bengali, or type custom English)..."
+                  ></textarea>
+                  <p className="text-xs text-gray-500 mt-1.5 flex items-center gap-1.5">
+                    <i className="fas fa-info-circle text-blue-500"></i>
+                    ভক্তরা যখন ইংরেজি ভাষা (EN) নির্বাচন করবেন, তখন এই বার্তাটি স্ক্রোল করবে। তারিখ ও বার স্বয়ংক্রিয়ভাবে পরিবর্তিত হয়।
+                  </p>
+                </div>
+
+                <div className="pt-2">
+                  <button type="submit" disabled={isSaving} className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-xl font-bold disabled:opacity-50 shadow-md transition-all inline-flex items-center gap-2 cursor-pointer">
+                    <i className="fas fa-save"></i> {isSaving ? 'সংরক্ষণ করা হচ্ছে...' : 'সংরক্ষণ করুন'}
+                  </button>
+                </div>
               </form>
             </div>
           )}
@@ -3813,15 +4278,15 @@ const AdminPanel = ({
               <form onSubmit={handleSaveMember} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-10 bg-gray-50 p-6 rounded-2xl border border-gray-200 items-end shadow-inner">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-1">নাম <span className="text-red-500">*</span></label>
-                  <input type="text" value={newMember.name} onChange={e => setNewMember({ ...newMember, name: e.target.value })} className="w-full px-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-orange-500" required placeholder="উদা: রহিম উদ্দীন" />
+                  <input type="text" value={newMember.name} onChange={e => setNewMember(prev => ({ ...prev, name: e.target.value }))} className="w-full px-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-orange-500" required placeholder="উদা: রহিম উদ্দীন" />
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-1">পদবী <span className="text-red-500">*</span></label>
-                  <input type="text" value={newMember.role} onChange={e => setNewMember({ ...newMember, role: e.target.value })} className="w-full px-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-orange-500" required placeholder="উদা: সদস্য" />
+                  <input type="text" value={newMember.role} onChange={e => setNewMember(prev => ({ ...prev, role: e.target.value }))} className="w-full px-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-orange-500" required placeholder="উদা: সদস্য" />
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-1">ফোন নম্বর</label>
-                  <input type="text" value={newMember.phone} onChange={e => setNewMember({ ...newMember, phone: e.target.value })} className="w-full px-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-orange-500" placeholder="উদা: ০১৭১..." />
+                  <input type="text" value={newMember.phone} onChange={e => setNewMember(prev => ({ ...prev, phone: e.target.value }))} className="w-full px-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-orange-500" placeholder="উদা: ০১৭১..." />
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-1">ছবি (আপলোড বা লিংক)</label>
@@ -3831,7 +4296,7 @@ const AdminPanel = ({
                       <span className="text-gray-600 truncate font-medium">{(newMember.image && newMember.image.startsWith('data:')) ? 'ছবি আপলোড করা হয়েছে' : 'ডিভাইস থেকে আপলোড'}</span>
                       <input type="file" accept="image/*" onChange={(e) => handleImageChange(e, setNewMember, newMember)} className="hidden" />
                     </label>
-                    <input type="text" value={(!newMember.image || newMember.image.startsWith('data:')) ? '' : newMember.image} onChange={(e) => setNewMember({ ...newMember, image: e.target.value })} className="w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-orange-500" placeholder="অথবা ড্রাইভ লিংক দিন..." />
+                    <input type="text" value={(!newMember.image || newMember.image.startsWith('data:')) ? '' : newMember.image} onChange={(e) => setNewMember(prev => ({ ...prev, image: e.target.value }))} className="w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-orange-500" placeholder="অথবা ড্রাইভ লিংক দিন..." />
                   </div>
                   {newMember.image && (
                     <img src={newMember.image} alt="Preview" className="w-16 h-16 object-cover rounded-lg border border-gray-300 shadow-sm mt-2" />
@@ -3904,19 +4369,19 @@ const AdminPanel = ({
               <form onSubmit={handleSaveTestimonial} className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10 bg-gray-50 p-6 rounded-2xl border border-gray-200 items-end shadow-inner">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-1">নাম <span className="text-red-500">*</span></label>
-                  <input type="text" value={newTestimonial.name} onChange={e => setNewTestimonial({ ...newTestimonial, name: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500" required placeholder="নাম লিখুন" />
+                  <input type="text" value={newTestimonial.name} onChange={e => setNewTestimonial(prev => ({ ...prev, name: e.target.value }))} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500" required placeholder="নাম লিখুন" />
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-1">পদবী/ঠিকানা</label>
-                  <input type="text" value={newTestimonial.designation} onChange={e => setNewTestimonial({ ...newTestimonial, designation: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500" placeholder="পদবী লিখুন" />
+                  <input type="text" value={newTestimonial.designation} onChange={e => setNewTestimonial(prev => ({ ...prev, designation: e.target.value }))} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500" placeholder="পদবী লিখুন" />
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-1">তারিখ</label>
-                  <input type="date" value={newTestimonial.date} onChange={e => setNewTestimonial({ ...newTestimonial, date: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm text-gray-700 focus:ring-2 focus:ring-orange-500" />
+                  <input type="date" value={newTestimonial.date} onChange={e => setNewTestimonial(prev => ({ ...prev, date: e.target.value }))} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm text-gray-700 focus:ring-2 focus:ring-orange-500" />
                 </div>
                 <div className="md:col-span-2">
                   <label className="block text-sm font-bold text-gray-700 mb-1">মতামত <span className="text-red-500">*</span></label>
-                  <QuillEditor value={newTestimonial.text} onChange={val => setNewTestimonial({ ...newTestimonial, text: val })} placeholder="মতামত লিখুন..." />
+                  <QuillEditor value={newTestimonial.text} onChange={val => setNewTestimonial(prev => ({ ...prev, text: val }))} placeholder="মতামত লিখুন..." />
                 </div>
                 <div className="md:col-span-2 mt-2 flex gap-3">
                   <button type="submit" disabled={isSaving} className="w-full bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 flex items-center justify-center gap-2 font-bold disabled:opacity-50 shadow-md">
@@ -3966,15 +4431,15 @@ const AdminPanel = ({
               <form onSubmit={handleSaveNotice} className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10 bg-gray-50 p-6 rounded-2xl border border-gray-200 items-end shadow-inner">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-1">শিরোনাম <span className="text-red-500">*</span></label>
-                  <input type="text" value={newNotice.title} onChange={e => setNewNotice({ ...newNotice, title: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500" required placeholder="উদা: নতুন কমিটি গঠন" />
+                  <input type="text" value={newNotice.title} onChange={e => setNewNotice(prev => ({ ...prev, title: e.target.value }))} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500" required placeholder="উদা: নতুন কমিটি গঠন" />
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-1">তারিখ <span className="text-red-500">*</span></label>
-                  <input type="date" value={newNotice.date} onChange={e => setNewNotice({ ...newNotice, date: e.target.value })} required className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm text-gray-700 focus:ring-2 focus:ring-orange-500" />
+                  <input type="date" value={newNotice.date} onChange={e => setNewNotice(prev => ({ ...prev, date: e.target.value }))} required className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm text-gray-700 focus:ring-2 focus:ring-orange-500" />
                 </div>
                 <div className="md:col-span-2">
                   <label className="block text-sm font-bold text-gray-700 mb-1">নোটিশের বিবরণ <span className="text-red-500">*</span></label>
-                  <QuillEditor value={newNotice.text} onChange={val => setNewNotice({ ...newNotice, text: val })} placeholder="বিস্তারিত লিখুন..." />
+                  <QuillEditor value={newNotice.text} onChange={val => setNewNotice(prev => ({ ...prev, text: val }))} placeholder="বিস্তারিত লিখুন..." />
                 </div>
                 <div className="md:col-span-2 mt-2 flex gap-3">
                   <button type="submit" disabled={isSaving} className="w-full bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 flex items-center justify-center gap-2 font-bold disabled:opacity-50 shadow-md">
@@ -4025,11 +4490,11 @@ const AdminPanel = ({
               <form onSubmit={handleSaveEvent} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-10 bg-gray-50 p-6 rounded-2xl border border-gray-200 items-end shadow-inner">
                 <div className="lg:col-span-1">
                   <label className="block text-sm font-bold text-gray-700 mb-1">ইভেন্টের শিরোনাম <span className="text-red-500">*</span></label>
-                  <input type="text" value={newEvent.title} onChange={e => setNewEvent({ ...newEvent, title: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500" required placeholder="উদা: বার্ষিক পূজা" />
+                  <input type="text" value={newEvent.title} onChange={e => setNewEvent(prev => ({ ...prev, title: e.target.value }))} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500" required placeholder="উদা: বার্ষিক পূজা" />
                 </div>
                 <div className="lg:col-span-1">
                   <label className="block text-sm font-bold text-gray-700 mb-1">তারিখ <span className="text-red-500">*</span></label>
-                  <input type="date" value={newEvent.date} onChange={e => setNewEvent({ ...newEvent, date: e.target.value })} required className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm text-gray-700 focus:ring-2 focus:ring-orange-500" />
+                  <input type="date" value={newEvent.date} onChange={e => setNewEvent(prev => ({ ...prev, date: e.target.value }))} required className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm text-gray-700 focus:ring-2 focus:ring-orange-500" />
                 </div>
                 <div className="lg:col-span-1">
                   <label className="block text-sm font-bold text-gray-700 mb-1">ছবি (আপলোড বা লিংক)</label>
@@ -4039,7 +4504,7 @@ const AdminPanel = ({
                       <span className="text-gray-600 truncate font-medium">{(newEvent.image && newEvent.image.startsWith('data:')) ? 'ছবি আপলোড করা হয়েছে' : 'ডিভাইস থেকে আপলোড'}</span>
                       <input type="file" accept="image/*" onChange={(e) => handleImageChange(e, setNewEvent, newEvent)} className="hidden" />
                     </label>
-                    <input type="text" value={(!newEvent.image || newEvent.image.startsWith('data:')) ? '' : newEvent.image} onChange={(e) => setNewEvent({ ...newEvent, image: e.target.value })} className="w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-orange-500" placeholder="অথবা গুগ্‌ল ড্রাইভ লিংক দিন..." />
+                    <input type="text" value={(!newEvent.image || newEvent.image.startsWith('data:')) ? '' : newEvent.image} onChange={(e) => setNewEvent(prev => ({ ...prev, image: e.target.value }))} className="w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-orange-500" placeholder="অথবা গুগ্‌ল ড্রাইভ লিংক দিন..." />
                   </div>
                   {newEvent.image && (
                     <img src={newEvent.image} alt="Preview" className="w-16 h-16 object-cover rounded-lg border border-gray-300 shadow-sm mt-2" />
@@ -4047,7 +4512,7 @@ const AdminPanel = ({
                 </div>
                 <div className="md:col-span-2 lg:col-span-3">
                   <label className="block text-sm font-bold text-gray-700 mb-1">ইভেন্টের বিস্তারিত <span className="text-red-500">*</span></label>
-                  <QuillEditor value={newEvent.description} onChange={val => setNewEvent({ ...newEvent, description: val })} placeholder="বিস্তারিত লিখুন..." />
+                  <QuillEditor value={newEvent.description} onChange={val => setNewEvent(prev => ({ ...prev, description: val }))} placeholder="বিস্তারিত লিখুন..." />
                 </div>
                 <div className="md:col-span-2 lg:col-span-3 mt-2 flex gap-3">
                   <button type="submit" disabled={isSaving} className="w-full bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 flex items-center justify-center gap-2 font-bold disabled:opacity-50 shadow-md">
@@ -4105,22 +4570,22 @@ const AdminPanel = ({
               <form onSubmit={handleSaveDonation} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-10 bg-gray-50 p-6 rounded-2xl border border-gray-200 items-end shadow-inner">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-1">দাতার নাম <span className="text-red-500">*</span></label>
-                  <input type="text" value={newDonation.name} onChange={e => setNewDonation({ ...newDonation, name: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500" required placeholder="নাম লিখুন" />
+                  <input type="text" value={newDonation.name} onChange={e => setNewDonation(prev => ({ ...prev, name: e.target.value }))} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500" required placeholder="নাম লিখুন" />
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-1">ঠিকানা বা পদবী</label>
-                  <input type="text" value={newDonation.address} onChange={e => setNewDonation({ ...newDonation, address: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500" placeholder="উদা: ঢাকা" />
+                  <input type="text" value={newDonation.address} onChange={e => setNewDonation(prev => ({ ...prev, address: e.target.value }))} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500" placeholder="উদা: ঢাকা" />
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-1">অণুদানের ধরণ <span className="text-red-500">*</span></label>
-                  <select value={newDonation.type} onChange={e => setNewDonation({ ...newDonation, type: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500 bg-white">
+                  <select value={newDonation.type} onChange={e => setNewDonation(prev => ({ ...prev, type: e.target.value }))} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500 bg-white">
                     <option value="নগদ অর্থ">নগদ অর্থ</option>
                     <option value="সরঞ্জাম/অন্যান্য">সরঞ্জাম/অন্যান্য</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-1">পরিমাণ / বিবরণ <span className="text-red-500">*</span></label>
-                  <input type="text" value={newDonation.amount} onChange={e => setNewDonation({ ...newDonation, amount: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500" required placeholder="উদা: ৫০০০ টাকা বা ১টি ফ্যান" />
+                  <input type="text" value={newDonation.amount} onChange={e => setNewDonation(prev => ({ ...prev, amount: e.target.value }))} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500" required placeholder="উদা: ৫০০০ টাকা বা ১টি ফ্যান" />
                 </div>
                 <div className="lg:col-span-4 mt-2 flex gap-3">
                   <button type="submit" disabled={isSaving} className="w-full bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 flex items-center justify-center gap-2 font-bold disabled:opacity-50 shadow-md">
@@ -4541,13 +5006,22 @@ const AdminPanel = ({
                 <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
                   <i className="fas fa-om text-orange-600"></i> পবিত্র মন্ত্র ও পদ্মাপুরাণ পরিচালনা
                 </h3>
-                <button
-                  type="button"
-                  onClick={() => playSacredBellSound()}
-                  className="bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors"
-                >
-                  <i className="fas fa-bell"></i> ঘণ্টা ধ্বনি টেস্ট
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => playSacredBellSound()}
+                    className="bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <i className="fas fa-bell"></i> ঘণ্টা টেস্ট
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => playSacredShankhSound()}
+                    className="bg-orange-100 hover:bg-orange-200 text-orange-900 text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <span>🐚</span> শঙ্খধ্বনি টেস্ট
+                  </button>
+                </div>
               </div>
 
               {/* Mantra Add/Edit Form */}
@@ -4567,7 +5041,7 @@ const AdminPanel = ({
                         if (val === 'প্রণাম') valEn = 'Pranam';
                         if (val === 'পদ্মপুরাণ') valEn = 'Padma Purana';
                         if (val === 'রক্ষা মন্ত্র') valEn = 'Protection';
-                        setNewMantra({ ...newMantra, category: val, category_en: valEn });
+                        setNewMantra(prev => ({ ...prev, category: val, category_en: valEn }));
                       }}
                       className="w-full p-2.5 bg-white border border-gray-300 rounded-lg text-sm"
                     >
@@ -4583,7 +5057,7 @@ const AdminPanel = ({
                       type="text"
                       required
                       value={newMantra.title || ''}
-                      onChange={(e) => setNewMantra({ ...newMantra, title: e.target.value })}
+                      onChange={(e) => setNewMantra(prev => ({ ...prev, title: e.target.value }))}
                       placeholder="মা মনসার ধ্যান মন্ত্র"
                       className="w-full p-2.5 bg-white border border-gray-300 rounded-lg text-sm"
                     />
@@ -4593,7 +5067,7 @@ const AdminPanel = ({
                     <input
                       type="text"
                       value={newMantra.title_en || ''}
-                      onChange={(e) => setNewMantra({ ...newMantra, title_en: e.target.value })}
+                      onChange={(e) => setNewMantra(prev => ({ ...prev, title_en: e.target.value }))}
                       placeholder="Maa Manasa Dhyana Mantra"
                       className="w-full p-2.5 bg-white border border-gray-300 rounded-lg text-sm"
                     />
@@ -4606,7 +5080,7 @@ const AdminPanel = ({
                     rows="3"
                     required
                     value={newMantra.sanskrit || ''}
-                    onChange={(e) => setNewMantra({ ...newMantra, sanskrit: e.target.value })}
+                    onChange={(e) => setNewMantra(prev => ({ ...prev, sanskrit: e.target.value }))}
                     placeholder="ওঁ দেবীং মনসাং ভক্ত্যা সংপূজ্য বিধিবৎ সদা..."
                     className="w-full p-3 bg-white border border-gray-300 rounded-lg text-sm font-serif"
                   ></textarea>
@@ -4617,7 +5091,7 @@ const AdminPanel = ({
                   <input
                     type="text"
                     value={newMantra.pronunciation || ''}
-                    onChange={(e) => setNewMantra({ ...newMantra, pronunciation: e.target.value })}
+                    onChange={(e) => setNewMantra(prev => ({ ...prev, pronunciation: e.target.value }))}
                     placeholder="Om Devim Manasam Bhaktya..."
                     className="w-full p-2.5 bg-white border border-gray-300 rounded-lg text-sm"
                   />
@@ -4629,7 +5103,7 @@ const AdminPanel = ({
                     <textarea
                       rows="2"
                       value={newMantra.meaning || ''}
-                      onChange={(e) => setNewMantra({ ...newMantra, meaning: e.target.value })}
+                      onChange={(e) => setNewMantra(prev => ({ ...prev, meaning: e.target.value }))}
                       className="w-full p-2.5 bg-white border border-gray-300 rounded-lg text-xs"
                     ></textarea>
                   </div>
@@ -4638,7 +5112,7 @@ const AdminPanel = ({
                     <textarea
                       rows="2"
                       value={newMantra.meaning_en || ''}
-                      onChange={(e) => setNewMantra({ ...newMantra, meaning_en: e.target.value })}
+                      onChange={(e) => setNewMantra(prev => ({ ...prev, meaning_en: e.target.value }))}
                       className="w-full p-2.5 bg-white border border-gray-300 rounded-lg text-xs"
                     ></textarea>
                   </div>
@@ -4743,8 +5217,8 @@ const AdminPanel = ({
               {/* Status Notice */}
               {credMsg.text && (
                 <div className={`p-4 rounded-xl mb-6 text-sm flex items-center gap-3 border font-medium ${credMsg.type === 'success'
-                    ? 'bg-green-50 text-green-800 border-green-200'
-                    : 'bg-red-50 text-red-800 border-red-200'
+                  ? 'bg-green-50 text-green-800 border-green-200'
+                  : 'bg-red-50 text-red-800 border-red-200'
                   }`}>
                   <i className={`fas ${credMsg.type === 'success' ? 'fa-circle-check text-green-600' : 'fa-triangle-exclamation text-red-600'} text-lg`}></i>
                   <div>{credMsg.text}</div>
@@ -4884,6 +5358,7 @@ function App() {
   const [dbError, setDbError] = useState(false);
 
   const [marqueeText, setMarqueeText] = useState('মন্দিরে স্বাগতম ✦ মায়ের আশীর্বাদ আপনার সহায় হোক ✦ ঐশ্বরিক উপস্থিতি অনুভব করুন');
+  const [marqueeTextEn, setMarqueeTextEn] = useState('');
   const [featuredTestimonialIds, setFeaturedTestimonialIds] = useState([]);
   const [committeeMembers, setCommitteeMembers] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
@@ -4939,23 +5414,26 @@ function App() {
 
     audio.volume = 0.55;
 
-    // Check saved preference
+    // Check saved preference - DEFAULT to true when newly opened (null / not 'false')
     const savedMusicPref = localStorage.getItem('site_music_enabled');
+    const shouldAutoPlay = savedMusicPref !== 'false';
 
     const tryAutoPlay = () => {
+      if (!shouldAutoPlay) return;
       audio.play().then(() => {
         setIsMusicPlaying(true);
+        localStorage.setItem('site_music_enabled', 'true');
       }).catch(() => {
         // Autoplay blocked by browser policy until interaction
         setIsMusicPlaying(false);
       });
     };
 
-    if (savedMusicPref === 'true') {
+    if (shouldAutoPlay) {
       tryAutoPlay();
     }
 
-    // Gentle one-time gesture unlock for browsers requiring user interaction
+    // Broad one-time gesture unlock for browsers requiring user interaction (touch, click, scroll, key)
     const handleFirstGesture = () => {
       if (localStorage.getItem('site_music_enabled') !== 'false' && audio.paused) {
         audio.play().then(() => {
@@ -4963,16 +5441,18 @@ function App() {
           localStorage.setItem('site_music_enabled', 'true');
         }).catch(() => { });
       }
-      window.removeEventListener('pointerdown', handleFirstGesture);
-      window.removeEventListener('keydown', handleFirstGesture);
+      removeGestureListeners();
     };
 
-    window.addEventListener('pointerdown', handleFirstGesture, { once: true });
-    window.addEventListener('keydown', handleFirstGesture, { once: true });
+    const gestureEvents = ['pointerdown', 'touchstart', 'click', 'keydown', 'scroll', 'wheel'];
+    const removeGestureListeners = () => {
+      gestureEvents.forEach(evt => window.removeEventListener(evt, handleFirstGesture, { capture: true }));
+    };
+
+    gestureEvents.forEach(evt => window.addEventListener(evt, handleFirstGesture, { once: true, passive: true, capture: true }));
 
     return () => {
-      window.removeEventListener('pointerdown', handleFirstGesture);
-      window.removeEventListener('keydown', handleFirstGesture);
+      removeGestureListeners();
     };
   }, []);
 
@@ -5062,6 +5542,8 @@ function App() {
       if (settingsData) {
         const mq = settingsData.find(s => s.key === 'marquee');
         if (mq) setMarqueeText(mq.value);
+        const mqEn = settingsData.find(s => s.key === 'marquee_en');
+        if (mqEn) setMarqueeTextEn(mqEn.value);
         const ft = settingsData.find(s => s.key === 'featured_test_ids');
         if (ft && ft.value) {
           try { setFeaturedTestimonialIds(JSON.parse(ft.value)); } catch (e) { }
@@ -5153,7 +5635,7 @@ function App() {
 
   const renderPage = () => {
     switch (currentPage) {
-      case 'home': return <Home dbError={dbError} marqueeText={marqueeText} testimonials={testimonials} featuredTestimonialIds={featuredTestimonialIds} committeeMembers={committeeMembers} events={events} notices={notices} timings={timings} travelInfo={travelInfo} mantras={mantras} navigateTo={navigateTo} showToast={showToast} lang={lang} />;
+      case 'home': return <Home dbError={dbError} marqueeText={marqueeText} marqueeTextEn={marqueeTextEn} testimonials={testimonials} featuredTestimonialIds={featuredTestimonialIds} committeeMembers={committeeMembers} events={events} notices={notices} timings={timings} travelInfo={travelInfo} mantras={mantras} navigateTo={navigateTo} showToast={showToast} lang={lang} />;
       case 'timings': return <TimingsPage timings={timings} navigateTo={navigateTo} lang={lang} />;
       case 'travel': return <TravelPage travelInfo={travelInfo} navigateTo={navigateTo} lang={lang} showToast={showToast} />;
       case 'mantras': return <MantrasPage mantras={mantras} navigateTo={navigateTo} lang={lang} showToast={showToast} />;
@@ -5167,6 +5649,7 @@ function App() {
         supabaseClient={supabaseClient} dbError={dbError} navigateTo={navigateTo}
         isAdminAuthenticated={isAdminAuthenticated} setIsAdminAuthenticated={setIsAdminAuthenticated}
         marqueeText={marqueeText} setMarqueeText={setMarqueeText}
+        marqueeTextEn={marqueeTextEn} setMarqueeTextEn={setMarqueeTextEn}
         committeeMembers={committeeMembers} setCommitteeMembers={setCommitteeMembers}
         testimonials={testimonials} setTestimonials={setTestimonials}
         events={events} setEvents={setEvents} notices={notices} setNotices={setNotices}
@@ -5178,7 +5661,7 @@ function App() {
         adminCredentials={adminCredentials} setAdminCredentials={setAdminCredentials}
         showToast={showToast}
       />;
-      default: return <Home dbError={dbError} marqueeText={marqueeText} testimonials={testimonials} featuredTestimonialIds={featuredTestimonialIds} committeeMembers={committeeMembers} events={events} notices={notices} timings={timings} travelInfo={travelInfo} mantras={mantras} navigateTo={navigateTo} showToast={showToast} lang={lang} />;
+      default: return <Home dbError={dbError} marqueeText={marqueeText} marqueeTextEn={marqueeTextEn} testimonials={testimonials} featuredTestimonialIds={featuredTestimonialIds} committeeMembers={committeeMembers} events={events} notices={notices} timings={timings} travelInfo={travelInfo} mantras={mantras} navigateTo={navigateTo} showToast={showToast} lang={lang} />;
     }
   };
 
