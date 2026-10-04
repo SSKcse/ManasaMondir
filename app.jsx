@@ -613,6 +613,25 @@ const I18N = {
     historyChap6Text: "কালের আবর্তে প্রাচীন মাটির মন্দিরটি বারবার প্রাকৃতিক দুর্যোগের মুখোমুখি হলেও ভক্তদের অটল ভক্তি ও 'কবি বিজয় গুপ্তের স্মৃতি রক্ষা, শ্রী শ্রী মা মনসা মন্দির সংরক্ষণ ও উন্নয়ন কমিটি'-এর উদ্যোগে এর গৌরব অম্লান রাখা হয়েছে। ২০০৫ সালে মন্দিরের গর্ভগৃহে স্থাপন করা হয় এক টন (১০০০ কেজি) ওজনের সুবিশাল পিতলের শ্রী শ্রী মা মনসা বিগ্রহ। পরবর্তীতে ২০১৩ সালে ভক্তদের সার্বিক অনুদানে ঐতিহাসিক দীঘির তীরে মনোরম শ্বেতপাথরে সজ্জিত আধুনিক ত্রিতল মন্দির ভবন, বিশাল নাটমন্দির ও ভক্তনিবাস নির্মিত হয়। আজ এই তীর্থস্থানটি হিন্দু ধর্মাবলম্বীদের এক জাগ্রত পুণ্যপীঠ এবং সমগ্র বাঙালি জাতির হাজার বছরের সমৃদ্ধ সাহিত্য সংস্কৃতির এক অনন্য জীবন্ত স্মৃতিসৌধ।",
 
     // Footer
+    
+    // Booking & Royani & Panjika Additions
+    booking: "পূজা বুকিং",
+    bookingTitle: "অনলাইন পূজা ও সংকল্প বুকিং",
+    bookingSubtitle: "শ্রী শ্রী মা মনসা দেবীর চরণে মানত, নিত্য ভোগ ও বিশেষ পূজা সংকল্প গ্রহণ",
+    royani: "রয়ানী গান",
+    royaniTitle: "ঐতিহ্যবাহী রয়ানী গান ও পদ্মাপুরাণ",
+    royaniSubtitle: "মধ্যযুগের মহাকবি বিজয় গুপ্তের অমর সৃষ্টি ও গৈলা মনসা মন্দিরের ৫০০+ বছরের ঐতিহ্যবাহী সংগীতধারা",
+    panjika: "পঞ্জিকা ও তিথি",
+    panjikaTitle: "শুভ পঞ্জিকা ও মহোৎসব সময়সূচী",
+    receipt: "দান রসিদ",
+    receiptTitle: "স্বয়ংক্রিয় পবিত্র দান রসিদ",
+    receiptSubtitle: "শ্রী শ্রী মা মনসা মন্দির তহবিলে প্রদত্ত প্রণামীর স্মারক রসিদ সংগ্রহ ও প্রিন্ট",
+    annualFestivalTarget: "বাৎসরিক মহোৎসব ও মনসা পূজা ২০২৬",
+    festivalCountdown: "মহোৎসব ও রয়ানী গানের বাকি",
+    daysUnit: "দিন",
+    hoursUnit: "ঘণ্টা",
+    minsUnit: "মিনিট",
+    secsUnit: "সেকেন্ড",
     footerAbout: "কবি বিজয় গুপ্তের প্রতিষ্ঠিত ঐতিহাসিক মন্দির। মায়ের আশীর্বাদে সবার জীবনে শান্তি ও সমৃদ্ধি নেমে আসুক।",
     quickLinks: "প্রয়োজনীয় লিংক",
     adminLogin: "এডমিন লগইন",
@@ -1291,9 +1310,11 @@ const Header = ({ navigateTo, isMenuOpen, setIsMenuOpen, lang, setLang, isMusicP
       </div>
 
       {/* Desktop Navigation with Matching Harmony */}
-      <nav className="hidden lg:flex items-center gap-5 xl:gap-6 font-medium text-xs xl:text-sm">
+      <nav className="hidden lg:flex items-center gap-4 xl:gap-5 font-medium text-xs xl:text-sm">
         <button onClick={() => navigateTo('home')} className="hover:text-yellow-300 transition-colors cursor-pointer">{t('home', lang)}</button>
         <button onClick={() => navigateTo('history')} className="hover:text-yellow-300 transition-colors cursor-pointer">{t('history', lang)}</button>
+        <button onClick={() => navigateTo('royani')} className="hover:text-yellow-300 transition-colors cursor-pointer flex items-center gap-1.5"><i className="fas fa-music text-yellow-300 text-xs"></i> {t('royani', lang)}</button>
+        <button onClick={() => navigateTo('booking')} className="hover:text-yellow-300 transition-colors cursor-pointer flex items-center gap-1.5"><i className="fas fa-hands-praying text-yellow-300 text-xs"></i> {t('booking', lang)}</button>
         <button onClick={() => navigateTo('committee')} className="hover:text-yellow-300 transition-colors cursor-pointer">{t('committee', lang)}</button>
         <button onClick={() => navigateTo('event')} className="hover:text-yellow-300 transition-colors cursor-pointer">{t('events', lang)}</button>
         <button onClick={() => navigateTo('notice')} className="hover:text-yellow-300 transition-colors flex items-center gap-1.5 cursor-pointer">
@@ -1335,6 +1356,8 @@ const Header = ({ navigateTo, isMenuOpen, setIsMenuOpen, lang, setLang, isMusicP
           <HeaderControls isMusicPlaying={isMusicPlaying} toggleMusic={toggleMusic} lang={lang} setLang={setLang} />
         </div>
         <button onClick={() => navigateTo('home')} className="py-2.5 px-6 text-left border-b border-orange-600/40 hover:bg-orange-600/50 transition-colors flex items-center gap-2.5"><i className="fas fa-home text-yellow-300 w-5"></i> {t('home', lang)}</button>
+        <button onClick={() => navigateTo('booking')} className="py-2.5 px-6 text-left border-b border-orange-600/40 hover:bg-orange-600/50 transition-colors flex items-center gap-2.5 text-yellow-200 font-bold"><i className="fas fa-hands-praying text-yellow-300 w-5"></i> {t('booking', lang)}</button>
+        <button onClick={() => navigateTo('royani')} className="py-2.5 px-6 text-left border-b border-orange-600/40 hover:bg-orange-600/50 transition-colors flex items-center gap-2.5 text-yellow-200"><i className="fas fa-music text-yellow-300 w-5"></i> {t('royani', lang)}</button>
         <button onClick={() => navigateTo('history')} className="py-2.5 px-6 text-left border-b border-orange-600/40 hover:bg-orange-600/50 transition-colors flex items-center gap-2.5"><i className="fas fa-landmark text-yellow-300 w-5"></i> {t('history', lang)}</button>
         <button onClick={() => navigateTo('timings')} className="py-2.5 px-6 text-left border-b border-orange-600/40 hover:bg-orange-600/50 transition-colors flex items-center gap-2.5"><i className="fas fa-clock text-yellow-300 w-5"></i> {t('timings', lang)}</button>
         <button onClick={() => navigateTo('travel')} className="py-2.5 px-6 text-left border-b border-orange-600/40 hover:bg-orange-600/50 transition-colors flex items-center gap-2.5"><i className="fas fa-route text-yellow-300 w-5"></i> {t('travel', lang)}</button>
@@ -1371,6 +1394,8 @@ const Footer = ({ navigateTo, lang, setLang }) => (
       <div>
         <h4 className="text-lg font-bold text-white mb-4 border-b border-gray-700 pb-2">{t('quickLinks', lang)}</h4>
         <ul className="space-y-2">
+          <li><button onClick={() => navigateTo('booking')} className="hover:text-yellow-400 flex items-center gap-2 text-yellow-300 font-bold"><i className="fas fa-hands-praying text-xs text-yellow-400"></i> {t('booking', lang)}</button></li>
+          <li><button onClick={() => navigateTo('royani')} className="hover:text-yellow-400 flex items-center gap-2"><i className="fas fa-music text-xs text-yellow-400"></i> {t('royani', lang)}</button></li>
           <li><button onClick={() => navigateTo('history')} className="hover:text-yellow-400 flex items-center gap-2"><i className="fas fa-chevron-right text-xs"></i> {t('history', lang)}</button></li>
           <li><button onClick={() => navigateTo('timings')} className="hover:text-yellow-400 flex items-center gap-2"><i className="fas fa-chevron-right text-xs"></i> {t('timings', lang)}</button></li>
           <li><button onClick={() => navigateTo('travel')} className="hover:text-yellow-400 flex items-center gap-2"><i className="fas fa-chevron-right text-xs"></i> {t('travel', lang)}</button></li>
@@ -1750,6 +1775,98 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
                 <i className="fas fa-arrow-right text-[11px] text-gray-300 group-hover:text-amber-600 group-hover:translate-x-1 transition-all ml-1.5 shrink-0"></i>
               </div>
               <p className="text-xs text-gray-500 font-medium truncate mt-0.5">{lang === 'en' ? 'Annual Festivals & Calendar' : 'বাৎসরিক মহোৎসব ও নির্ঘণ্ট'}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Panjika & Upcoming Festival Countdown */}
+      <section className="container mx-auto px-4 mt-6">
+        <PanjikaWidget navigateTo={navigateTo} lang={lang} />
+
+        {/* Three Holy Sacred Feature Gateways */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto -mt-2 mb-12">
+          {/* Card 1: Booking */}
+          <div
+            onClick={() => navigateTo('booking')}
+            className="cursor-pointer bg-white p-6 sm:p-7 rounded-3xl shadow-xl hover:shadow-2xl border-2 border-amber-300/80 hover:border-amber-500 transition-all duration-300 hover:-translate-y-2 relative overflow-hidden group card-hover-glow"
+          >
+            <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600"></div>
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all">
+                <i className="fas fa-hands-praying"></i>
+              </div>
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-amber-700 bg-amber-100 px-2.5 py-0.5 rounded-full">
+                  {lang === 'en' ? 'Online Seva' : 'অনলাইন সেবা'}
+                </span>
+                <h3 className="text-xl font-bold font-serif text-gray-900 mt-0.5 group-hover:text-amber-700 transition-colors">
+                  {t('booking', lang)}
+                </h3>
+              </div>
+            </div>
+            <p className="text-gray-600 text-xs sm:text-sm leading-relaxed mb-4">
+              {lang === 'en' ? 'Offer special Puja, Anna-Bhog, and personal prayer Sankalpa at the lotus feet of Maa Manasa.' : 'মা মনসার চরণে মানত শোধ, নিত্য ভোগ ও রোগমুক্তি সংকল্প গ্রহণের পূর্ণাঙ্গ সেবা।'}
+            </p>
+            <div className="flex items-center justify-between text-xs font-bold text-amber-700 pt-3 border-t border-gray-100">
+              <span>{lang === 'en' ? 'Book Sankalpa' : 'সংকল্প নিন ও টোকেন পান'}</span>
+              <i className="fas fa-arrow-right group-hover:translate-x-1.5 transition-transform"></i>
+            </div>
+          </div>
+
+          {/* Card 2: Royani Gaan */}
+          <div
+            onClick={() => navigateTo('royani')}
+            className="cursor-pointer bg-white p-6 sm:p-7 rounded-3xl shadow-xl hover:shadow-2xl border-2 border-orange-300/80 hover:border-orange-500 transition-all duration-300 hover:-translate-y-2 relative overflow-hidden group card-hover-glow"
+          >
+            <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-orange-600 via-red-600 to-amber-600"></div>
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-14 h-14 rounded-2xl bg-orange-50 text-orange-700 border border-orange-200 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 group-hover:bg-orange-600 group-hover:text-white transition-all">
+                <i className="fas fa-music"></i>
+              </div>
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-orange-700 bg-orange-100 px-2.5 py-0.5 rounded-full">
+                  {lang === 'en' ? '500+ Yrs Heritage' : 'ঐতিহ্যবাহী লোকসংগীত'}
+                </span>
+                <h3 className="text-xl font-bold font-serif text-gray-900 mt-0.5 group-hover:text-orange-700 transition-colors">
+                  {t('royani', lang)}
+                </h3>
+              </div>
+            </div>
+            <p className="text-gray-600 text-xs sm:text-sm leading-relaxed mb-4">
+              {lang === 'en' ? 'Explore the medieval folk epic of Poet Bijoy Gupta, authentic verses, and 108 Japa meditation.' : 'কবি বিজয় গুপ্তের অমর সৃষ্টি, চার খণ্ডের সচিত্র পালা এবং ১০৮ জপমালার পুণ্য সুরলহরী।'}
+            </p>
+            <div className="flex items-center justify-between text-xs font-bold text-orange-700 pt-3 border-t border-gray-100">
+              <span>{lang === 'en' ? 'Read Epic & Chants' : 'পালা পরিক্রমা ও ধ্যান'}</span>
+              <i className="fas fa-arrow-right group-hover:translate-x-1.5 transition-transform"></i>
+            </div>
+          </div>
+
+          {/* Card 3: Donation & Receipt */}
+          <div
+            onClick={() => navigateTo('donation')}
+            className="cursor-pointer bg-white p-6 sm:p-7 rounded-3xl shadow-xl hover:shadow-2xl border-2 border-yellow-300/80 hover:border-yellow-500 transition-all duration-300 hover:-translate-y-2 relative overflow-hidden group card-hover-glow"
+          >
+            <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-amber-400 via-yellow-400 to-orange-500"></div>
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-14 h-14 rounded-2xl bg-yellow-50 text-yellow-700 border border-yellow-200 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 group-hover:bg-yellow-500 group-hover:text-white transition-all">
+                <i className="fas fa-file-invoice"></i>
+              </div>
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-yellow-800 bg-yellow-100 px-2.5 py-0.5 rounded-full">
+                  {lang === 'en' ? 'Instant Memorial Slip' : 'স্বয়ংক্রিয় দান রসিদ'}
+                </span>
+                <h3 className="text-xl font-bold font-serif text-gray-900 mt-0.5 group-hover:text-yellow-700 transition-colors">
+                  {t('receipt', lang)}
+                </h3>
+              </div>
+            </div>
+            <p className="text-gray-600 text-xs sm:text-sm leading-relaxed mb-4">
+              {lang === 'en' ? 'Download and print your official sacred devotee memorial donation receipt with seal & serial number.' : 'মন্দির তহবিলে প্রদত্ত প্রণামীর অফিসিয়াল সিল ও স্মারক নম্বরযুক্ত রসিদ ডাউনলোড ও প্রিন্ট করুন।'}
+            </p>
+            <div className="flex items-center justify-between text-xs font-bold text-yellow-800 pt-3 border-t border-gray-100">
+              <span>{lang === 'en' ? 'Generate Official Receipt' : 'স্মারক রসিদ সংগ্রহ করুন'}</span>
+              <i className="fas fa-arrow-right group-hover:translate-x-1.5 transition-transform"></i>
             </div>
           </div>
         </div>
@@ -2294,6 +2411,874 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
 // --- Sub Pages ---
 
 // 1. Daily Puja & Aarti Timings Page
+
+// ==========================================
+// 1. Holy Words Number Formatter (Bengali & English)
+// ==========================================
+const amountInBengaliWords = (num) => {
+  const n = parseInt(num, 10);
+  if (isNaN(n) || n <= 0) return 'শূন্য টাকা মাত্র';
+  const ones = ['', 'এক', 'দুই', 'তিন', 'চার', 'পাঁচ', 'ছয়', 'সাত', 'আট', 'নয়', 'দশ',
+    'এগারো', 'বারো', 'তেরো', 'চৌদ্দ', 'পনেরো', 'ষোলো', 'সতেরো', 'আঠারো', 'উনিশ', 'বিশ',
+    'একুশ', 'বাইশ', 'তেইশ', 'চব্বিশ', 'পঁচিশ', 'ছাব্বিশ', 'সাতাশ', 'আঠাশ', 'উনত্রিশ', 'ত্রিশ',
+    'একত্রিশ', 'বত্রিশ', 'তেত্রিশ', 'চৌত্রিশ', 'পঁয়ত্রিশ', 'ছত্রিশ', 'সাঁইত্রিশ', 'আটত্রিশ', 'উনচল্লিশ', 'চল্লিশ',
+    'একচল্লিশ', 'বিয়াল্লিশ', 'তেতাল্লিশ', 'চুয়াল্লিশ', 'পঁয়তাল্লিশ', 'ছেচল্লিশ', 'সাতচল্লিশ', 'আটচল্লিশ', 'উনপঞ্চাশ', 'পঞ্চাশ',
+    'একান্ন', 'বায়ান্ন', 'তিপ্পান্ন', 'চুয়ান্ন', 'পঞ্চান্ন', 'ছাপ্পান্ন', 'সাতান্ন', 'আটান্ন', 'উনষাট', 'ষাট',
+    'একষট্টি', 'বাষট্টি', 'তেষট্টি', 'চৌষট্টি', 'পঁয়ষট্টি', 'ছেষট্টি', 'সাতষট্টি', 'আটষট্টি', 'উনসত্তর', 'সত্তর',
+    'একাত্তর', 'বাহাত্তর', 'তিয়াত্তর', 'চুয়াত্তর', 'পঁচাত্তর', 'ছিয়াত্তর', 'সাতাত্তর', 'আটাত্তর', 'উনআশি', 'আশি',
+    'একাশি', 'বিরাশি', 'তিরাশি', 'চুরাশি', 'পঁচাশি', 'ছিয়াশি', 'সাতাশি', 'অষ্টআশি', 'নব্বই',
+    'একানব্বই', 'বানব্বই', 'তিরানব্বই', 'চুরানব্বই', 'পঁচানব্বই', 'ছিয়ানব্বই', 'সাতানব্বই', 'আটানব্বই', 'নিরানব্বই'];
+
+  let result = '';
+  let rem = n;
+  if (rem >= 10000000) {
+    const koti = Math.floor(rem / 10000000);
+    result += (ones[koti] || koti) + ' কোটি ';
+    rem %= 10000000;
+  }
+  if (rem >= 100000) {
+    const lakh = Math.floor(rem / 100000);
+    result += (ones[lakh] || lakh) + ' লক্ষ ';
+    rem %= 100000;
+  }
+  if (rem >= 1000) {
+    const hajar = Math.floor(rem / 1000);
+    result += (ones[hajar] || hajar) + ' হাজার ';
+    rem %= 1000;
+  }
+  if (rem >= 100) {
+    const shata = Math.floor(rem / 100);
+    result += (ones[shata] || shata) + ' শত ';
+    rem %= 100;
+  }
+  if (rem > 0) {
+    result += (ones[rem] || rem) + ' ';
+  }
+  return result.trim() + ' টাকা মাত্র';
+};
+
+const amountInEnglishWords = (num) => {
+  const n = parseInt(num, 10);
+  if (isNaN(n) || n <= 0) return 'Zero Taka Only';
+  const a = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
+    'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+  const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+  const inWords = (num) => {
+    if (num < 20) return a[num];
+    const digit = num % 10;
+    return b[Math.floor(num / 10)] + (digit ? ' ' + a[digit] : '');
+  };
+  let str = '';
+  let rem = n;
+  if (rem >= 10000000) {
+    str += inWords(Math.floor(rem / 10000000)) + ' Crore ';
+    rem %= 10000000;
+  }
+  if (rem >= 100000) {
+    str += inWords(Math.floor(rem / 100000)) + ' Lakh ';
+    rem %= 100000;
+  }
+  if (rem >= 1000) {
+    str += inWords(Math.floor(rem / 1000)) + ' Thousand ';
+    rem %= 1000;
+  }
+  if (rem >= 100) {
+    str += inWords(Math.floor(rem / 100)) + ' Hundred ';
+    rem %= 100;
+  }
+  if (rem > 0) {
+    str += inWords(rem) + ' ';
+  }
+  return str.trim() + ' Taka Only';
+};
+
+// ==========================================
+// 2. Panjika & Upcoming Festival Countdown Widget
+// ==========================================
+const PanjikaWidget = ({ navigateTo, lang = 'bn' }) => {
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+  useEffect(() => {
+    const targetDate = new Date('2026-08-18T06:00:00+06:00').getTime();
+    const updateCountdown = () => {
+      const now = new Date().getTime();
+      const diff = targetDate - now;
+      if (diff > 0) {
+        setTimeLeft({
+          days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+          minutes: Math.floor((diff / 1000 / 60) % 60),
+          seconds: Math.floor((diff / 1000) % 60)
+        });
+      }
+    };
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const festivals = [
+    {
+      tithiBn: 'শ্রাবণী শুক্লা পঞ্চমী',
+      tithiEn: 'Shravani Shukla Panchami',
+      eventBn: 'পবিত্র নাগ পঞ্চমী মহাপূজা ও বিশেষ অভিষেক',
+      eventEn: 'Nag Panchami Mahapuja & Sacred Abhishekam',
+      dateBn: '১৮ জুলাই ২০২৬',
+      dateEn: '18 July 2026'
+    },
+    {
+      tithiBn: 'বাৎসরিক মহোৎসব তিথি',
+      tithiEn: 'Annual Mahotsav Day',
+      eventBn: 'শ্রীশ্রী মা মনসা পূজা ও অষ্টপ্রহর রয়ানী গান',
+      eventEn: 'Annual Maa Manasa Puja & Royani Folk Gaan',
+      dateBn: '১৮ আগস্ট ২০২৬',
+      dateEn: '18 August 2026',
+      isGrand: true
+    },
+    {
+      tithiBn: 'ভাদ্র সংক্রান্তি',
+      tithiEn: 'Bhadra Sankranti',
+      eventBn: 'বাৎসরিক মনসা পূজা মহা সমাপন ও প্রসাদ বিতরণ',
+      eventEn: 'Grand Concluding Puja & Mahaprasad Distribution',
+      dateBn: '১৭ সেপ্টেম্বর ২০২৬',
+      dateEn: '17 September 2026'
+    },
+    {
+      tithiBn: 'অগ্রহায়ণ পূর্ণিমা',
+      tithiEn: 'Agrahayana Purnima',
+      eventBn: 'নবান্ন উৎসব ও দেবী মনসার অন্নভোগ নিবেদন',
+      eventEn: 'Nabanna Festival & Sacred Anna-Bhog Offering',
+      dateBn: '২৪ নভেম্বর ২০২৬',
+      dateEn: '24 November 2026'
+    }
+  ];
+
+  return (
+    <div className="bg-gradient-to-r from-orange-950 via-red-950 to-amber-950 text-white rounded-3xl p-6 sm:p-8 shadow-2xl border-2 border-yellow-400/40 relative overflow-hidden my-10 card-hover-glow">
+      <div className="absolute -right-10 -bottom-10 opacity-10 text-yellow-300 text-9xl pointer-events-none">
+        <i className="fas fa-om"></i>
+      </div>
+
+      {/* Top Header Badge */}
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-yellow-400/20 pb-4 mb-6">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-yellow-400/20 border border-yellow-400/40 flex items-center justify-center text-yellow-300 text-2xl shadow-inner">
+            <i className="fas fa-calendar-check"></i>
+          </div>
+          <div>
+            <span className="inline-block text-[11px] uppercase tracking-wider text-yellow-300 font-bold bg-yellow-400/20 px-2.5 py-0.5 rounded-full border border-yellow-400/30">
+              {lang === 'en' ? 'Sacred Tithi & Panjika' : 'শুভ পঞ্জিকা ও তিথি নির্ঘণ্ট'}
+            </span>
+            <h3 className="text-xl sm:text-2xl font-bold font-serif text-yellow-300 mt-0.5">
+              {t('annualFestivalTarget', lang)}
+            </h3>
+          </div>
+        </div>
+        <div className="text-right">
+          <p className="text-xs text-orange-200">
+            {lang === 'en' ? 'Historic Goila Temple Mahotsav' : 'গৈলার ঐতিহ্যবাহী বাৎসরিক মহোৎসব'}
+          </p>
+          <p className="text-sm sm:text-base font-bold text-yellow-300 font-serif">
+            {lang === 'en' ? 'Tuesday, 18 August 2026' : '১৮ আগস্ট ২০২৬ (মঙ্গলবার)'}
+          </p>
+        </div>
+      </div>
+
+      {/* Countdown Grid */}
+      <div className="mb-8">
+        <p className="text-center text-xs sm:text-sm text-yellow-200/90 font-medium mb-3 flex items-center justify-center gap-2">
+          <i className="fas fa-hourglass-half text-yellow-400 animate-spin" style={{ animationDuration: '6s' }}></i>
+          {t('festivalCountdown', lang)}:
+        </p>
+        <div className="grid grid-cols-4 gap-2 sm:gap-4 max-w-xl mx-auto text-center">
+          <div className="bg-black/50 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-yellow-400/30 shadow-lg">
+            <span className="block text-2xl sm:text-4xl font-extrabold text-yellow-300 font-mono">
+              {formatNumber(timeLeft.days, lang)}
+            </span>
+            <span className="text-[10px] sm:text-xs text-orange-200 font-medium uppercase tracking-wider">
+              {t('daysUnit', lang)}
+            </span>
+          </div>
+          <div className="bg-black/50 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-yellow-400/30 shadow-lg">
+            <span className="block text-2xl sm:text-4xl font-extrabold text-yellow-300 font-mono">
+              {formatNumber(timeLeft.hours, lang)}
+            </span>
+            <span className="text-[10px] sm:text-xs text-orange-200 font-medium uppercase tracking-wider">
+              {t('hoursUnit', lang)}
+            </span>
+          </div>
+          <div className="bg-black/50 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-yellow-400/30 shadow-lg">
+            <span className="block text-2xl sm:text-4xl font-extrabold text-yellow-300 font-mono">
+              {formatNumber(timeLeft.minutes, lang)}
+            </span>
+            <span className="text-[10px] sm:text-xs text-orange-200 font-medium uppercase tracking-wider">
+              {t('minsUnit', lang)}
+            </span>
+          </div>
+          <div className="bg-black/50 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-yellow-400/30 shadow-lg">
+            <span className="block text-2xl sm:text-4xl font-extrabold text-yellow-300 font-mono">
+              {formatNumber(timeLeft.seconds, lang)}
+            </span>
+            <span className="text-[10px] sm:text-xs text-orange-200 font-medium uppercase tracking-wider">
+              {t('secsUnit', lang)}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Auspicious Tithis Calendar List */}
+      <div className="bg-black/40 backdrop-blur-md rounded-2xl p-4 sm:p-5 border border-yellow-400/20 mb-6">
+        <h4 className="text-sm font-bold text-yellow-300 uppercase tracking-wider mb-3 flex items-center gap-2">
+          <i className="fas fa-star text-xs text-yellow-400"></i>
+          {lang === 'en' ? 'Auspicious Annual Tithis & Ceremonies' : 'বার্ষিক পবিত্র তিথি ও পূজানুষ্ঠান'}
+        </h4>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
+          {festivals.map((fest, idx) => (
+            <div
+              key={idx}
+              className={`p-3 rounded-xl border flex items-start justify-between gap-3 ${
+                fest.isGrand
+                  ? 'bg-amber-500/20 border-yellow-400/50 text-yellow-100 shadow-md'
+                  : 'bg-white/5 border-white/10 text-gray-200'
+              }`}
+            >
+              <div>
+                <span className="text-yellow-300 font-bold block">
+                  {lang === 'en' ? fest.tithiEn : fest.tithiBn}
+                </span>
+                <p className="text-white font-medium text-xs mt-0.5">
+                  {lang === 'en' ? fest.eventEn : fest.eventBn}
+                </p>
+              </div>
+              <span className="text-[11px] bg-black/50 text-yellow-300 font-semibold px-2 py-1 rounded-md shrink-0 border border-yellow-400/30">
+                {lang === 'en' ? fest.dateEn : fest.dateBn}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Action CTA Buttons */}
+      <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 no-print">
+        <button
+          onClick={() => navigateTo('booking')}
+          className="btn-shine bg-gradient-to-r from-amber-400 to-yellow-500 text-orange-950 px-6 py-2.5 rounded-full font-bold shadow-lg hover:shadow-yellow-500/50 flex items-center gap-2 text-sm active:scale-95 cursor-pointer"
+        >
+          <i className="fas fa-hands-praying text-xs"></i>
+          {lang === 'en' ? 'Book Holy Puja & Sankalpa' : 'পূজা ও সংকল্প বুকিং করুন'}
+        </button>
+        <button
+          onClick={() => navigateTo('royani')}
+          className="bg-white/10 hover:bg-white/20 text-yellow-200 border border-yellow-400/40 px-6 py-2.5 rounded-full font-semibold flex items-center gap-2 text-sm transition-all active:scale-95 cursor-pointer"
+        >
+          <i className="fas fa-music text-xs"></i>
+          {lang === 'en' ? 'Explore Royani Gaan Epic' : 'ঐতিহ্যবাহী রয়ানী গান দর্শন'}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// ==========================================
+// 3. Online Puja & Sankalpa Booking Page
+// ==========================================
+const BookingPage = ({ navigateTo, showToast, lang = 'bn' }) => {
+  const [formData, setFormData] = useState({
+    devoteeName: '',
+    gotra: '',
+    phone: '',
+    address: '',
+    pujaDate: '',
+    pujaType: 'মা মনসার বিশেষ নিত্য পূজা ও পুষ্পাঞ্জলি',
+    sankalpa: '',
+    amount: ''
+  });
+  const [confirmedBooking, setConfirmedBooking] = useState(null);
+
+  const gotraPresets = ['কশ্যপ', 'শাণ্ডিল্য', 'ভরদ্বাজ', 'আলম্বায়ন', 'সাবর্ণ্য', 'মৌদ্গল্য', 'পরাশর', 'শিবগোত্র'];
+  const pujaTypes = [
+    {
+      id: 'daily_special',
+      nameBn: 'মা মনসার বিশেষ নিত্য পূজা ও পুষ্পাঞ্জলি',
+      nameEn: 'Special Daily Manasa Puja & Pushpanjali',
+      descBn: 'সুস্বাস্থ্য, দীর্ঘায়ু ও পারিবারিক শান্তি কামনায়'
+    },
+    {
+      id: 'bhog_seva',
+      nameBn: 'অন্নভোগ ও মহাপ্রসাদ নিবেদন',
+      nameEn: 'Sacred Anna-Bhog & Mahaprasad Offering',
+      descBn: 'মন্দিরে ভক্তসেবা ও দ্বিপ্রহরিক পরম অন্নভোগ'
+    },
+    {
+      id: 'mansik_puja',
+      nameBn: 'মনস্কামনা পূরণ ও মানত শোধ পূজা',
+      nameEn: 'Wish-Fulfillment & Mansik Puja',
+      descBn: 'বিশেষ মনোবাঞ্ছা পূর্ণান্তে দেবীর চরণে কৃতজ্ঞতা'
+    },
+    {
+      id: 'sarpa_bhay',
+      nameBn: 'সর্পভয় নিবারণ ও অষ্টনাগ পূজা',
+      nameEn: 'Sarpa-Bhay Nivarana & Astanaga Puja',
+      descBn: 'অষ্টনাগের সন্তুষ্টি ও গৃহশান্তি বিধান'
+    },
+    {
+      id: 'shanti_sankalpa',
+      nameBn: 'রোগমুক্তি ও সঙ্কটমোচন সংকল্প পূজা',
+      nameEn: 'Healing & Crisis-Removal Sankalpa Puja',
+      descBn: 'শারীরিক সুস্থতা ও বিঘ্নবিনাশ কামনায়'
+    },
+    {
+      id: 'annual_festival',
+      nameBn: 'বাৎসরিক শ্রাবণী মহোৎসব বিশেষ সংকল্প',
+      nameEn: 'Annual Shravani Mahotsav Special Puja',
+      descBn: 'ঐতিহাসিক ১৮ আগস্ট বাৎসরিক মহা মিলনোৎসব'
+    }
+  ];
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!formData.devoteeName.trim() || !formData.phone.trim()) {
+      if (showToast) showToast(lang === 'en' ? 'Please enter Devotee Name and Phone number' : 'অনুগ্রহ করে ভক্তের নাম ও মোবাইল নম্বর লিখুন');
+      return;
+    }
+    const token = 'MMG-PUJA-' + Math.floor(100000 + Math.random() * 900000);
+    const booking = {
+      ...formData,
+      token,
+      timestamp: new Date().toISOString()
+    };
+    try {
+      const existing = JSON.parse(localStorage.getItem('mmg_puja_bookings') || '[]');
+      existing.unshift(booking);
+      localStorage.setItem('mmg_puja_bookings', JSON.stringify(existing.slice(0, 50)));
+    } catch (err) {}
+    setConfirmedBooking(booking);
+    if (showToast) showToast(lang === 'en' ? 'Sacred Puja Booking Confirmed! Token generated.' : 'পূজা ও সংকল্প বুকিং সম্পন্ন হয়েছে! সংকল্প পত্র তৈরি হয়েছে।');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const copyBookingSlip = () => {
+    if (!confirmedBooking) return;
+    const text = `শ্রী শ্রী মা মনসা মন্দির, গৈলা - সংকল্প পত্র\nটোকেন নং: ${confirmedBooking.token}\nভক্তের নাম: ${confirmedBooking.devoteeName}\nগোত্র: ${confirmedBooking.gotra || 'অনুল্লিখিত'}\nপূজার প্রকার: ${confirmedBooking.pujaType}\nপূজার তারিখ: ${confirmedBooking.pujaDate || 'নিকটতম তিথি'}\nমোবাইল: ${confirmedBooking.phone}\nসংকল্প/প্রার্থনা: ${confirmedBooking.sankalpa || 'সর্বমঙ্গলের জন্য'}\nযোগাযোগ: ০১৭২৭০৭৫২৫৪, ০১৭১২৯৪০৭১৬`;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+    }
+    if (showToast) showToast(lang === 'en' ? 'Sankalpa details copied!' : 'সংকল্প বিবরণ কপি হয়েছে!');
+  };
+
+  return (
+    <div className="bg-orange-50 min-h-screen py-12 anim-fade-up">
+      <div className="container mx-auto px-4 max-w-4xl">
+        <BackButton navigateTo={navigateTo} lang={lang} />
+
+        {/* Banner Header */}
+        <div className="text-center mb-10 page-banner-aurora p-8 rounded-3xl bg-gradient-to-r from-orange-950 via-red-950 to-amber-950 text-white shadow-xl border-2 border-yellow-400/40 relative">
+          <div className="inline-flex items-center gap-2 bg-yellow-400/20 text-yellow-300 px-4 py-1.5 rounded-full text-xs font-bold mb-3 border border-yellow-400/30">
+            <i className="fas fa-hands-praying text-xs text-yellow-400"></i>
+            {lang === 'en' ? 'Online Darshan & Seva' : 'অনলাইন পূজা ও সংকল্প সেবা'}
+          </div>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold font-serif text-yellow-300 mb-3 divine-title-glow">
+            {t('bookingTitle', lang)}
+          </h1>
+          <p className="text-orange-100 text-sm sm:text-base max-w-2xl mx-auto">
+            {t('bookingSubtitle', lang)}
+          </p>
+        </div>
+
+        {confirmedBooking ? (
+          /* Confirmation Slip / Token Card */
+          <div className="bg-white rounded-3xl shadow-2xl border-4 border-amber-400/60 p-6 sm:p-10 mb-12 relative overflow-hidden print-sacred-card">
+            <div className="text-center pb-6 border-b-2 border-amber-200">
+              <div className="w-16 h-16 mx-auto rounded-full bg-orange-100 border-2 border-amber-500 flex items-center justify-center text-amber-700 text-2xl shadow-md mb-3">
+                <i className="fas fa-om"></i>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold font-serif text-orange-950">
+                {lang === 'en' ? 'Shree Shree Maa Manasa Mandir, Goila' : 'শ্রী শ্রী মা মনসা মন্দির, গৈলা'}
+              </h2>
+              <p className="text-xs sm:text-sm text-gray-600 font-medium">
+                {lang === 'en' ? 'Goila, Agailjhara, Barishal • Established 1494 AD' : 'গৈলা, আগৈলঝাড়া, বরিশাল • স্থাপিত ১৪৯৪ খ্রিষ্টাব্দ'}
+              </p>
+              <div className="inline-block mt-3 bg-amber-100 text-amber-900 border border-amber-400 px-4 py-1 rounded-full text-xs sm:text-sm font-bold tracking-wide">
+                ✦ {lang === 'en' ? 'Sacred Puja Booking Token Slip' : 'পবিত্র পূজা ও সংকল্প প্রাপ্তিস্বীকার পত্র'} ✦
+              </div>
+            </div>
+
+            <div className="py-6 space-y-4 text-gray-800 text-sm sm:text-base">
+              <div className="flex justify-between items-center bg-orange-50/70 p-3 rounded-xl border border-orange-100">
+                <span className="font-semibold text-gray-600">{lang === 'en' ? 'Token Number:' : 'টোকেন নম্বর:'}</span>
+                <span className="font-mono font-bold text-amber-800 text-lg sm:text-xl tracking-wider">{confirmedBooking.token}</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
+                  <span className="block text-xs text-gray-500 font-semibold">{lang === 'en' ? 'Devotee Name' : 'ভক্তের নাম'}</span>
+                  <span className="font-bold text-gray-900 text-base">{confirmedBooking.devoteeName}</span>
+                </div>
+                <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
+                  <span className="block text-xs text-gray-500 font-semibold">{lang === 'en' ? 'Gotra (Ancestry)' : 'গোত্র'}</span>
+                  <span className="font-bold text-gray-900 text-base">{confirmedBooking.gotra || (lang === 'en' ? 'Not Specified' : 'অনুল্লিখিত')}</span>
+                </div>
+                <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
+                  <span className="block text-xs text-gray-500 font-semibold">{lang === 'en' ? 'Puja Type' : 'পূজার প্রকার'}</span>
+                  <span className="font-bold text-orange-900">{confirmedBooking.pujaType}</span>
+                </div>
+                <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
+                  <span className="block text-xs text-gray-500 font-semibold">{lang === 'en' ? 'Scheduled Date' : 'কাঙ্ক্ষিত পূজার তারিখ'}</span>
+                  <span className="font-bold text-gray-900">{confirmedBooking.pujaDate || (lang === 'en' ? 'Nearest Auspicious Tithi' : 'নিকটবর্তী শুভ তিথি')}</span>
+                </div>
+              </div>
+
+              {confirmedBooking.sankalpa && (
+                <div className="p-4 bg-amber-50/80 rounded-2xl border border-amber-200">
+                  <span className="block text-xs text-amber-800 font-bold mb-1">
+                    <i className="fas fa-pray text-xs mr-1"></i>
+                    {lang === 'en' ? 'Devotee Sankalpa / Prayer Details:' : 'বিশেষ প্রার্থনা ও সংকল্প বিবরণ:'}
+                  </span>
+                  <p className="text-gray-900 italic font-serif text-sm sm:text-base leading-relaxed">
+                    "{confirmedBooking.sankalpa}"
+                  </p>
+                </div>
+              )}
+
+              <div className="bg-orange-100/70 p-4 rounded-2xl border border-orange-200 text-xs sm:text-sm text-orange-950 flex items-center gap-3">
+                <i className="fas fa-phone-volume text-xl text-orange-700 shrink-0"></i>
+                <div>
+                  <strong className="block">{lang === 'en' ? 'Priest & Temple Coordination Contact:' : 'পুরোহিত ও মন্দির পরিচালনা সমন্বয় হেল্পলাইন:'}</strong>
+                  <span>০১৭১৭-৫০৩৬৫৭ (সভাপতি), ০১৭২৭০৭৫২৫৪ (অর্থ সম্পাদক), ০১৭১২৯৪০৭১৬ (দপ্তর সম্পাদক)</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-wrap items-center justify-center gap-3 pt-6 border-t border-gray-200 no-print">
+              <button
+                onClick={() => window.print()}
+                className="btn-shine bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-bold px-6 py-2.5 rounded-full shadow-md flex items-center gap-2 active:scale-95 cursor-pointer text-sm"
+              >
+                <i className="fas fa-print"></i>
+                {lang === 'en' ? 'Print / Save Slip' : 'সংকল্প পত্র প্রিন্ট / সেভ করুন'}
+              </button>
+              <button
+                onClick={copyBookingSlip}
+                className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold px-6 py-2.5 rounded-full border border-gray-300 flex items-center gap-2 active:scale-95 cursor-pointer text-sm"
+              >
+                <i className="fas fa-copy"></i>
+                {lang === 'en' ? 'Copy Details' : 'বিবরণ কপি করুন'}
+              </button>
+              <button
+                onClick={() => setConfirmedBooking(null)}
+                className="bg-orange-50 hover:bg-orange-100 text-orange-800 font-bold px-6 py-2.5 rounded-full border border-orange-300 flex items-center gap-2 active:scale-95 cursor-pointer text-sm"
+              >
+                <i className="fas fa-plus-circle"></i>
+                {lang === 'en' ? 'Book Another Puja' : 'নতুন পূজা বুক করুন'}
+              </button>
+            </div>
+          </div>
+        ) : (
+          /* Booking Form */
+          <div className="bg-white rounded-3xl shadow-xl border-2 border-orange-100 p-6 sm:p-10 mb-12">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label className="block text-sm font-bold text-gray-800 mb-1">
+                  {lang === 'en' ? 'Devotee Name *' : 'ভক্তের পূর্ণ নাম *'}
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder={lang === 'en' ? 'Enter devotee full name' : 'যেমন: অর্পণ চক্রবর্তী'}
+                  value={formData.devoteeName}
+                  onChange={(e) => setFormData({ ...formData, devoteeName: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none text-base font-medium"
+                />
+              </div>
+
+              {/* Gotra with Preset Pills */}
+              <div>
+                <label className="block text-sm font-bold text-gray-800 mb-1">
+                  {lang === 'en' ? 'Gotra (Lineage)' : 'গোত্র'}
+                </label>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {gotraPresets.map((g) => (
+                    <button
+                      type="button"
+                      key={g}
+                      onClick={() => setFormData({ ...formData, gotra: g })}
+                      className={`px-3 py-1 rounded-full text-xs font-bold border transition-all active:scale-95 cursor-pointer ${
+                        formData.gotra === g
+                          ? 'bg-amber-500 text-white border-amber-600 shadow-sm'
+                          : 'bg-orange-50 text-orange-900 border-orange-200 hover:bg-orange-100'
+                      }`}
+                    >
+                      {g}
+                    </button>
+                  ))}
+                </div>
+                <input
+                  type="text"
+                  placeholder={lang === 'en' ? 'Or type your Gotra manually' : 'অথবা সরাসরি গোত্র লিখুন (যেমন: কশ্যপ)'}
+                  value={formData.gotra}
+                  onChange={(e) => setFormData({ ...formData, gotra: e.target.value })}
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none text-sm"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-800 mb-1">
+                    {lang === 'en' ? 'Mobile / WhatsApp Number *' : 'মোবাইল / হোয়াটসঅ্যাপ নম্বর *'}
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="017XXXXXXXX"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none text-base font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-800 mb-1">
+                    {lang === 'en' ? 'Preferred Puja Date' : 'পূজার কাঙ্ক্ষিত তারিখ'}
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.pujaDate}
+                    onChange={(e) => setFormData({ ...formData, pujaDate: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none text-base"
+                  />
+                </div>
+              </div>
+
+              {/* Puja Type Radio Selector */}
+              <div>
+                <label className="block text-sm font-bold text-gray-800 mb-2">
+                  {lang === 'en' ? 'Select Puja Type / Category *' : 'পূজার প্রকার নির্বাচন করুন *'}
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {pujaTypes.map((pt) => {
+                    const isSelected = formData.pujaType === pt.nameBn;
+                    return (
+                      <div
+                        key={pt.id}
+                        onClick={() => setFormData({ ...formData, pujaType: pt.nameBn })}
+                        className={`p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 flex items-start gap-3 ${
+                          isSelected
+                            ? 'bg-amber-50/80 border-amber-500 shadow-md'
+                            : 'bg-white border-gray-200 hover:border-amber-300'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="pujaType"
+                          checked={isSelected}
+                          onChange={() => setFormData({ ...formData, pujaType: pt.nameBn })}
+                          className="mt-1 accent-amber-600"
+                        />
+                        <div>
+                          <span className="font-bold text-gray-900 block text-sm sm:text-base">
+                            {lang === 'en' ? pt.nameEn : pt.nameBn}
+                          </span>
+                          <span className="text-xs text-gray-500 mt-0.5 block">
+                            {pt.descBn}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Address / Location */}
+              <div>
+                <label className="block text-sm font-bold text-gray-800 mb-1">
+                  {lang === 'en' ? 'Devotee Address / City' : 'ভক্তের ঠিকানা / জেলা বা দেশের নাম'}
+                </label>
+                <input
+                  type="text"
+                  placeholder={lang === 'en' ? 'City, Country (e.g. Barishal / Kolkata)' : 'যেমন: আগৈলঝাড়া, বরিশাল / ঢাকা / কলকাতা'}
+                  value={formData.address}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none text-sm"
+                />
+              </div>
+
+              {/* Special Sankalpa / Prayer */}
+              <div>
+                <label className="block text-sm font-bold text-gray-800 mb-1">
+                  {lang === 'en' ? 'Special Sankalpa / Prayer (Optional)' : 'বিশেষ সংকল্প বা প্রার্থনা বিবরণ (ঐচ্ছিক)'}
+                </label>
+                <textarea
+                  rows="3"
+                  placeholder={lang === 'en' ? 'Write your personal prayer, family member names, or blessings sought' : 'দেবী মনসার শ্রীচরণে আপনার বা পরিবারের রোগমুক্তি, মঙ্গল বা বিশেষ মানসিক প্রার্থনা লিখুন'}
+                  value={formData.sankalpa}
+                  onChange={(e) => setFormData({ ...formData, sankalpa: e.target.value })}
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none text-sm"
+                ></textarea>
+              </div>
+
+              {/* Submit CTA */}
+              <div className="pt-2 text-center">
+                <button
+                  type="submit"
+                  className="btn-shine w-full sm:w-auto bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-400 text-white font-extrabold px-10 py-4 rounded-full text-lg shadow-xl shadow-orange-500/30 transition-all hover:scale-[1.02] active:scale-95 border-2 border-yellow-200 cursor-pointer"
+                >
+                  <i className="fas fa-om mr-2"></i>
+                  {lang === 'en' ? 'Submit Sacred Puja Booking' : 'পবিত্র সংকল্প গ্রহণ ও পূজা বুক করুন'}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ==========================================
+// 4. Royani Gaan & Padma Purana Archive Page
+// ==========================================
+const RoyaniPage = ({ navigateTo, showToast, lang = 'bn' }) => {
+  const [activePala, setActivePala] = useState(0);
+  const [japaCount, setJapaCount] = useState(0);
+
+  const palas = [
+    {
+      id: 1,
+      titleBn: 'প্রথম পর্ব: দেবী মনসার জন্ম ও মর্ত্যে পূজার আকাঙ্ক্ষা',
+      titleEn: 'Episode 1: Emergence of Devi Manasa & Desire for Worship',
+      tagBn: 'স্বর্গ ও মর্ত্যের মেলবন্ধন',
+      tagEn: 'Heavenly Origins',
+      verseBn: `পূর্বেতে বন্দনা করি দেব পদ্মনাভ।
+যাহার নাভিকমলে ব্রহ্মার প্রভাব ॥
+দক্ষিণ চরণে বন্দো গৈলা যে নগর।
+মনসা মঙ্গল কবি বিজয় গুপ্ত সুর ॥`,
+      storyBn: `মধ্যযুগের অমর কবি বিজয় গুপ্ত তাঁর কাব্যে বর্ণনা করেছেন কীভাবে শিবের তেজ ও পদ্মবনে দেবী মনসার অলৌকিক আবির্ভাব ঘটে। দেবলোকে স্থান পেলেও মর্ত্যভূমিতে ভক্তবৃন্দের অকৃত্রিম ভক্তি ও পূজাই দেবীর মহিমাকে পূর্ণতা দান করে। গৈলার এই পবিত্র মন্দির সেই ভক্তিধারার আদি ও জাগ্রত সাক্ষী।`,
+      storyEn: `Poet Bijoy Gupta depicts the divine emergence of Devi Manasa from the lotus lake through the spiritual energy of Lord Shiva. Though revered in the heavens, the Goddess desires worship among mortals on earth, beginning the historic narrative in Bengal.`
+    },
+    {
+      id: 2,
+      titleBn: 'দ্বিতীয় পর্ব: শিবভক্ত চাঁদ সওদাগরের সংঘাত ও সপ্তডিঙা নিমজ্জন',
+      titleEn: 'Episode 2: Conflict with Chand Sadagar & Sinking of Seven Ships',
+      tagBn: 'অহংকার বনাম দেবীর পরীক্ষা',
+      tagEn: 'Ego vs Divine Test',
+      verseBn: `শিবের পরম ভক্ত চাঁদ সওদাগর।
+মনসার চরণে কভু না নোয়ায় শির ॥
+কালিদহে ডুবিল সপ্ত মধুকর তরণী।
+চারিদিকে হাহাকার শুনি নিদারুণ বাণী ॥`,
+      storyBn: `চম্পকনগরের অধিপতি শিবের একনিষ্ঠ ভক্ত চাঁদ সওদাগর দেবী মনসাকে পূজা করতে অস্বীকার করেন। দেবীর মায়ায় কালিদহ সাগরে তাঁর বাণিজ্যের সাতটি জাহাজ (সপ্তডিঙা মধুকর) অতল জলে নিমজ্জিত হয় এবং ছয় পুত্র প্রাণ হারায়। তবুও অটল চাঁদ সওদাগর মাথা নোয়ান না।`,
+      storyEn: `Chand Sadagar, a staunch devotee of Lord Shiva, adamantly refuses to worship Manasa. Through divine trials, his seven merchant vessels sink in the Kalidaha sea and his sons perish, yet his resolve remains unbroken.`
+    },
+    {
+      id: 3,
+      titleBn: 'তৃতীয় পর্ব: লখিন্দর-বেহুলার অমর প্রেম ও সাঁতালির লোহার বাসর',
+      titleEn: 'Episode 3: Wedding of Lakhindar-Behula & Iron Chamber',
+      tagBn: 'অমর প্রেম ও বিষের দংশন',
+      tagEn: 'Sacred Love & Destiny',
+      verseBn: `সাঁতালী পর্বতে বাড়ি লোহার বাসর।
+ছিদ্র দিয়া প্রবেশিল কালনাগিনী ঘোর ॥
+নিদ্রায় লখিন্দর ছটফট অঙ্গ জ্বলে।
+বেহুলা জাগিয়া দেখে স্বামী পড়ে ভূমিতলে ॥`,
+      storyBn: `সর্পদংশন এড়াতে সাঁতালী পর্বতের চূড়ায় নিশ্ছিদ্র লোহার বাসর ঘর নির্মাণ করা হয়। কিন্তু বিধিলিপি অলঙ্ঘ্য—সূক্ষ্ম এক ছিদ্রপথে কালনাগিনী প্রবেশ করে লখিন্দরকে দংশন করে। সদ্য বিবাহিতা বেহুলা শোকে মুহ্যমান না হয়ে মৃত স্বামীকে বাঁচাতে এক অভূতপূর্ব অলৌকিক সংকল্প গ্রহণ করে।`,
+      storyEn: `To avert the snakebite prophecy, an impenetrable iron bridal chamber is erected. Yet destiny unfolds as Kalnagini slips through a needle-thin crevice to bite Lakhindar. Newlywed Behula undertakes a legendary vow to resurrect her husband.`
+    },
+    {
+      id: 4,
+      titleBn: 'চতুর্থ পর্ব: কলার ভেলায় বেহুলার দেবযাত্রা ও চাঁদ সওদাগরের মনসাপূজা',
+      titleEn: 'Episode 4: Behula\'s Heavenly Voyage & Historic Worship',
+      tagBn: 'সতীত্বের জয় ও ভক্তির প্রতিষ্ঠা',
+      tagEn: 'Triumph of Devotion',
+      verseBn: `কলার মান্দাসে ভাসে সতী রূপবতী।
+স্বর্গে গিয়া নৃত্য করে সাধ্বী মহামতী ॥
+তুষ্ট হইয়া হর-গৌরী দিলেন বরদান।
+সপ্ত ভাই জীয়ন্ত হৈল ফিরিল ধনমান ॥`,
+      storyBn: `গঙ্গাবক্ষে কলার মান্দাসে মৃত লখিন্দরকে কোলে নিয়ে বেহুলা অন্তহীন বিপদ অতিক্রম করে স্বর্গে দেবতাদের সভায় পৌঁছান। তাঁর অনুপম নৃত্য ও সতীধর্মে মহাদেব ও মনসাদেবী প্রসন্ন হন। লখিন্দর জীবন ফিরে পান, নিমজ্জিত জাহাজ ভেসে ওঠে, এবং চাঁদ সওদাগর বামহস্তে দেবীর চরণে পদ্মফুল অর্পণ করে মনসাপূজা প্রবর্তন করেন।`,
+      storyEn: `Floating down the river on a banana raft with Lakhindar\'s body, Behula endures perilous trials to reach Indra\'s celestial court. Her dance and unwavering devotion move Shiva and Manasa; life is restored to Lakhindar, and Chand Sadagar offers worship with a lotus flower.`
+    }
+  ];
+
+  const handleJapa = () => {
+    setJapaCount((prev) => {
+      const next = (prev + 1) % 109;
+      if (next === 108) {
+        if (playSacredBellSound) playSacredBellSound();
+        if (showToast) showToast(lang === 'en' ? 'Sacred 108 Japa Chanting Completed!' : '১০৮ বার পবিত্র মনসা মন্ত্র জপ সমাপ্ত হয়েছে! মায়ের কৃপা বর্ষিত হোক।');
+      }
+      return next;
+    });
+  };
+
+  return (
+    <div className="bg-orange-50 min-h-screen py-12 anim-fade-up">
+      <div className="container mx-auto px-4 max-w-5xl">
+        <BackButton navigateTo={navigateTo} lang={lang} />
+
+        {/* Banner Aurora Header */}
+        <div className="text-center mb-10 page-banner-aurora p-8 rounded-3xl bg-gradient-to-r from-orange-950 via-red-950 to-amber-950 text-white shadow-xl border-2 border-yellow-400/40 relative">
+          <div className="inline-flex items-center gap-2 bg-yellow-400/20 text-yellow-300 px-4 py-1.5 rounded-full text-xs font-bold mb-3 border border-yellow-400/30">
+            <i className="fas fa-music text-xs text-yellow-400"></i>
+            {lang === 'en' ? '530+ Years Living Musical Heritage' : '৫৩০+ বছরের প্রাচীন লোকসংগীত ঐতিহ্য'}
+          </div>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold font-serif text-yellow-300 mb-3 divine-title-glow">
+            {t('royaniTitle', lang)}
+          </h1>
+          <p className="text-orange-100 text-sm sm:text-base max-w-3xl mx-auto">
+            {t('royaniSubtitle', lang)}
+          </p>
+        </div>
+
+        {/* Historical Context Card */}
+        <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border-2 border-orange-100 mb-10 card-hover-glow">
+          <div className="flex items-center gap-4 border-b border-orange-100 pb-4 mb-4">
+            <div className="w-12 h-12 rounded-2xl bg-orange-100 text-orange-700 flex items-center justify-center text-2xl shrink-0 shadow-sm">
+              <i className="fas fa-feather-alt"></i>
+            </div>
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold font-serif text-gray-900">
+                {lang === 'en' ? 'What is Royani Gaan?' : 'রয়ানী গান কী ও এর ঐতিহাসিক পটভূমি'}
+              </h2>
+              <p className="text-xs sm:text-sm text-gray-500">
+                {lang === 'en' ? 'Origin in Goila, Agailjhara, Barishal' : 'গৈলা মনসা মন্দির ও মধ্যযুগের পদ্মাপুরাণ ঐতিহ্য'}
+              </p>
+            </div>
+          </div>
+          <div className="text-gray-700 leading-relaxed space-y-3 text-sm sm:text-base">
+            <p>
+              {lang === 'en'
+                ? 'Royani Gaan is a distinctive devotional folk-musical performance in southern Bengal, centered upon the sacred Manasamangal (Padma Purana) composed by medieval master poet Bijoy Gupta in 1494 AD at Goila.'
+                : 'রয়ানী গান হলো মধ্যযুগের অমর বাঙালি মহাকবি বিজয় গুপ্ত রচিত মনসামঙ্গল বা পদ্মাপুরাণ কাব্যের উপর ভিত্তি করে পরিবেশিত এক সুপ্রাচীন লোকসংগীত ধারা। রজনী (রাত) শব্দ থেকে রয়ানী নামের উদ্ভব, কারণ শ্রাবণ মাসে মনসা পূজাকে কেন্দ্র করে এই গান সারা রাতব্যাপী পালাগান হিসেবে ভাবগাম্ভীর্যের সাথে পরিবেশিত হয়।'}
+            </p>
+            <p>
+              {lang === 'en'
+                ? 'Performed by an ensemble of 12 to 20 artists led by the "Sarkar", accompanied by traditional khol, cymbals (kartal), violin, and shehnai, the all-night performance reenacts the triumph of devotion over ego through heartfelt songs and dramatic poetry.'
+                : '১২ থেকে ২০ জনের একটি সুনিপুণ দল এই পালা পরিবেশন করে, যাদের প্রধানকে বলা হয় "সরকার"। খোল, করতাল, হারমোনিয়াম, বেহালা ও সানাইয়ের সুরের মূর্ছনায় করুণ ও বীররসের মেলবন্ধনে দেবী মনসা, চাঁদ সওদাগর ও বেহুলা-লখিন্দরের অমর আখ্যান জাগ্রত হয়। শত শত বছর ধরে গৈলা মনসা মন্দির প্রাঙ্গণে এই সুরলহরী অবিরাম প্রবহমান।'}
+            </p>
+          </div>
+        </div>
+
+        {/* Interactive 4 Episodes of Royani */}
+        <div className="bg-white rounded-3xl shadow-xl border-2 border-orange-100 overflow-hidden mb-10">
+          <div className="bg-gradient-to-r from-orange-100 via-amber-100 to-orange-100 p-6 border-b border-orange-200">
+            <h3 className="text-xl sm:text-2xl font-bold text-orange-950 font-serif text-center flex items-center justify-center gap-2">
+              <i className="fas fa-book-open text-orange-600"></i>
+              {lang === 'en' ? 'Four Sacred Episodes of Royani Pala' : 'রয়ানী পালা গানের চার মূল অধ্যায়'}
+            </h3>
+          </div>
+
+          {/* Episode Tabs */}
+          <div className="p-4 sm:p-6 bg-orange-50/50 border-b border-orange-100 flex flex-wrap gap-2 justify-center">
+            {palas.map((p, idx) => (
+              <button
+                key={p.id}
+                onClick={() => setActivePala(idx)}
+                className={`px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all active:scale-95 cursor-pointer ${
+                  activePala === idx
+                    ? 'bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-md'
+                    : 'bg-white text-gray-700 hover:bg-orange-100 border border-orange-200'
+                }`}
+              >
+                {lang === 'en' ? `Episode ${idx + 1}` : `পর্ব ${toBengaliDigits(idx + 1)}`}
+              </button>
+            ))}
+          </div>
+
+          {/* Active Pala Display */}
+          <div className="p-6 sm:p-8">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xs font-extrabold uppercase tracking-wider text-amber-700 bg-amber-100 px-3 py-1 rounded-full">
+                {lang === 'en' ? palas[activePala].tagEn : palas[activePala].tagBn}
+              </span>
+            </div>
+            <h4 className="text-2xl font-bold font-serif text-gray-900 mb-4">
+              {lang === 'en' ? palas[activePala].titleEn : palas[activePala].titleBn}
+            </h4>
+
+            {/* Sacred Poetic Verse Box */}
+            <div className="my-6 p-6 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300 shadow-inner relative overflow-hidden">
+              <div className="absolute top-2 right-4 text-6xl text-amber-200/60 font-serif select-none pointer-events-none">
+                ❞
+              </div>
+              <p className="text-xs font-bold text-amber-800 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                <i className="fas fa-quill-pen"></i>
+                {lang === 'en' ? 'Original Verse by Poet Bijoy Gupta (Padma Purana):' : 'কবি বিজয় গুপ্তের মূল পদ্মাপুরাণ পয়ার:'}
+              </p>
+              <pre className="font-serif text-base sm:text-lg text-gray-900 whitespace-pre-line leading-relaxed font-bold">
+                {palas[activePala].verseBn}
+              </pre>
+            </div>
+
+            <p className="text-gray-700 leading-relaxed text-base sm:text-lg">
+              {lang === 'en' ? palas[activePala].storyEn : palas[activePala].storyBn}
+            </p>
+          </div>
+        </div>
+
+        {/* Digital Japa Mala Chanting Counter */}
+        <div className="bg-gradient-to-r from-amber-900 via-orange-950 to-red-950 text-white rounded-3xl p-6 sm:p-8 shadow-2xl border-2 border-yellow-400/40 text-center relative overflow-hidden mb-12">
+          <div className="max-w-xl mx-auto">
+            <div className="inline-block bg-yellow-400/20 text-yellow-300 px-4 py-1 rounded-full text-xs font-bold mb-3 border border-yellow-400/30">
+              <i className="fas fa-ring text-xs text-yellow-400 mr-1.5"></i>
+              {lang === 'en' ? 'Digital 108 Japa Meditation' : '১০৮ বার পবিত্র মন্ত্র জপমালা'}
+            </div>
+            <h3 className="text-2xl sm:text-3xl font-bold font-serif text-yellow-300 mb-2">
+              "ওঁ হ্রীং শ্রীং ক্লীং ঐং মনসাদেব্যৈ স্বাহা"
+            </h3>
+            <p className="text-xs sm:text-sm text-orange-200 mb-6">
+              {lang === 'en'
+                ? 'Tap the counter bead for each chant. Complete 108 times for sacred blessings.'
+                : 'প্রতিবার মন্ত্রোচ্চারণের পর জপ বোতাম চাপুন। ১০৮ বার সম্পন্ন হলে পুণ্যধ্বনি ধ্বনিত হবে।'}
+            </p>
+
+            <div className="flex items-center justify-center gap-6 mb-6">
+              <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-black/50 border-4 border-yellow-400 flex flex-col items-center justify-center shadow-[0_0_30px_rgba(251,191,36,0.3)]">
+                <span className="text-3xl sm:text-4xl font-mono font-extrabold text-yellow-300">
+                  {formatNumber(japaCount, lang)}
+                </span>
+                <span className="text-[10px] sm:text-xs text-orange-200 uppercase tracking-widest">
+                  / ১০৮
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-center gap-3">
+              <button
+                onClick={handleJapa}
+                className="btn-shine bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-300 text-orange-950 font-extrabold px-8 py-3.5 rounded-full text-base sm:text-lg shadow-lg active:scale-90 transition-all border-2 border-yellow-200 cursor-pointer"
+              >
+                <i className="fas fa-hand-pointer mr-2"></i>
+                {lang === 'en' ? 'Chant / জপ করুন' : 'জপ করুন (স্পর্শ করুন)'}
+              </button>
+              <button
+                onClick={() => setJapaCount(0)}
+                className="bg-black/40 hover:bg-black/60 text-orange-200 font-semibold px-4 py-3 rounded-full border border-yellow-400/30 text-xs active:scale-95 cursor-pointer"
+                title="Reset Counter"
+              >
+                <i className="fas fa-redo-alt"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Navigation CTA */}
+        <div className="flex flex-wrap items-center justify-center gap-4 text-center no-print">
+          <button
+            onClick={() => navigateTo('mantras')}
+            className="bg-white hover:bg-orange-100 text-orange-900 font-bold px-6 py-3 rounded-full border-2 border-orange-200 shadow-md text-sm active:scale-95 cursor-pointer"
+          >
+            <i className="fas fa-om mr-2 text-amber-600"></i>
+            {lang === 'en' ? 'Explore All Sacred Mantras' : 'মন্দিরের সকল পবিত্র মন্ত্র দেখুন'}
+          </button>
+          <button
+            onClick={() => navigateTo('booking')}
+            className="btn-shine bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold px-6 py-3 rounded-full shadow-lg text-sm active:scale-95 cursor-pointer"
+          >
+            <i className="fas fa-hands-praying mr-2"></i>
+            {lang === 'en' ? 'Book Special Puja Online' : 'অনলাইন পূজা বুকিং করুন'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const TimingsPage = ({ timings, navigateTo, lang }) => {
   const [currentTime, setCurrentTime] = useState(() => new Date());
   useEffect(() => {
@@ -2989,6 +3974,19 @@ const NoticeBoardPage = ({ notices, navigateTo, lang }) => (
 );
 
 const DonationPage = ({ donations, navigateTo, showToast, lang }) => {
+  const [activeTab, setActiveTab] = useState('methods'); // 'methods' or 'receipt'
+  const [receiptForm, setReceiptForm] = useState({
+    name: '',
+    phone: '',
+    gotra: '',
+    amount: '',
+    method: 'bKash',
+    trxId: '',
+    purpose: 'সাধারণ প্রণামী ও সেবা',
+    date: new Date().toISOString().split('T')[0]
+  });
+  const [generatedReceipt, setGeneratedReceipt] = useState(null);
+
   const copyToClipboard = (text, label) => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text);
@@ -3002,6 +4000,31 @@ const DonationPage = ({ donations, navigateTo, showToast, lang }) => {
     }
     if (showToast) showToast(label + ' ' + t('copiedToast', lang));
   };
+
+  const handleGenerateReceipt = (e) => {
+    e.preventDefault();
+    if (!receiptForm.name.trim() || !receiptForm.amount || parseFloat(receiptForm.amount) <= 0) {
+      if (showToast) showToast(lang === 'en' ? 'Please enter Donor Name and Valid Amount' : 'অনুগ্রহ করে দাতার নাম ও সঠিক দানের পরিমাণ লিখুন');
+      return;
+    }
+    const receiptNo = 'MMG-REC-' + Math.floor(100000 + Math.random() * 900000);
+    const receipt = {
+      ...receiptForm,
+      receiptNo,
+      amountWords: lang === 'en' ? amountInEnglishWords(receiptForm.amount) : amountInBengaliWords(receiptForm.amount),
+      timestamp: new Date().toISOString()
+    };
+    setGeneratedReceipt(receipt);
+    if (showToast) showToast(lang === 'en' ? 'Official Memorial Receipt Generated!' : 'পবিত্র স্মারক দান রসিদ তৈরি হয়েছে!');
+  };
+
+  const copyReceiptDetails = () => {
+    if (!generatedReceipt) return;
+    const txt = `শ্রী শ্রী মা মনসা মন্দির, গৈলা - স্মারক দান রসিদ\nরসিদ নং: ${generatedReceipt.receiptNo}\nদাতার নাম: ${generatedReceipt.name}\nগোত্র: ${generatedReceipt.gotra || 'অনুল্লিখিত'}\nমোবাইল: ${generatedReceipt.phone || '-'}\nপরিমাণ: ৳ ${generatedReceipt.amount} /- (${generatedReceipt.amountWords})\nমাধ্যম: ${generatedReceipt.method}\nTrxID: ${generatedReceipt.trxId || '-'}\nউদ্দেশ্য: ${generatedReceipt.purpose}\nতারিখ: ${generatedReceipt.date}\nসত্যায়িত: শ্রী শ্রী মা মনসা মন্দির তহবিল`;
+    if (navigator.clipboard) navigator.clipboard.writeText(txt);
+    if (showToast) showToast(lang === 'en' ? 'Receipt details copied!' : 'রসিদ বিবরণ কপি হয়েছে!');
+  };
+
   const publicDonations = donations ? donations.filter(d => !d.is_hidden) : [];
   return (
     <div className="bg-orange-50 min-h-screen py-12 anim-fade-up">
@@ -3009,7 +4032,7 @@ const DonationPage = ({ donations, navigateTo, showToast, lang }) => {
         <BackButton navigateTo={navigateTo} lang={lang} />
 
         {/* Banner Aurora Header */}
-        <div className="text-center mb-10 page-banner-aurora p-8 rounded-3xl bg-gradient-to-r from-orange-950 via-red-950 to-amber-950 text-white shadow-xl border-2 border-yellow-400/40 relative">
+        <div className="text-center mb-8 page-banner-aurora p-8 rounded-3xl bg-gradient-to-r from-orange-950 via-red-950 to-amber-950 text-white shadow-xl border-2 border-yellow-400/40 relative">
           <div className="inline-flex items-center gap-2 bg-yellow-400/20 text-yellow-300 px-4 py-1.5 rounded-full text-xs font-bold mb-3 border border-yellow-400/30">
             <i className="fas fa-heart text-xs text-red-400"></i> {lang === 'en' ? 'Sacred Temple Service' : 'প্রণামী ও ভক্তিসেবা'}
           </div>
@@ -3019,6 +4042,244 @@ const DonationPage = ({ donations, navigateTo, showToast, lang }) => {
           <p className="text-orange-100 text-sm sm:text-base max-w-2xl mx-auto">{t('donationDesc1', lang)}</p>
           <p className="text-yellow-200/90 text-xs sm:text-sm max-w-2xl mx-auto mt-1 font-medium">{t('donationDesc2', lang)}</p>
         </div>
+
+        {/* View Mode Switcher Tabs */}
+        <div className="flex justify-center gap-3 mb-10 no-print">
+          <button
+            onClick={() => setActiveTab('methods')}
+            className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all active:scale-95 flex items-center gap-2 cursor-pointer ${
+              activeTab === 'methods'
+                ? 'bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-lg shadow-orange-500/30'
+                : 'bg-white text-gray-700 hover:bg-orange-100 border border-orange-200'
+            }`}
+          >
+            <i className="fas fa-hand-holding-heart text-xs"></i>
+            {lang === 'en' ? 'Donation Channels' : 'প্রণামী মাধ্যম ও তথ্য'}
+          </button>
+          <button
+            onClick={() => setActiveTab('receipt')}
+            className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all active:scale-95 flex items-center gap-2 cursor-pointer ${
+              activeTab === 'receipt'
+                ? 'bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-lg shadow-orange-500/30'
+                : 'bg-white text-gray-700 hover:bg-orange-100 border border-orange-200'
+            }`}
+          >
+            <i className="fas fa-file-invoice text-xs"></i>
+            {lang === 'en' ? 'Official Receipt Generator' : 'স্বয়ংক্রিয় দান রসিদ সংগ্রহ'}
+          </button>
+        </div>
+
+        {activeTab === 'receipt' ? (
+          <div className="mb-12">
+            {generatedReceipt ? (
+              /* High-Definition Official Sacred Devotee Memorial Receipt */
+              <div className="bg-white rounded-3xl shadow-2xl border-4 border-amber-500/70 p-6 sm:p-10 relative overflow-hidden print-sacred-card">
+                <div className="absolute top-0 left-0 right-0 h-3 bg-gradient-to-r from-amber-500 via-orange-500 to-red-600"></div>
+
+                {/* Receipt Header with Temple Seal */}
+                <div className="text-center pb-6 border-b-2 border-amber-200">
+                  <div className="w-16 h-16 mx-auto rounded-full bg-orange-100 border-2 border-amber-500 flex items-center justify-center text-amber-700 text-2xl shadow-md mb-2">
+                    <i className="fas fa-om"></i>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-bold font-serif text-orange-950">
+                    {lang === 'en' ? 'Shree Shree Maa Manasa Mandir, Goila' : 'শ্রী শ্রী মা মনসা মন্দির, গৈলা'}
+                  </h2>
+                  <p className="text-xs sm:text-sm text-gray-600 font-medium">
+                    {lang === 'en' ? 'Goila, Agailjhara, Barishal, Bangladesh • Established 1494 AD' : 'গৈলা, আগৈলঝাড়া, বরিশাল, বাংলাদেশ • প্রতিষ্ঠা ১৪৯৪ খ্রিষ্টাব্দ / ১৪১৬ শকাব্দ'}
+                  </p>
+                  <div className="inline-block mt-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-5 py-1 rounded-full text-xs sm:text-sm font-bold tracking-wide shadow-sm">
+                    ✦ {lang === 'en' ? 'Official Devotee Memorial Pronami Receipt' : 'পবিত্র স্মারক দান ও প্রণামী রসিদ'} ✦
+                  </div>
+                </div>
+
+                {/* Receipt Details Body */}
+                <div className="py-6 space-y-4 text-gray-800 text-sm sm:text-base">
+                  <div className="flex flex-wrap justify-between items-center bg-orange-50/80 p-3.5 rounded-2xl border border-orange-200">
+                    <div>
+                      <span className="text-xs text-gray-500 block font-semibold">{lang === 'en' ? 'Receipt Serial No:' : 'রসিদ স্মারক নং:'}</span>
+                      <span className="font-mono font-bold text-amber-900 text-lg sm:text-xl tracking-wider">{generatedReceipt.receiptNo}</span>
+                    </div>
+                    <div className="text-right mt-2 sm:mt-0">
+                      <span className="text-xs text-gray-500 block font-semibold">{lang === 'en' ? 'Date:' : 'তারিখ:'}</span>
+                      <span className="font-bold text-gray-800">{generatedReceipt.date}</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-100">
+                      <span className="block text-xs text-gray-500 font-semibold">{lang === 'en' ? 'Donor / Devotee Name' : 'দাতার নাম'}</span>
+                      <span className="font-bold text-gray-900 text-base">{generatedReceipt.name}</span>
+                    </div>
+                    <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-100">
+                      <span className="block text-xs text-gray-500 font-semibold">{lang === 'en' ? 'Gotra (Lineage)' : 'গোত্র'}</span>
+                      <span className="font-bold text-gray-900 text-base">{generatedReceipt.gotra || (lang === 'en' ? 'Not Mentioned' : 'অনুল্লিখিত')}</span>
+                    </div>
+                    <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-100">
+                      <span className="block text-xs text-gray-500 font-semibold">{lang === 'en' ? 'Payment Method' : 'প্রদানের মাধ্যম'}</span>
+                      <span className="font-bold text-orange-900">{generatedReceipt.method}</span>
+                    </div>
+                    <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-100">
+                      <span className="block text-xs text-gray-500 font-semibold">{lang === 'en' ? 'Transaction ID / Reference' : 'ট্রানজেকশন আইডি (TrxID) / স্লিপ নং'}</span>
+                      <span className="font-mono font-bold text-gray-800">{generatedReceipt.trxId || (lang === 'en' ? 'Cash/Direct Seva' : 'সরাসরি প্রণামী')}</span>
+                    </div>
+                  </div>
+
+                  {/* Amount Highlights */}
+                  <div className="p-5 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300">
+                    <div className="flex flex-wrap justify-between items-center mb-2">
+                      <span className="text-xs font-bold uppercase tracking-wider text-amber-800">{lang === 'en' ? 'Donated Amount' : 'গৃহীত প্রণামীর পরিমাণ'}</span>
+                      <span className="text-2xl sm:text-3xl font-extrabold text-amber-900 font-mono">৳ {formatNumber(generatedReceipt.amount, lang)} /-</span>
+                    </div>
+                    <div className="text-sm font-serif font-bold text-gray-800 border-t border-amber-200/80 pt-2">
+                      <span className="text-xs text-gray-500 font-sans font-semibold mr-1">{lang === 'en' ? 'In Words:' : 'কথায়:'}</span>
+                      {generatedReceipt.amountWords}
+                    </div>
+                  </div>
+
+                  {/* Verification & Blessing Seal */}
+                  <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-200 flex items-center justify-between flex-wrap gap-3">
+                    <div className="flex items-center gap-2.5 text-emerald-800 font-bold text-xs sm:text-sm">
+                      <i className="fas fa-check-circle text-emerald-600 text-lg"></i>
+                      <span>{lang === 'en' ? 'Verified & Acknowledged in Sacred Temple Fund' : 'শ্রী শ্রী মা মনসা মন্দির পুণ্য তহবিলে গৃহীত ও সত্যায়িত'}</span>
+                    </div>
+                    <span className="text-[11px] font-mono text-emerald-700 bg-emerald-100/70 px-2.5 py-1 rounded-md border border-emerald-300">
+                      AUTH-SEAL-VERIFIED
+                    </span>
+                  </div>
+
+                  <p className="text-center text-xs sm:text-sm text-gray-600 italic font-serif pt-2">
+                    "{lang === 'en' ? 'May Devi Manasa bless your family with eternal health, prosperity, and peace.' : 'দেবী মনসার অপার কৃপায় আপনার ও আপনার পরিবারে রোগমুক্তি, ধনধান্য ও শান্তি বর্ষিত হোক।'}"
+                  </p>
+                </div>
+
+                {/* Print & Action Buttons */}
+                <div className="flex flex-wrap items-center justify-center gap-3 pt-6 border-t border-gray-200 no-print">
+                  <button
+                    onClick={() => window.print()}
+                    className="btn-shine bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-bold px-6 py-2.5 rounded-full shadow-md flex items-center gap-2 active:scale-95 cursor-pointer text-sm"
+                  >
+                    <i className="fas fa-print"></i>
+                    {lang === 'en' ? 'Print / Download Receipt' : 'রসিদ প্রিন্ট / PDF সংরক্ষণ'}
+                  </button>
+                  <button
+                    onClick={copyReceiptDetails}
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold px-6 py-2.5 rounded-full border border-gray-300 flex items-center gap-2 active:scale-95 cursor-pointer text-sm"
+                  >
+                    <i className="fas fa-copy"></i>
+                    {lang === 'en' ? 'Copy Details' : 'বিবরণ কপি করুন'}
+                  </button>
+                  <button
+                    onClick={() => setGeneratedReceipt(null)}
+                    className="bg-orange-50 hover:bg-orange-100 text-orange-800 font-bold px-6 py-2.5 rounded-full border border-orange-300 flex items-center gap-2 active:scale-95 cursor-pointer text-sm"
+                  >
+                    <i className="fas fa-redo"></i>
+                    {lang === 'en' ? 'New Receipt' : 'নতুন রসিদ তৈরি'}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* Receipt Input Form */
+              <div className="bg-white rounded-3xl p-6 sm:p-10 shadow-xl border-2 border-orange-100">
+                <div className="text-center mb-6">
+                  <h3 className="text-xl sm:text-2xl font-bold font-serif text-gray-900">
+                    {lang === 'en' ? 'Official Donation Receipt Form' : 'অনলাইন দান রসিদ তৈরি করুন'}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                    {lang === 'en' ? 'Enter your contribution details to generate and download an official memorial receipt.' : 'আপনার প্রেরিত প্রণামীর তথ্য প্রদান করে তৎক্ষণাৎ মন্দিরের সিলযুক্ত স্মারক রসিদ সংগ্রহ করুন।'}
+                  </p>
+                </div>
+                <form onSubmit={handleGenerateReceipt} className="space-y-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-bold text-gray-800 mb-1">{lang === 'en' ? 'Donor Full Name *' : 'দাতার পূর্ণ নাম *'}</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder={lang === 'en' ? 'Your Name' : 'যেমন: শান্তনু দাস'}
+                        value={receiptForm.name}
+                        onChange={(e) => setReceiptForm({ ...receiptForm, name: e.target.value })}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none text-base"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-800 mb-1">{lang === 'en' ? 'Mobile Number' : 'মোবাইল নম্বর'}</label>
+                      <input
+                        type="tel"
+                        placeholder="01XXXXXXXXX"
+                        value={receiptForm.phone}
+                        onChange={(e) => setReceiptForm({ ...receiptForm, phone: e.target.value })}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none text-base font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-bold text-gray-800 mb-1">{lang === 'en' ? 'Donation Amount (BDT) *' : 'দানের পরিমাণ (টাকা) *'}</label>
+                      <input
+                        type="number"
+                        required
+                        min="1"
+                        placeholder="500, 1000, 5000..."
+                        value={receiptForm.amount}
+                        onChange={(e) => setReceiptForm({ ...receiptForm, amount: e.target.value })}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none text-base font-mono font-bold"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-800 mb-1">{lang === 'en' ? 'Payment Method' : 'প্রণামীর মাধ্যম'}</label>
+                      <select
+                        value={receiptForm.method}
+                        onChange={(e) => setReceiptForm({ ...receiptForm, method: e.target.value })}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none text-base"
+                      >
+                        <option value="bKash">bKash (বিকাশ)</option>
+                        <option value="Nagad">Nagad (নগদ)</option>
+                        <option value="Bank Transfer">Bank Transfer (ব্যাংক একাউন্ট)</option>
+                        <option value="Cash / On-Site">Cash / On-Site (নগদ সেবা)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-bold text-gray-800 mb-1">{lang === 'en' ? 'Transaction ID (TrxID) / Slip No.' : 'ট্রানজেকশন আইডি (TrxID) / স্লিপ নং'}</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. 9J87K1L2"
+                        value={receiptForm.trxId}
+                        onChange={(e) => setReceiptForm({ ...receiptForm, trxId: e.target.value })}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none text-base font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-800 mb-1">{lang === 'en' ? 'Gotra (Optional)' : 'গোত্র (ঐচ্ছিক)'}</label>
+                      <input
+                        type="text"
+                        placeholder="যেমন: কশ্যপ / শাণ্ডিল্য"
+                        value={receiptForm.gotra}
+                        onChange={(e) => setReceiptForm({ ...receiptForm, gotra: e.target.value })}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none text-base"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="text-center pt-3">
+                    <button
+                      type="submit"
+                      className="btn-shine bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-400 text-white font-extrabold px-10 py-3.5 rounded-full text-base sm:text-lg shadow-xl shadow-orange-500/30 transition-all hover:scale-[1.02] active:scale-95 border-2 border-yellow-200 cursor-pointer"
+                    >
+                      <i className="fas fa-file-invoice mr-2"></i>
+                      {lang === 'en' ? 'Generate & View Official Receipt' : 'পবিত্র স্মারক রসিদ তৈরি করুন'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+          </div>
+        ) : null}
+
+        <div className={activeTab === 'receipt' ? 'hidden' : ''}>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           <div className="bg-white p-8 rounded-3xl shadow-lg border-2 border-orange-100 card-hover-glow relative overflow-hidden">
@@ -3126,6 +4387,7 @@ const DonationPage = ({ donations, navigateTo, showToast, lang }) => {
 
         <div className="bg-gradient-to-r from-orange-950 via-amber-950 to-orange-900 text-white p-8 rounded-3xl text-center shadow-xl border-2 border-yellow-400/40 relative overflow-hidden">
           <p className="text-xl italic font-serif text-yellow-300">"{t('donationQuote', lang)}"</p>
+        </div>
         </div>
       </div>
     </div>
@@ -5643,6 +6905,8 @@ function App() {
       case 'testimonials': return <TestimonialsPage testimonials={testimonials} navigateTo={navigateTo} lang={lang} />;
       case 'donation': return <DonationPage donations={donations} navigateTo={navigateTo} showToast={showToast} lang={lang} />;
       case 'history': return <HistoryPage navigateTo={navigateTo} lang={lang} />;
+      case 'booking': return <BookingPage navigateTo={navigateTo} showToast={showToast} lang={lang} />;
+      case 'royani': return <RoyaniPage navigateTo={navigateTo} showToast={showToast} lang={lang} />;
       case 'event': return <EventsPage events={events} navigateTo={navigateTo} showToast={showToast} lang={lang} />;
       case 'notice': return <NoticeBoardPage notices={notices} navigateTo={navigateTo} lang={lang} />;
       case 'admin': return <AdminPanel

@@ -594,6 +594,38 @@
             font-size: 14px;
             min-height: 120px;
         }
+
+        /* High-Definition Print Styles for Sacred Receipt & Puja Token */
+        @media print {
+            body {
+                background: white !important;
+                color: #111827 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            header,
+            footer,
+            .no-print,
+            #floating-music,
+            .scroll-to-top,
+            .toast-animate,
+            .marquee-wrapper,
+            button {
+                display: none !important;
+            }
+
+            .print-sacred-card {
+                box-shadow: none !important;
+                border: 2px solid #b45309 !important;
+                margin: 0 auto !important;
+                width: 100% !important;
+                max-width: 800px !important;
+                page-break-inside: avoid !important;
+                background: white !important;
+                padding: 20px !important;
+            }
+        }
     </style>
 
 </head>
@@ -602,7 +634,7 @@
     <div id="root"></div>
 
     <!-- Pre-compiled Ultra-Fast Production JS (Zero Babel Delay, 120 FPS) -->
-    <script src="app.min.js?v=24" defer></script>
+    <script src="app.min.js?v=25" defer></script>
 </body>
 
 </html>
