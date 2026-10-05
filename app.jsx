@@ -8905,53 +8905,68 @@ function App() {
 
   const audioRef = useRef(null);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+  const userPausedRef = useRef(false);
 
-  // Initialize and handle Theme Music
+  // Initialize and handle Theme Music (Auto-play when newly opened)
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
     audio.volume = 0.55;
 
-    // Check saved preference - DEFAULT to true when newly opened (null / not 'false')
-    const savedMusicPref = localStorage.getItem('site_music_enabled');
-    const shouldAutoPlay = savedMusicPref !== 'false';
-
-    const tryAutoPlay = () => {
-      if (!shouldAutoPlay) return;
-      audio.play().then(() => {
+    // Helper to start playback smoothly
+    const startAudio = () => {
+      if (userPausedRef.current) return Promise.resolve();
+      if (!audio.paused) {
         setIsMusicPlaying(true);
-        localStorage.setItem('site_music_enabled', 'true');
-      }).catch(() => {
-        // Autoplay blocked by browser policy until interaction
-        setIsMusicPlaying(false);
+        return Promise.resolve();
+      }
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        return playPromise.then(() => {
+          setIsMusicPlaying(true);
+          removeGestureListeners();
+        }).catch(() => {
+          // Autoplay blocked before interaction; keep listeners active
+          setIsMusicPlaying(false);
+        });
+      }
+      return Promise.resolve();
+    };
+
+    // 1. Immediate autoplay attempt on initial page load
+    startAudio();
+
+    // 2. Fallback for strict browser autoplay policies:
+    // Automatically trigger on the very first user interaction (click, tap, key press)
+    const onUserInteraction = () => {
+      if (!userPausedRef.current) {
+        startAudio();
+      }
+    };
+
+    const gestureEvents = ['click', 'pointerdown', 'touchstart', 'touchend', 'keydown'];
+    const removeGestureListeners = () => {
+      gestureEvents.forEach(evt => {
+        document.removeEventListener(evt, onUserInteraction, true);
+        window.removeEventListener(evt, onUserInteraction, true);
       });
     };
 
-    if (shouldAutoPlay) {
-      tryAutoPlay();
-    }
+    gestureEvents.forEach(evt => {
+      document.addEventListener(evt, onUserInteraction, { capture: true });
+      window.addEventListener(evt, onUserInteraction, { capture: true });
+    });
 
-    // Broad one-time gesture unlock for browsers requiring user interaction (touch, click, scroll, key)
-    const handleFirstGesture = () => {
-      if (localStorage.getItem('site_music_enabled') !== 'false' && audio.paused) {
-        audio.play().then(() => {
-          setIsMusicPlaying(true);
-          localStorage.setItem('site_music_enabled', 'true');
-        }).catch(() => { });
-      }
-      removeGestureListeners();
-    };
-
-    const gestureEvents = ['pointerdown', 'touchstart', 'click', 'keydown', 'scroll', 'wheel'];
-    const removeGestureListeners = () => {
-      gestureEvents.forEach(evt => window.removeEventListener(evt, handleFirstGesture, { capture: true }));
-    };
-
-    gestureEvents.forEach(evt => window.addEventListener(evt, handleFirstGesture, { once: true, passive: true, capture: true }));
+    const onPlay = () => setIsMusicPlaying(true);
+    const onPause = () => setIsMusicPlaying(false);
+    audio.addEventListener('play', onPlay);
+    audio.addEventListener('pause', onPause);
 
     return () => {
       removeGestureListeners();
+      audio.removeEventListener('play', onPlay);
+      audio.removeEventListener('pause', onPause);
     };
   }, []);
 
@@ -8961,13 +8976,13 @@ function App() {
 
     if (isMusicPlaying) {
       audio.pause();
+      userPausedRef.current = true;
       setIsMusicPlaying(false);
-      localStorage.setItem('site_music_enabled', 'false');
       showToast(t('musicPaused', lang));
     } else {
+      userPausedRef.current = false;
       audio.play().then(() => {
         setIsMusicPlaying(true);
-        localStorage.setItem('site_music_enabled', 'true');
         showToast(t('musicPlaying', lang));
       }).catch(err => {
         console.error('Audio play error:', err);
@@ -9240,7 +9255,7 @@ function App() {
         )}
       </main>
       {currentPage !== 'admin' && <Footer navigateTo={navigateTo} lang={lang} setLang={setLang} />}
-      <audio ref={audioRef} src="music/theme.mp3" loop preload="auto"></audio>
+      <audio ref={audioRef} id="global-audio" src="music/theme.mp3" loop preload="auto" autoPlay playsInline></audio>
       <FloatingMusicWidget isMusicPlaying={isMusicPlaying} toggleMusic={toggleMusic} lang={lang} />
       <ScrollToTop lang={lang} />
     </div>
