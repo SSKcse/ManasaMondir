@@ -376,20 +376,371 @@ const SUPABASE_ANON_KEY = 'sb_publishable_KYDbVGr_25UA3jn9zfkC9g_L5TFDGoD';
 // Initialize Supabase Client
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// গ্যালারির ছবিগুলো
-const galleryImages = [
-  'header image.jpg',
-  'gallary image.png',
-  'ma manasa mondir font.jpg',
-  'ma manasa mondir lake dighi view.jpg'
+// Default 4 Sacred Episodes of Royani Gaan
+const DEFAULT_ROYANI_PALAS = [
+  {
+    id: 1,
+    titleBn: 'প্রথম পর্ব: দেবী মনসার জন্ম ও মর্ত্যে পূজার আকাঙ্ক্ষা',
+    titleEn: 'Episode 1: Emergence of Devi Manasa & Desire for Worship',
+    tagBn: 'স্বর্গ ও মর্ত্যের মেলবন্ধন',
+    tagEn: 'Heavenly Origins',
+    verseBn: `পূর্বেতে বন্দনা করি দেব পদ্মনাভ।\nযাহার নাভিকমলে ব্রহ্মার প্রভাব ॥\nদক্ষিণ চরণে বন্দো গৈলা যে নগর।\nমনসা মঙ্গল কবি বিজয় গুপ্ত সুর ॥`,
+    storyBn: `মধ্যযুগের অমর কবি বিজয় গুপ্ত তাঁর কাব্যে বর্ণনা করেছেন কীভাবে শিবের তেজ ও পদ্মবনে দেবী মনসার অলৌকিক আবির্ভাব ঘটে। দেবলোকে স্থান পেলেও মর্ত্যভূমিতে ভক্তবৃন্দের অকৃত্রিম ভক্তি ও পূজাই দেবীর মহিমাকে পূর্ণতা দান করে। গৈলার এই পবিত্র মন্দির সেই ভক্তিধারার আদি ও জাগ্রত সাক্ষী।`,
+    storyEn: `Poet Bijoy Gupta depicts the divine emergence of Devi Manasa from the lotus lake through the spiritual energy of Lord Shiva. Though revered in the heavens, the Goddess desires worship among mortals on earth, beginning the historic narrative in Bengal.`
+  },
+  {
+    id: 2,
+    titleBn: 'দ্বিতীয় পর্ব: শিবভক্ত চাঁদ সওদাগরের সংঘাত ও সপ্তডিঙা নিমজ্জন',
+    titleEn: 'Episode 2: Conflict with Chand Sadagar & Sinking of Seven Ships',
+    tagBn: 'অহংকার বনাম দেবীর পরীক্ষা',
+    tagEn: 'Ego vs Divine Test',
+    verseBn: `শিবের পরম ভক্ত চাঁদ সওদাগর।\nমনসার চরণে কভু না নোয়ায় শির ॥\nকালিদহে ডুবিল সপ্ত মধুকর তরণী।\nচারিদেকে হাহাকার শুনি নিদারুণ বাণী ॥`,
+    storyBn: `চম্পকনগরের অধিপতি শিবের একনিষ্ঠ ভক্ত চাঁদ সওদাগর দেবী মনসাকে পূজা করতে অস্বীকার করেন। দেবীর মায়ায় কালিদহ সাগরে তাঁর বাণিজ্যের সাতটি জাহাজ (সপ্তডিঙা মধুকর) অতল জলে নিমজ্জিত হয় এবং ছয় পুত্র প্রাণ হারায়। তবুও অটল চাঁদ সওদাগর মাথা নোয়ান না।`,
+    storyEn: `Chand Sadagar, a staunch devotee of Lord Shiva, adamantly refuses to worship Manasa. Through divine trials, his seven merchant vessels sink in the Kalidaha sea and his sons perish, yet his resolve remains unbroken.`
+  },
+  {
+    id: 3,
+    titleBn: 'তৃতীয় পর্ব: লখিন্দর-বেহুলার অমর প্রেম ও সাঁতালির লোহার বাসর',
+    titleEn: 'Episode 3: Wedding of Lakhindar-Behula & Iron Chamber',
+    tagBn: 'অমর প্রেম ও বিষের দংশন',
+    tagEn: 'Sacred Love & Destiny',
+    verseBn: `সাঁতালী পর্বতে বাড়ি লোহার বাসর।\nছিদ্র দিয়া প্রবেশিল কালনাগিনী ঘোর ॥\nনিদ্রায় লখিন্দর ছটফট অঙ্গ জ্বলে।\nবেহুলা জাগিয়া দেখে স্বামী পড়ে ভূমিতলে ॥`,
+    storyBn: `সর্পদংশন এড়াতে সাঁতালী পর্বতের চূড়ায় নিশ্ছিদ্র লোহার বাসর ঘর নির্মাণ করা হয়। কিন্তু বিধিলিপি অলঙ্ঘ্য—সূক্ষ্ম এক ছিদ্রপথে কালনাগিনী প্রবেশ করে লখিন্দরকে দংশন করে। সদ্য বিবাহিতা বেহুলা শোকে মুহ্যমান না হয়ে মৃত স্বামীকে বাঁচাতে এক অভূতপূর্ব অলৌকিক সংকল্প গ্রহণ করে।`,
+    storyEn: `To avert the snakebite prophecy, an impenetrable iron bridal chamber is erected. Yet destiny unfolds as Kalnagini slips through a needle-thin crevice to bite Lakhindar. Newlywed Behula undertakes a legendary vow to resurrect her husband.`
+  },
+  {
+    id: 4,
+    titleBn: 'চতুর্থ পর্ব: কলার ভেলায় বেহুলার দেবযাত্রা ও চাঁদ সওদাগরের মনসাপূজা',
+    titleEn: 'Episode 4: Behula\'s Heavenly Voyage & Historic Worship',
+    tagBn: 'সতীত্বের জয় ও ভক্তির প্রতিষ্ঠা',
+    tagEn: 'Triumph of Devotion',
+    verseBn: `কলার মান্দাসে ভাসে সতী রূপবতী।\nস্বর্গে গিয়া নৃত্য করে সাধ্বী মহামতী ॥\nতুষ্ট হইয়া হর-গৌরী দিলেন বরদান।\nসপ্ত ভাই জীয়ন্ত হৈল ফিরিল ধনমান ॥`,
+    storyBn: `গঙ্গাবক্ষে কলার মান্দাসে মৃত লখিন্দরকে কোলে নিয়ে বেহুলা অন্তহীন বিপদ অতিক্রম করে স্বর্গে দেবতাদের সভায় পৌঁছান। তাঁর অনুপম নৃত্য ও সতীধর্মে মহাদেব ও মনসাদেবী প্রসন্ন হন। লখিন্দর জীবন ফিরে পান, নিমজ্জিত জাহাজ ভেসে ওঠে, এবং চাঁদ সওদাগর বামহস্তে দেবীর চরণে পদ্মফুল অর্পণ করে মনসাপূজা প্রবর্তন করেন।`,
+    storyEn: `Floating down the river on a banana raft with Lakhindar\'s body, Behula endures perilous trials to reach Indra\'s celestial court. Her dance and unwavering devotion move Shiva and Manasa; life is restored to Lakhindar, and Chand Sadagar offers worship with a lotus flower.`
+  }
 ];
 
-const galleryCaptions = [
-  { bn: 'শ্রীশ্রী মা মনসা মন্দির তোরণ ও মূল প্রাঙ্গণ', en: 'Temple Entrance & Main Courtyard' },
-  { bn: 'ঐতিহাসিক শ্রীশ্রী মা মনসা মন্দির নাটমন্দির', en: 'Historic Natmandir of Manasa Temple' },
-  { bn: 'শ্রীশ্রী মা মনসা মন্দিরের পবিত্র সম্মুখভাগ', en: 'Front Façade of Sacred Sanctum' },
-  { bn: 'মনসা মন্দিরের পবিত্র ঘটের দীঘি ও মনোরম পরিবেশ', en: 'Sacred Temple Lake (Ghoter Dighi)' }
+// Default Temple History & Heritage Content
+const DEFAULT_TEMPLE_HISTORY = {
+  p1: "বরিশাল জেলার আগৈলঝাড়া উপজেলার গৈলা (তৎকালীন ফুল্লশ্রী) গ্রামে অবস্থিত পঞ্চশতবর্ষীয় ঐতিহাসিক পুণ্যতোয়া শ্রী শ্রী মা মনসা মন্দির। পঞ্চদশ শতকের শেষ ভাগে (১৪৯৪ খ্রিষ্টাব্দ / ১৪১৬ শকাব্দে) মধ্যযুগের অন্যতম শ্রেষ্ঠ বাঙালি কবি বিজয় গুপ্ত স্বয়ং মা মনসার স্বপ্নাদেশে এই মন্দিরটি প্রতিষ্ঠা করেন।",
+  p2: "এখানেই রচিত হয়েছিল বাংলা সাহিত্যের অমূল্য সম্পদ মহাকাব্য 'পদ্মাপুরাণ' বা 'মনসামঙ্গল'। ৫৩০ বছরেরও অধিক সময় ধরে এই মন্দিরটি অবিভক্ত বাংলা তথা সমগ্র ভারতীয় উপমহাদেশের ভক্তদের এক পরম জাগ্রত তীর্থভূমি হিসেবে পরিগণিত হয়ে আসছে।",
+  founder: "মহাকবি বিজয় গুপ্ত",
+  established: "১৪৯৪ খ্রিষ্টাব্দ (১৪১৬ শকাব্দ)",
+  shloka: "গৈলা নামে গ্রামখানি সর্বগুণে ধান্দা ।\nতাহাতে বসতি করে লোক পঞ্চনন্দা ॥\nপশ্চিমে পশ্চিমে নদী মধ্যে ফুল্লশ্রী ।\nতাহাতে বিজয় গুপ্ত রচে দেবীর চরিত্রী ॥",
+  shlokaMeaning: "মহাকবি বিজয় গুপ্ত তাঁর রচিত পদ্মাপুরাণের সূচনায় নিজ জন্মভূমি গৈলা গ্রামের মহিমা ও দেবী মনসার কৃপাবাণী লিপিবদ্ধ করেছেন।"
+};
+
+// High-Fidelity Official Sacred Receipt Printing Helper
+const printReceiptDirectly = (receipt, currentLang = 'bn') => {
+  if (!receipt) return;
+  const isBn = currentLang === 'bn';
+  const printWindow = window.open('', '_blank', 'width=850,height=950');
+  if (!printWindow) {
+    window.print();
+    return;
+  }
+
+  const amtNum = typeof receipt.amount === 'number' ? receipt.amount : parseFloat(receipt.amount || 0);
+  const amtFormatted = isBn ? toBengaliDigits(amtNum) : amtNum.toLocaleString();
+
+  const html = `<!DOCTYPE html>
+<html lang="${isBn ? 'bn' : 'en'}">
+<head>
+  <meta charset="UTF-8">
+  <title>পবিত্র দান ও প্রণামী রসিদ - ${receipt.receiptNo}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Noto+Serif+Bengali:wght@600;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
+      background: #fdfbf7;
+      color: #1c1917;
+      padding: 24px;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .receipt-box {
+      max-width: 760px;
+      margin: 0 auto;
+      background: #ffffff;
+      border: 4px double #b45309;
+      border-radius: 16px;
+      padding: 30px 34px;
+      position: relative;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    .watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0.04;
+      font-size: 260px;
+      pointer-events: none;
+      font-family: 'Noto Serif Bengali', serif;
+      color: #b45309;
+    }
+    .header {
+      text-align: center;
+      border-bottom: 2px dashed #f59e0b;
+      padding-bottom: 16px;
+      margin-bottom: 18px;
+    }
+    .header h1 {
+      font-family: 'Noto Serif Bengali', serif;
+      font-size: 26px;
+      color: #7c2d12;
+      margin-bottom: 4px;
+      font-weight: 900;
+    }
+    .header p {
+      font-size: 13px;
+      color: #57534e;
+    }
+    .sloka {
+      font-family: 'Noto Serif Bengali', serif;
+      font-size: 13px;
+      font-weight: bold;
+      color: #9a3412;
+      background: #fef3c7;
+      display: inline-block;
+      padding: 4px 16px;
+      border-radius: 9999px;
+      border: 1px solid #fcd34d;
+      margin: 6px 0;
+    }
+    .badge-bar {
+      background: linear-gradient(90deg, #d97706, #ea580c);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      padding: 5px 16px;
+      border-radius: 9999px;
+      display: inline-block;
+      margin-top: 4px;
+    }
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      padding: 10px 14px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      font-size: 13px;
+    }
+    .meta-row .rec-no {
+      font-family: monospace;
+      font-weight: bold;
+      color: #78350f;
+      font-size: 15px;
+    }
+    .info-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 18px;
+    }
+    .info-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #f5f5f4;
+      font-size: 13.5px;
+    }
+    .info-table td.label {
+      width: 32%;
+      color: #78716c;
+      font-weight: 600;
+    }
+    .info-table td.val {
+      color: #1c1917;
+      font-weight: 700;
+    }
+    .amount-box {
+      background: linear-gradient(135deg, #fffbeb, #ffedd5);
+      border: 2px solid #f59e0b;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .amount-val {
+      font-size: 24px;
+      font-weight: 900;
+      color: #7c2d12;
+      font-family: monospace;
+    }
+    .amount-words {
+      font-size: 12.5px;
+      color: #78350f;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+    .auth-banner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      color: #065f46;
+      font-weight: 600;
+      margin-bottom: 22px;
+    }
+    .seal-wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding-top: 24px;
+    }
+    .sig-line {
+      text-align: center;
+      width: 190px;
+      border-top: 1px dashed #78716c;
+      padding-top: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #44403c;
+    }
+    .stamp-circle {
+      width: 90px;
+      height: 90px;
+      border: 2px dashed #dc2626;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #dc2626;
+      font-size: 9.5px;
+      font-weight: 700;
+      text-align: center;
+      padding: 3px;
+      transform: rotate(-8deg);
+      line-height: 1.2;
+    }
+    .blessing-foot {
+      text-align: center;
+      font-size: 11.5px;
+      color: #78716c;
+      font-style: italic;
+      margin-top: 18px;
+      border-top: 1px solid #e7e5e4;
+      padding-top: 8px;
+    }
+    @media print {
+      body { padding: 0; background: #fff; }
+      .receipt-box { box-shadow: none; border: 3px double #b45309; }
+      @page { size: A4 portrait; margin: 12mm 15mm; }
+    }
+  </style>
+</head>
+<body>
+  <div class="receipt-box">
+    <div class="watermark">ॐ</div>
+    <div class="header">
+      <h1>শ্রী শ্রী মা মনসা মন্দির, গৈলা</h1>
+      <p>মহাকবি বিজয় গুপ্তের প্রতিষ্ঠিত ঐতিহাসিক মহাপবিত্র তীর্থস্থান | স্থাপিত: ১৪৯৪ খ্রিষ্টাব্দ (১৪১৬ শকাব্দ)</p>
+      <p>গৈলা, আগৈলঝাড়া, বরিশাল, বাংলাদেশ • যোগাযোগ: ০১৭২৭০৭৫২৫৪, ০১৭১২৯৪০৭১৬</p>
+      <div class="sloka">ওঁ হ্রীং শ্রীং ক্লীং ঐং মনসাদেব্যৈ নমঃ</div>
+      <div>
+        <span class="badge-bar">✦ পবিত্র স্মারক দান ও প্রণামী রসিদ (OFFICIAL DONATION MEMORIAL RECEIPT) ✦</span>
+      </div>
+    </div>
+
+    <div class="meta-row">
+      <div>
+        <span>রসিদ নং:</span>
+        <span class="rec-no">${receipt.receiptNo}</span>
+      </div>
+      <div>
+        <span>তারিখ:</span>
+        <strong>${receipt.date || new Date().toISOString().split('T')[0]}</strong>
+      </div>
+    </div>
+
+    <table class="info-table">
+      <tr>
+        <td class="label">পুণ্যার্থী / দাতার নাম:</td>
+        <td class="val">${receipt.name}</td>
+      </tr>
+      ${receipt.gotra ? `<tr><td class="label">গোত্র:</td><td class="val">${receipt.gotra}</td></tr>` : ''}
+      ${receipt.phone ? `<tr><td class="label">মোবাইল নম্বর:</td><td class="val">${receipt.phone}</td></tr>` : ''}
+      ${receipt.address ? `<tr><td class="label">ঠিকানা:</td><td class="val">${receipt.address}</td></tr>` : ''}
+      <tr>
+        <td class="label">দানের খাত / উদ্দেশ্য:</td>
+        <td class="val">${receipt.purpose || 'শ্রী শ্রী মা মনসা মন্দির সাধারণ ভক্তিসেবা ও পূজা তহবিল'}</td>
+      </tr>
+      <tr>
+        <td class="label">প্রদানের মাধ্যম:</td>
+        <td class="val">${receipt.method} ${receipt.trxId ? `(TrxID: ${receipt.trxId})` : ''}</td>
+      </tr>
+    </table>
+
+    <div class="amount-box">
+      <div>
+        <div style="font-size:11px;font-weight:700;color:#92400e;text-transform:uppercase;">গৃহীত প্রণামীর পরিমাণ</div>
+        <div class="amount-words">কথায়: ${receipt.amountWords || ''}</div>
+      </div>
+      <div class="amount-val">৳ ${amtFormatted}/-</div>
+    </div>
+
+    <div class="auth-banner">
+      <span>✓ শ্রী শ্রী মা মনসা মন্দির পুণ্য তহবিলে গৃহীত ও নথিবদ্ধ</span>
+      <span style="font-family:monospace;">SEAL-VERIFIED</span>
+    </div>
+
+    <div class="seal-wrap">
+      <div class="sig-line">
+        ${receipt.issuedBy || 'অনলাইন ভক্ত সেবা'}<br>
+        <strong>আদায়কারীর স্বাক্ষর</strong>
+      </div>
+      <div class="stamp-circle">
+        <div>★ মন্দির কার্যালয় ★</div>
+        <div style="font-size:11px;font-weight:900;">সত্যায়িত</div>
+        <div>গৈলা, বরিশাল</div>
+      </div>
+      <div class="sig-line">
+        সাধারণ সম্পাদক / সভাপতি<br>
+        <strong>মন্দির পরিচালনা কমিটি</strong>
+      </div>
+    </div>
+
+    <div class="blessing-foot">
+      "দেবী মনসার অপার কৃপায় আপনার ও আপনার পরিবারে রোগমুক্তি, ধনধান্য, সুস্বাস্থ্য ও শান্তি বর্ষিত হোক।"
+    </div>
+  </div>
+  <script>
+    window.onload = function() {
+      setTimeout(function() {
+        window.print();
+      }, 350);
+    };
+  <\/script>
+</body>
+</html>`;
+
+  printWindow.document.open();
+  printWindow.document.write(html);
+  printWindow.document.close();
+};
+
+// গ্যালারির ছবিগুলো
+const DEFAULT_GALLERY_ITEMS = [
+  { id: 'gal_1', url: 'header image.jpg', captionBn: 'শ্রীশ্রী মা মনসা মন্দির তোরণ ও মূল প্রাঙ্গণ', captionEn: 'Temple Entrance & Main Courtyard' },
+  { id: 'gal_2', url: 'gallary image.png', captionBn: 'ঐতিহাসিক শ্রীশ্রী মা মনসা মন্দির নাটমন্দির', captionEn: 'Historic Natmandir of Manasa Temple' },
+  { id: 'gal_3', url: 'ma manasa mondir font.jpg', captionBn: 'শ্রীশ্রী মা মনসা মন্দিরের পবিত্র সম্মুখভাগ', captionEn: 'Front Façade of Sacred Sanctum' },
+  { id: 'gal_4', url: 'ma manasa mondir lake dighi view.jpg', captionBn: 'মনসা মন্দিরের পবিত্র ঘটের দীঘি ও মনোরম পরিবেশ', captionEn: 'Sacred Temple Lake (Ghoter Dighi)' }
 ];
+
+const galleryImages = DEFAULT_GALLERY_ITEMS.map(g => g.url);
+const galleryCaptions = DEFAULT_GALLERY_ITEMS.map(g => ({ bn: g.captionBn, en: g.captionEn }));
 
 // --- Rich Text Editor Component ---
 const QuillEditor = ({ value, onChange, placeholder }) => {
@@ -882,7 +1233,7 @@ const SectionHeader = ({ tag, title, subtitle, icon = "fa-om", className = "text
         <span>{tag}</span>
       </div>
     )}
-    <h2 className="text-3xl sm:text-4xl font-extrabold font-serif text-transparent bg-clip-text bg-gradient-to-r from-amber-950 via-orange-900 to-red-950 tracking-tight leading-tight">
+    <h2 className="text-3xl sm:text-4xl font-extrabold font-serif text-amber-950 tracking-normal leading-normal sm:leading-relaxed py-1">
       {title}
     </h2>
     <div className="flex items-center justify-center gap-2.5 mt-3.5 select-none">
@@ -1304,7 +1655,7 @@ const Header = ({ navigateTo, isMenuOpen, setIsMenuOpen, lang, setLang, isMusicP
           <img src="logo (1).jpg" alt="Logo" className="w-full h-full object-cover" />
         </div>
         <div>
-          <h1 className="text-xl md:text-2xl font-bold font-serif tracking-tight text-white group-hover:text-yellow-200 transition-colors">{t('templeTitle', lang)}</h1>
+          <h1 className="text-xl md:text-2xl font-bold font-serif tracking-normal leading-normal text-white group-hover:text-yellow-200 transition-colors py-0.5">{t('templeTitle', lang)}</h1>
           <p className="text-xs text-yellow-200 font-medium">{t('templeLocation', lang)}</p>
         </div>
       </div>
@@ -1346,31 +1697,40 @@ const Header = ({ navigateTo, isMenuOpen, setIsMenuOpen, lang, setLang, isMusicP
       </div>
     </div>
 
-    {/* Mobile Slide-Out Drawer */}
+    {/* Mobile Slide-Out Drawer with 100% Solid Opaque Background & Backdrop */}
     {isMenuOpen && (
-      <div className="lg:hidden bg-gradient-to-b from-orange-700 to-orange-850 absolute w-full left-0 top-full shadow-2xl flex flex-col font-medium border-t border-orange-500/50 z-50">
-        <div className="p-3 bg-orange-900/60 backdrop-blur-md flex justify-between items-center border-b border-orange-600/50">
-          <span className="text-xs text-yellow-200 uppercase tracking-wider font-bold flex items-center gap-1">
-            <i className="fas fa-sliders-h text-xs"></i> Controls / নিয়ন্ত্রণ
-          </span>
-          <HeaderControls isMusicPlaying={isMusicPlaying} toggleMusic={toggleMusic} lang={lang} setLang={setLang} />
+      <>
+        {/* Dark Dimmer Backdrop to completely cover and hide background elements */}
+        <div
+          className="fixed inset-0 bg-black/85 backdrop-blur-md z-40 lg:hidden"
+          onClick={() => setIsMenuOpen(false)}
+        ></div>
+
+        {/* 100% Solid Opaque Mobile Navigation Menu */}
+        <div className="lg:hidden bg-stone-950 text-white fixed w-full left-0 top-[60px] sm:top-[68px] shadow-2xl flex flex-col font-medium border-t-2 border-orange-500 border-b-4 border-amber-500 z-50 max-h-[85vh] overflow-y-auto">
+          <div className="p-3 bg-stone-900 border-b border-stone-800 flex justify-between items-center">
+            <span className="text-xs text-yellow-300 uppercase tracking-wider font-bold flex items-center gap-1.5">
+              <i className="fas fa-sliders-h text-xs"></i> Controls / নিয়ন্ত্রণ
+            </span>
+            <HeaderControls isMusicPlaying={isMusicPlaying} toggleMusic={toggleMusic} lang={lang} setLang={setLang} />
+          </div>
+          <button onClick={() => navigateTo('home')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3"><i className="fas fa-home text-yellow-400 w-5"></i> {t('home', lang)}</button>
+          <button onClick={() => navigateTo('booking')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3 text-amber-300 font-bold"><i className="fas fa-hands-praying text-amber-400 w-5"></i> {t('booking', lang)}</button>
+          <button onClick={() => navigateTo('royani')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3 text-amber-300"><i className="fas fa-music text-amber-400 w-5"></i> {t('royani', lang)}</button>
+          <button onClick={() => navigateTo('history')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3"><i className="fas fa-landmark text-yellow-400 w-5"></i> {t('history', lang)}</button>
+          <button onClick={() => navigateTo('timings')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3"><i className="fas fa-clock text-yellow-400 w-5"></i> {t('timings', lang)}</button>
+          <button onClick={() => navigateTo('travel')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3"><i className="fas fa-route text-yellow-400 w-5"></i> {t('travel', lang)}</button>
+          <button onClick={() => navigateTo('mantras')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3"><i className="fas fa-om text-yellow-400 w-5"></i> {t('mantras', lang)}</button>
+          <button onClick={() => navigateTo('committee')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3"><i className="fas fa-users text-yellow-400 w-5"></i> {t('committee', lang)}</button>
+          <button onClick={() => navigateTo('event')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3"><i className="fas fa-calendar-alt text-yellow-400 w-5"></i> {t('events', lang)}</button>
+          <button onClick={() => navigateTo('notice')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3"><i className="fas fa-bell text-yellow-400 w-5"></i> {t('noticeBoard', lang)}</button>
+          <button onClick={() => navigateTo('testimonials')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3"><i className="fas fa-comments text-yellow-400 w-5"></i> {t('testimonials', lang)}</button>
+          <button onClick={() => navigateTo('donation')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3 text-amber-400 font-extrabold"><i className="fas fa-heart text-red-500 w-5"></i> {t('donation', lang)}</button>
+          <button onClick={() => navigateTo('admin')} className="py-3 px-6 text-left bg-black text-gray-300 flex items-center gap-3 hover:text-white transition-colors">
+            <i className="fas fa-cog text-orange-400 w-5"></i> {t('adminPanel', lang)}
+          </button>
         </div>
-        <button onClick={() => navigateTo('home')} className="py-2.5 px-6 text-left border-b border-orange-600/40 hover:bg-orange-600/50 transition-colors flex items-center gap-2.5"><i className="fas fa-home text-yellow-300 w-5"></i> {t('home', lang)}</button>
-        <button onClick={() => navigateTo('booking')} className="py-2.5 px-6 text-left border-b border-orange-600/40 hover:bg-orange-600/50 transition-colors flex items-center gap-2.5 text-yellow-200 font-bold"><i className="fas fa-hands-praying text-yellow-300 w-5"></i> {t('booking', lang)}</button>
-        <button onClick={() => navigateTo('royani')} className="py-2.5 px-6 text-left border-b border-orange-600/40 hover:bg-orange-600/50 transition-colors flex items-center gap-2.5 text-yellow-200"><i className="fas fa-music text-yellow-300 w-5"></i> {t('royani', lang)}</button>
-        <button onClick={() => navigateTo('history')} className="py-2.5 px-6 text-left border-b border-orange-600/40 hover:bg-orange-600/50 transition-colors flex items-center gap-2.5"><i className="fas fa-landmark text-yellow-300 w-5"></i> {t('history', lang)}</button>
-        <button onClick={() => navigateTo('timings')} className="py-2.5 px-6 text-left border-b border-orange-600/40 hover:bg-orange-600/50 transition-colors flex items-center gap-2.5"><i className="fas fa-clock text-yellow-300 w-5"></i> {t('timings', lang)}</button>
-        <button onClick={() => navigateTo('travel')} className="py-2.5 px-6 text-left border-b border-orange-600/40 hover:bg-orange-600/50 transition-colors flex items-center gap-2.5"><i className="fas fa-route text-yellow-300 w-5"></i> {t('travel', lang)}</button>
-        <button onClick={() => navigateTo('mantras')} className="py-2.5 px-6 text-left border-b border-orange-600/40 hover:bg-orange-600/50 transition-colors flex items-center gap-2.5"><i className="fas fa-om text-yellow-300 w-5"></i> {t('mantras', lang)}</button>
-        <button onClick={() => navigateTo('committee')} className="py-2.5 px-6 text-left border-b border-orange-600/40 hover:bg-orange-600/50 transition-colors flex items-center gap-2.5"><i className="fas fa-users text-yellow-300 w-5"></i> {t('committee', lang)}</button>
-        <button onClick={() => navigateTo('event')} className="py-2.5 px-6 text-left border-b border-orange-600/40 hover:bg-orange-600/50 transition-colors flex items-center gap-2.5"><i className="fas fa-calendar-alt text-yellow-300 w-5"></i> {t('events', lang)}</button>
-        <button onClick={() => navigateTo('notice')} className="py-2.5 px-6 text-left border-b border-orange-600/40 hover:bg-orange-600/50 transition-colors flex items-center gap-2.5"><i className="fas fa-bell text-yellow-300 w-5"></i> {t('noticeBoard', lang)}</button>
-        <button onClick={() => navigateTo('testimonials')} className="py-2.5 px-6 text-left border-b border-orange-600/40 hover:bg-orange-600/50 transition-colors flex items-center gap-2.5"><i className="fas fa-comments text-yellow-300 w-5"></i> {t('testimonials', lang)}</button>
-        <button onClick={() => navigateTo('donation')} className="py-2.5 px-6 text-left border-b border-orange-600/40 hover:bg-orange-600/50 transition-colors flex items-center gap-2.5 text-yellow-300 font-bold"><i className="fas fa-heart text-red-400 w-5"></i> {t('donation', lang)}</button>
-        <button onClick={() => navigateTo('admin')} className="py-2.5 px-6 text-left bg-gray-900 text-gray-200 flex items-center gap-2.5 hover:bg-black transition-colors">
-          <i className="fas fa-cog text-orange-400 w-5"></i> {t('adminPanel', lang)}
-        </button>
-      </div>
+      </>
     )}
   </header>
 );
@@ -1575,19 +1935,24 @@ const getLiveStatus = (timings, lang = 'bn') => {
 };
 
 // --- Home Component ---
-const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTestimonialIds, committeeMembers, events, notices, timings, travelInfo, mantras, navigateTo, showToast, lang }) => {
+const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTestimonialIds, committeeMembers, events, notices, timings, travelInfo, mantras, galleryItems, navigateTo, showToast, lang }) => {
   const [currentImg, setCurrentImg] = useState(0);
+  const [lightboxImg, setLightboxImg] = useState(null);
   const [testIdx, setTestIdx] = useState(0);
+
+  const activeGallery = (galleryItems && galleryItems.length > 0) ? galleryItems : DEFAULT_GALLERY_ITEMS;
+  const currentGalleryImages = activeGallery.map(g => g.url);
+  const currentGalleryCaptions = activeGallery.map(g => ({ bn: g.captionBn, en: g.captionEn }));
 
   const featuredTests = testimonials.filter(t => featuredTestimonialIds.includes(t.id));
   const displayTests = featuredTests.length > 0 ? featuredTests : testimonials.slice(0, 3);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentImg((prev) => (prev + 1) % galleryImages.length);
+      setCurrentImg((prev) => (prev + 1) % currentGalleryImages.length);
     }, 4000);
     return () => clearInterval(timer);
-  }, []);
+  }, [currentGalleryImages.length]);
 
   useEffect(() => {
     if (displayTests.length <= 1) return;
@@ -1597,8 +1962,39 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
     return () => clearInterval(tTimer);
   }, [displayTests.length]);
 
-  const nextImg = () => setCurrentImg((prev) => (prev + 1) % galleryImages.length);
-  const prevImg = () => setCurrentImg((prev) => (prev === 0 ? galleryImages.length - 1 : prev - 1));
+  const nextImg = () => setCurrentImg((prev) => (prev + 1) % currentGalleryImages.length);
+  const prevImg = () => setCurrentImg((prev) => (prev === 0 ? currentGalleryImages.length - 1 : prev - 1));
+
+  const openLightbox = (idx, e) => {
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
+    }
+    const targetIdx = typeof idx === 'number' ? idx : currentImg;
+    setLightboxImg(targetIdx);
+  };
+
+  const closeLightbox = (e) => {
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
+    }
+    setLightboxImg(null);
+  };
+
+  useEffect(() => {
+    if (lightboxImg === null) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setLightboxImg(null);
+      if (e.key === 'ArrowRight') setLightboxImg((prev) => (prev + 1) % currentGalleryImages.length);
+      if (e.key === 'ArrowLeft') setLightboxImg((prev) => (prev === 0 ? currentGalleryImages.length - 1 : prev - 1));
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    const originalOverflow = document.body ? document.body.style.overflow : '';
+    if (document.body) document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      if (document.body) document.body.style.overflow = originalOverflow;
+    };
+  }, [lightboxImg]);
 
   // Determine marquee translation (auto-translate from admin Bengali or use custom English)
   const displayMarquee = lang === 'en'
@@ -1780,11 +2176,256 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
         </div>
       </section>
 
-      {/* Panjika & Upcoming Festival Countdown */}
-      <section className="container mx-auto px-4 mt-6">
-        <PanjikaWidget navigateTo={navigateTo} lang={lang} />
 
-        {/* Three Holy Sacred Feature Gateways */}
+
+      {/* Photo Gallery Section */}
+      <section className="py-16 container mx-auto px-4 mt-2">
+        <SectionHeader
+          tag={lang === 'en' ? 'Temple Visuals' : 'আলোকচিত্র সংকলন'}
+          title={t('photoGallery', lang)}
+          subtitle={lang === 'en' ? 'Explore the historic architecture, serene pond, and sacred ambiance of Maa Manasa Temple.' : 'ঐতিহাসিক শ্রীশ্রী মা মনসা মন্দিরের পবিত্র প্রাঙ্গণ, নাটমন্দির ও সুপ্রাচীন ঐতিহ্যের এক ঝলক।'}
+          icon="fa-images"
+        />
+
+        <div className="max-w-4xl mx-auto">
+          {/* Main Showcase Frame with Gold Rim & Ambient Glow */}
+          <div className="relative p-2 sm:p-3 bg-gradient-to-br from-amber-200 via-amber-400/50 to-orange-300 rounded-[2rem] shadow-[0_20px_50px_-15px_rgba(234,88,12,0.22)] border border-amber-300/80 group">
+            <div
+              onClick={(e) => openLightbox(currentImg, e)}
+              className="relative w-full aspect-[16/10] sm:aspect-video rounded-[1.4rem] overflow-hidden bg-stone-900 select-none shadow-inner cursor-pointer"
+              title={lang === 'en' ? 'Click to open full screen preview' : 'পূর্ণ আকারে ছবি দেখতে ক্লিক করুন'}
+            >
+              {currentGalleryImages.map((img, index) => (
+                <div
+                  key={index}
+                  onClick={(e) => openLightbox(currentImg, e)}
+                  className={`absolute inset-0 w-full h-full transition-opacity duration-700 flex items-center justify-center bg-stone-900 cursor-pointer ${index === currentImg ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}
+                >
+                  <img
+                    src={img}
+                    alt={currentGalleryCaptions[index] ? (lang === 'en' ? currentGalleryCaptions[index].en : currentGalleryCaptions[index].bn) : `Gallery ${index + 1}`}
+                    className="w-full h-full object-cover transform duration-700 ease-out group-hover:scale-103 pointer-events-none"
+                  />
+                </div>
+              ))}
+
+              {/* Prev / Next Chevrons - Positioned cleanly on edges without blocking the photo */}
+              <button
+                onClick={(e) => { e.stopPropagation(); prevImg(); }}
+                aria-label={t('prevPhoto', lang)}
+                className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-amber-500 text-white hover:text-amber-950 backdrop-blur-md border border-white/30 hover:border-amber-300 w-9 h-9 sm:w-11 sm:h-11 rounded-full opacity-80 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 z-20 flex items-center justify-center shadow-lg active:scale-95 cursor-pointer"
+              >
+                <i className="fas fa-chevron-left text-xs sm:text-base"></i>
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); nextImg(); }}
+                aria-label={t('nextPhoto', lang)}
+                className="absolute right-2.5 sm:right-3 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-amber-500 text-white hover:text-amber-950 backdrop-blur-md border border-white/30 hover:border-amber-300 w-9 h-9 sm:w-11 sm:h-11 rounded-full opacity-80 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 z-20 flex items-center justify-center shadow-lg active:scale-95 cursor-pointer"
+              >
+                <i className="fas fa-chevron-right text-xs sm:text-base"></i>
+              </button>
+
+              {/* Subtle Zoom Pill on Hover (non-obstructive corner cue) */}
+              <div className="absolute bottom-3 right-3 z-20 opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
+                <button
+                  onClick={(e) => openLightbox(currentImg, e)}
+                  className="bg-black/70 hover:bg-amber-500 text-amber-200 hover:text-amber-950 text-xs px-2.5 py-1 rounded-full border border-white/20 flex items-center gap-1.5 shadow-md cursor-pointer transition-colors"
+                >
+                  <i className="fas fa-expand text-[10px]"></i>
+                  <span>{lang === 'en' ? 'Full View' : 'পূর্ণ ছবি'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Dedicated Photo Caption & Control Bar (Outside photo for 100% unobstructed image visibility) */}
+          <div className="mt-3.5 bg-white/95 backdrop-blur-md rounded-2xl px-4 py-3 sm:py-3.5 border border-amber-200/90 shadow-md flex flex-col sm:flex-row items-center justify-between gap-3">
+            {/* Photo Caption */}
+            <div className="flex items-center gap-3 text-center sm:text-left min-w-0">
+              <span className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                <i className="fas fa-camera text-xs"></i>
+              </span>
+              <p className="text-sm sm:text-base font-bold text-amber-950 font-serif truncate">
+                {currentGalleryCaptions[currentImg] ? (lang === 'en' ? currentGalleryCaptions[currentImg].en : currentGalleryCaptions[currentImg].bn) : ''}
+              </p>
+            </div>
+
+            {/* Dots, Counter & Fullscreen Button */}
+            <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+              {/* Pagination Dots */}
+              <div className="flex items-center gap-1.5 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-200/80 shadow-2xs">
+                {currentGalleryImages.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentImg(i)}
+                    aria-label={`Photo ${i + 1}`}
+                    className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${i === currentImg
+                        ? 'w-6 bg-gradient-to-r from-amber-500 to-orange-500 shadow-xs'
+                        : 'w-2 bg-amber-300 hover:bg-amber-400'
+                      }`}
+                  ></button>
+                ))}
+              </div>
+
+              {/* Photo Counter */}
+              <span className="bg-amber-100 text-amber-900 font-bold text-xs sm:text-sm px-3 py-1 rounded-full border border-amber-300 font-mono tracking-wider shadow-2xs">
+                <span className="text-amber-700">{toBengaliDigits(currentImg + 1)}</span>
+                <span className="text-amber-400 font-normal mx-1">/</span>
+                <span>{toBengaliDigits(currentGalleryImages.length)}</span>
+              </span>
+
+              {/* Fullscreen Button */}
+              <button
+                onClick={(e) => openLightbox(currentImg, e)}
+                className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-xs sm:text-sm flex items-center gap-1.5 shadow-md hover:shadow-lg active:scale-95 transition-all cursor-pointer"
+                title={lang === 'en' ? 'Open Full Screen Preview' : 'পূর্ণ আকারে ছবি দেখুন'}
+              >
+                <i className="fas fa-expand text-xs"></i>
+                <span>{lang === 'en' ? 'Full Screen' : 'ফুল স্ক্রিন'}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Interactive Thumbnail Strip */}
+          <div className="grid grid-cols-4 gap-2.5 sm:gap-4 mt-3.5 px-1">
+            {currentGalleryImages.map((img, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentImg(i)}
+                onDoubleClick={(e) => openLightbox(i, e)}
+                className={`relative aspect-[16/10] rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-300 cursor-pointer border-2 ${i === currentImg
+                    ? 'border-amber-500 ring-2 ring-amber-400/40 shadow-md scale-[1.02]'
+                    : 'border-white/80 hover:border-amber-300 opacity-70 hover:opacity-100'
+                  }`}
+              >
+                <img src={img} alt={`Thumb ${i}`} className="w-full h-full object-cover" />
+                {i === currentImg && (
+                  <div className="absolute inset-0 bg-amber-500/15 pointer-events-none"></div>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Fullscreen Image Lightbox Modal (Portaled directly to document.body) */}
+        {lightboxImg !== null && typeof document !== 'undefined' && ReactDOM.createPortal(
+          <div
+            id="fullscreen-lightbox"
+            className="fixed inset-0 z-[999999] flex flex-col items-center justify-between p-3 sm:p-6 bg-black/95 select-none"
+            style={{ backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}
+          >
+            {/* Dedicated Backdrop (Clicking background closes modal) */}
+            <div
+              className="absolute inset-0 bg-black/85 cursor-pointer -z-10"
+              onClick={closeLightbox}
+              title={lang === 'en' ? 'Click background to close' : 'বন্ধ করতে বাইরে ক্লিক করুন'}
+            />
+
+            {/* Lightbox Top Header */}
+            <div className="w-full max-w-6xl flex items-center justify-between text-white py-2 px-2 z-20">
+              <div className="flex items-center gap-3">
+                <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 px-3.5 py-1 rounded-full text-xs sm:text-sm font-mono font-bold tracking-wider">
+                  {toBengaliDigits(lightboxImg + 1)} / {toBengaliDigits(currentGalleryImages.length)}
+                </span>
+                <span className="text-sm sm:text-base font-semibold text-amber-100 font-serif hidden md:inline truncate max-w-md">
+                  {currentGalleryCaptions[lightboxImg] ? (lang === 'en' ? currentGalleryCaptions[lightboxImg].en : currentGalleryCaptions[lightboxImg].bn) : ''}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {/* Native Fullscreen Display Toggle */}
+                <button
+                  onClick={() => {
+                    if (!document.fullscreenElement) {
+                      const el = document.getElementById('fullscreen-lightbox') || document.documentElement;
+                      if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+                      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+                    } else {
+                      if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+                    }
+                  }}
+                  className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-amber-300 border border-white/20 flex items-center justify-center transition-all cursor-pointer shadow-md"
+                  title={lang === 'en' ? 'Toggle Display Fullscreen' : 'মনিটর ফুলস্ক্রিন'}
+                >
+                  <i className="fas fa-expand-arrows-alt text-sm"></i>
+                </button>
+
+                {/* Close Button */}
+                <button
+                  onClick={closeLightbox}
+                  className="w-10 h-10 rounded-full bg-red-600/80 hover:bg-red-600 text-white flex items-center justify-center transition-all cursor-pointer shadow-lg active:scale-95"
+                  aria-label="Close"
+                  title={lang === 'en' ? 'Close Preview' : 'বন্ধ করুন'}
+                >
+                  <i className="fas fa-times text-base"></i>
+                </button>
+              </div>
+            </div>
+
+            {/* Lightbox Main Image Display */}
+            <div className="relative w-full max-w-5xl flex-1 flex items-center justify-center min-h-0 my-2 px-2 sm:px-14">
+              <img
+                src={currentGalleryImages[lightboxImg]}
+                alt={currentGalleryCaptions[lightboxImg] ? (lang === 'en' ? currentGalleryCaptions[lightboxImg].en : currentGalleryCaptions[lightboxImg].bn) : `Full view ${lightboxImg + 1}`}
+                className="max-w-full max-h-[72vh] sm:max-h-[78vh] object-contain rounded-xl shadow-2xl transition-all duration-300"
+              />
+
+              {/* Previous Photo Button */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightboxImg((prev) => (prev === 0 ? currentGalleryImages.length - 1 : prev - 1));
+                }}
+                className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-amber-500 text-white hover:text-amber-950 border border-white/30 hover:border-amber-400 w-11 h-11 sm:w-14 sm:h-14 rounded-full flex items-center justify-center cursor-pointer transition-all shadow-2xl z-30 active:scale-90"
+                aria-label="Previous"
+                title={lang === 'en' ? 'Previous Photo' : 'পূর্ববর্তী ছবি'}
+              >
+                <i className="fas fa-chevron-left text-lg sm:text-xl"></i>
+              </button>
+              {/* Next Photo Button */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightboxImg((prev) => (prev + 1) % currentGalleryImages.length);
+                }}
+                className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-amber-500 text-white hover:text-amber-950 border border-white/30 hover:border-amber-400 w-11 h-11 sm:w-14 sm:h-14 rounded-full flex items-center justify-center cursor-pointer transition-all shadow-2xl z-30 active:scale-90"
+                aria-label="Next"
+                title={lang === 'en' ? 'Next Photo' : 'পরবর্তী ছবি'}
+              >
+                <i className="fas fa-chevron-right text-lg sm:text-xl"></i>
+              </button>
+            </div>
+
+            {/* Lightbox Bottom Caption & Thumbnails */}
+            <div className="w-full max-w-4xl flex flex-col items-center gap-2 pb-2 z-20">
+              <p className="text-center text-amber-200 text-sm sm:text-base font-serif px-4">
+                {currentGalleryCaptions[lightboxImg] ? (lang === 'en' ? currentGalleryCaptions[lightboxImg].en : currentGalleryCaptions[lightboxImg].bn) : ''}
+              </p>
+
+              {/* Thumbnails in Lightbox */}
+              <div className="flex items-center gap-2 overflow-x-auto p-1 max-w-full">
+                {currentGalleryImages.map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setLightboxImg(i)}
+                    className={`w-14 h-10 sm:w-18 sm:h-12 rounded-lg overflow-hidden border-2 transition-all cursor-pointer shrink-0 ${
+                      i === lightboxImg
+                        ? 'border-amber-400 scale-105 shadow-md shadow-amber-400/50'
+                        : 'border-white/30 opacity-60 hover:opacity-100'
+                    }`}
+                  >
+                    <img src={img} alt={`Thumb ${i}`} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
+      </section>
+
+      {/* Three Holy Sacred Feature Gateways */}
+      <section className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto -mt-2 mb-12">
           {/* Card 1: Booking */}
           <div
@@ -1844,7 +2485,7 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
 
           {/* Card 3: Donation & Receipt */}
           <div
-            onClick={() => navigateTo('receipt')}
+            onClick={() => navigateTo('donation')}
             className="cursor-pointer bg-white p-6 sm:p-7 rounded-3xl shadow-xl hover:shadow-2xl border-2 border-yellow-300/80 hover:border-yellow-500 transition-all duration-300 hover:-translate-y-2 relative overflow-hidden group card-hover-glow"
           >
             <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-amber-400 via-yellow-400 to-orange-500"></div>
@@ -1868,110 +2509,6 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
               <span>{lang === 'en' ? 'Generate Official Receipt' : 'স্মারক রসিদ সংগ্রহ করুন'}</span>
               <i className="fas fa-arrow-right group-hover:translate-x-1.5 transition-transform"></i>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Photo Gallery Section */}
-      <section className="py-16 container mx-auto px-4 mt-2">
-        <SectionHeader
-          tag={lang === 'en' ? 'Temple Visuals' : 'আলোকচিত্র সংকলন'}
-          title={t('photoGallery', lang)}
-          subtitle={lang === 'en' ? 'Explore the historic architecture, serene pond, and sacred ambiance of Maa Manasa Temple.' : 'ঐতিহাসিক শ্রীশ্রী মা মনসা মন্দিরের পবিত্র প্রাঙ্গণ, নাটমন্দির ও সুপ্রাচীন ঐতিহ্যের এক ঝলক।'}
-          icon="fa-images"
-        />
-
-        <div className="max-w-4xl mx-auto">
-          {/* Main Showcase Frame with Gold Rim & Ambient Glow */}
-          <div className="relative p-2.5 sm:p-3.5 bg-gradient-to-br from-amber-200 via-amber-400/50 to-orange-300 rounded-[2rem] shadow-[0_20px_50px_-15px_rgba(234,88,12,0.25)] border border-amber-300/80 group">
-            <div className="relative w-full aspect-video rounded-[1.4rem] overflow-hidden bg-gray-950 select-none shadow-inner">
-              {galleryImages.map((img, index) => (
-                <div
-                  key={index}
-                  className={`absolute inset-0 w-full h-full transition-opacity duration-1000 flex items-center justify-center bg-gray-900 ${index === currentImg ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
-                >
-                  <img
-                    src={img}
-                    alt={`Gallery ${index}`}
-                    className="w-full h-full object-cover transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
-                  />
-                  {/* Bottom Vignette Gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none"></div>
-                </div>
-              ))}
-
-              {/* Floating Top Badge */}
-              <div className="absolute top-3.5 left-3.5 z-20 flex items-center gap-2 bg-black/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-amber-400/30 text-amber-200 text-xs font-semibold shadow-md">
-                <i className="fas fa-camera text-amber-400 text-xs"></i>
-                <span className="truncate max-w-[160px] sm:max-w-none">{lang === 'en' ? 'Historic Manasa Temple' : 'ঐতিহাসিক মনসা মন্দির'}</span>
-              </div>
-
-              {/* Floating Counter Badge */}
-              <div className="absolute top-3.5 right-3.5 z-20 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20 text-white text-xs font-mono font-bold tracking-widest shadow-md flex items-center gap-1.5">
-                <span className="text-amber-400 font-bold">{toBengaliDigits(currentImg + 1)}</span>
-                <span className="text-white/40">/</span>
-                <span>{toBengaliDigits(galleryImages.length)}</span>
-              </div>
-
-              {/* Bottom Caption Pill */}
-              <div className="absolute bottom-14 sm:bottom-16 left-4 right-4 z-20 text-center pointer-events-none">
-                <span className="inline-block bg-black/65 backdrop-blur-md text-amber-100 text-xs sm:text-sm font-medium px-4 py-1.5 rounded-full border border-amber-400/25 shadow-lg max-w-xl truncate">
-                  {galleryCaptions[currentImg] ? (lang === 'en' ? galleryCaptions[currentImg].en : galleryCaptions[currentImg].bn) : ''}
-                </span>
-              </div>
-
-              {/* Prev / Next Chevrons */}
-              <button
-                onClick={prevImg}
-                aria-label={t('prevPhoto', lang)}
-                className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/45 hover:bg-amber-500 text-white hover:text-orange-950 backdrop-blur-md border border-white/30 hover:border-amber-300 w-10 h-10 sm:w-12 sm:h-12 rounded-full opacity-85 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 z-20 flex items-center justify-center shadow-xl active:scale-90 cursor-pointer"
-              >
-                <i className="fas fa-chevron-left text-sm sm:text-base"></i>
-              </button>
-              <button
-                onClick={nextImg}
-                aria-label={t('nextPhoto', lang)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/45 hover:bg-amber-500 text-white hover:text-orange-950 backdrop-blur-md border border-white/30 hover:border-amber-300 w-10 h-10 sm:w-12 sm:h-12 rounded-full opacity-85 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 z-20 flex items-center justify-center shadow-xl active:scale-90 cursor-pointer"
-              >
-                <i className="fas fa-chevron-right text-sm sm:text-base"></i>
-              </button>
-
-              {/* Refined Pill Indicator */}
-              <div className="absolute bottom-4 left-0 right-0 flex justify-center items-center gap-2 z-20">
-                <div className="flex items-center gap-2 bg-black/50 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15 shadow-lg">
-                  {galleryImages.map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setCurrentImg(i)}
-                      aria-label={`Photo ${i + 1}`}
-                      className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${i === currentImg
-                          ? 'w-7 bg-gradient-to-r from-amber-300 to-yellow-400 shadow-xs shadow-amber-400/50'
-                          : 'w-2 bg-white/45 hover:bg-white/80'
-                        }`}
-                    ></button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Interactive Thumbnail Strip */}
-          <div className="grid grid-cols-4 gap-2.5 sm:gap-4 mt-4 px-1">
-            {galleryImages.map((img, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentImg(i)}
-                className={`relative aspect-[16/10] rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-300 cursor-pointer border-2 ${i === currentImg
-                    ? 'border-amber-500 ring-2 ring-amber-400/40 shadow-md scale-[1.02]'
-                    : 'border-white/80 hover:border-amber-300 opacity-70 hover:opacity-100'
-                  }`}
-              >
-                <img src={img} alt={`Thumb ${i}`} className="w-full h-full object-cover" />
-                {i === currentImg && (
-                  <div className="absolute inset-0 bg-amber-500/15 pointer-events-none"></div>
-                )}
-              </button>
-            ))}
           </div>
         </div>
       </section>
@@ -2110,7 +2647,7 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
               </div>
 
               {/* Title & Animated Pulse Divider */}
-              <h2 className="text-3xl sm:text-4xl font-extrabold font-serif text-gray-900 mb-2.5 tracking-tight leading-tight">
+              <h2 className="text-3xl sm:text-4xl font-extrabold font-serif text-gray-900 mb-2.5 tracking-normal leading-normal py-1">
                 {t('noticeBoard', lang)}
               </h2>
               <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
@@ -2177,89 +2714,107 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
         </div>
       </section>
 
-      {/* Sacred Mantra & Padmapuran Highlight Card */}
+      {/* Sacred Panjika & Devotional Hymns (Side by Side Matching Premium) */}
       <section className="py-16 container mx-auto px-4">
-        <div className="relative max-w-4xl mx-auto rounded-[2.5rem] p-1 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 shadow-[0_20px_60px_-15px_rgba(217,119,6,0.4)]">
-          <div className="bg-gradient-to-br from-[#240606] via-[#331102] to-[#1a0404] text-white rounded-[2.35rem] p-8 sm:p-12 md:p-14 relative overflow-hidden border border-amber-300/30 text-center">
+        <SectionHeader
+          tag={lang === 'en' ? 'Sacred Devotion & Tithis' : 'পবিত্র দিনপঞ্জি ও নিত্য স্তোত্র'}
+          title={lang === 'en' ? 'Temple Panjika & Sacred Chants' : 'শ্রীশ্রী মা মনসা নিত্য পঞ্জিকা ও মঙ্গলধ্বনি'}
+          subtitle={lang === 'en' ? 'Auspicious lunar calendar, sacred tithis, daily hymns, and interactive temple bells.' : 'দৈনিক তিথি-নক্ষত্র, মনসা পঞ্চমী, অমাবস্যা-পূর্ণিমা এবং মন্দিরের পবিত্র শঙ্খ ও ঘণ্টাধ্বনি।'}
+          icon="fa-om"
+          className="text-center mb-10"
+        />
 
-            {/* Sacred Om Watermark & Background Glow */}
-            <div className="absolute -right-6 -bottom-8 opacity-10 text-9xl text-amber-300 pointer-events-none select-none">
-              <i className="fas fa-om"></i>
-            </div>
-            <div className="absolute -left-10 -top-10 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 xl:gap-8 max-w-7xl mx-auto items-stretch">
+          {/* Left Column: Sacred Panjika Calendar */}
+          <div className="w-full flex flex-col h-full">
+            <PanjikaWidget navigateTo={navigateTo} lang={lang} />
+          </div>
 
-            {/* Corner Flourish Motifs */}
-            <span className="absolute top-4 left-5 text-amber-400/40 text-sm pointer-events-none select-none">❖</span>
-            <span className="absolute top-4 right-5 text-amber-400/40 text-sm pointer-events-none select-none">❖</span>
-            <span className="absolute bottom-4 left-5 text-amber-400/40 text-sm pointer-events-none select-none">❖</span>
-            <span className="absolute bottom-4 right-5 text-amber-400/40 text-sm pointer-events-none select-none">❖</span>
+          {/* Right Column: Sacred Mantra & Interactive Ghonta / Shonkho Sound Sanctuary */}
+          <div className="relative w-full h-full rounded-[2.5rem] p-1 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 shadow-[0_20px_50px_-15px_rgba(217,119,6,0.35)] flex flex-col">
+            <div className="bg-gradient-to-br from-[#240606] via-[#331102] to-[#1a0404] text-white rounded-[2.35rem] p-4 sm:p-6 md:p-7 relative overflow-hidden border border-amber-300/30 flex-1 flex flex-col justify-between text-center card-hover-glow">
 
-            <div className="relative z-10">
-              {/* Devotional Top Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest text-amber-200 bg-amber-400/15 border border-amber-400/40 backdrop-blur-md mb-4 shadow-xs">
-                <i className="fas fa-om text-amber-400"></i>
-                <span>{lang === 'en' ? 'Sacred Devotion of the Day' : 'আজকের পবিত্র স্তোত্র'}</span>
-                <i className="fas fa-om text-amber-400"></i>
+              {/* Sacred Om Watermark & Background Glow */}
+              <div className="absolute -right-6 -bottom-8 opacity-10 text-9xl text-amber-300 pointer-events-none select-none">
+                <i className="fas fa-om"></i>
               </div>
+              <div className="absolute -left-10 -top-10 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-              {/* Title with Gold Foil Gradient */}
-              <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold font-serif bg-gradient-to-r from-yellow-200 via-amber-300 to-yellow-100 bg-clip-text text-transparent mb-5 tracking-tight drop-shadow-sm">
-                {lang === 'en' ? 'Shree Shree Maa Manasa Pranam Mantra' : 'মা মনসার পবিত্র প্রণাম মন্ত্র'}
-              </h3>
+              {/* Corner Flourish Motifs */}
+              <span className="absolute top-4 left-5 text-amber-400/40 text-sm pointer-events-none select-none">❖</span>
+              <span className="absolute top-4 right-5 text-amber-400/40 text-sm pointer-events-none select-none">❖</span>
+              <span className="absolute bottom-4 left-5 text-amber-400/40 text-sm pointer-events-none select-none">❖</span>
+              <span className="absolute bottom-4 right-5 text-amber-400/40 text-sm pointer-events-none select-none">❖</span>
 
-              {/* Shloka Altar Sanctuary Box */}
-              <div className="bg-black/45 backdrop-blur-md rounded-2xl p-6 sm:p-8 border border-amber-400/35 max-w-2xl mx-auto mb-8 shadow-inner relative">
-                <p className="text-xl sm:text-2xl md:text-3xl font-serif text-amber-100 font-bold leading-relaxed tracking-wide mb-3 drop-shadow">
-                  ওঁ আস্তীকস্য মুনের্মাতা ভগিনী বাসুকেস্তথা ।<br />
-                  জরৎকারুমুনেঃ পত্নী মনসাদেবী নমোহস্তুতে ॥
-                </p>
-                <div className="h-[1px] w-24 bg-gradient-to-r from-transparent via-amber-400/60 to-transparent mx-auto my-3"></div>
-                <p className="text-xs sm:text-sm text-amber-200/90 italic font-medium leading-relaxed max-w-xl mx-auto">
-                  {lang === 'en'
-                    ? '"Salutations unto Goddess Manasa, Mother of sage Astika, sister of serpent king Vasuki, and devoted consort of sage Jaratkaru."'
-                    : '"হে মুনি আস্তীকের জননী, নাগরাজ বাসুকির ভগিনী এবং তপস্বী জরৎকারু মুনির ধর্মপত্নী দেবি মনসা, আপনাকে ভক্তিপূর্ণ প্রণাম জানাই।"'}
-                </p>
+              <div className="relative z-10 flex-1 flex flex-col justify-between">
+                <div>
+                  {/* Devotional Top Badge */}
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-widest text-amber-200 bg-amber-400/15 border border-amber-400/40 backdrop-blur-md mb-2.5 shadow-xs">
+                    <i className="fas fa-om text-amber-400"></i>
+                    <span>{lang === 'en' ? 'Sacred Devotion of the Day' : 'আজকের পবিত্র স্তোত্র'}</span>
+                    <i className="fas fa-om text-amber-400"></i>
+                  </div>
+
+                  {/* Title with Divine Glowing Gold Text */}
+                  <h3 className="text-xl sm:text-2xl md:text-3xl font-extrabold font-serif text-yellow-300 drop-shadow-[0_2px_8px_rgba(245,158,11,0.5)] mb-3.5 tracking-normal leading-normal py-1">
+                    {lang === 'en' ? 'Shree Shree Maa Manasa Pranam Mantra' : 'মা মনসার পবিত্র প্রণাম মন্ত্র'}
+                  </h3>
+
+                  {/* Shloka Altar Sanctuary Box */}
+                  <div className="bg-black/45 backdrop-blur-md rounded-2xl p-5 sm:p-6 border border-amber-400/35 max-w-xl mx-auto mb-4 shadow-inner relative">
+                    <p className="text-base sm:text-lg md:text-xl font-serif text-amber-100 font-bold leading-relaxed tracking-wide mb-2.5 drop-shadow">
+                      ওঁ আস্তীকস্য মুনের্মাতা ভগিনী বাসুকেস্তথা ।<br />
+                      জরৎকারুমুনেঃ পত্নী মনসাদেবী নমোহস্তুতে ॥
+                    </p>
+                    <div className="h-[1px] w-24 bg-gradient-to-r from-transparent via-amber-400/60 to-transparent mx-auto my-2.5"></div>
+                    <p className="text-xs sm:text-sm text-amber-200/90 italic font-medium leading-relaxed max-w-lg mx-auto">
+                      {lang === 'en'
+                        ? '"Salutations unto Goddess Manasa, Mother of sage Astika, sister of serpent king Vasuki, and devoted consort of sage Jaratkaru."'
+                        : '"হে মুনি আস্তীকের জননী, নাগরাজ বাসুকির ভগিনী এবং তপস্বী জরৎকারু মুনির ধর্মপত্নী দেবি মনসা, আপনাকে ভক্তিপূর্ণ প্রণাম জানাই।"'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Interactive Ghonta, Shonkho & Mantras Buttons */}
+                <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3.5 pt-2">
+                  {/* Sacred Bell (Ghonta) Button */}
+                  <button
+                    onClick={() => {
+                      playSacredBellSound();
+                      if (showToast) showToast(t('bellRungToast', lang));
+                    }}
+                    className="btn-shine bg-gradient-to-b from-amber-300 via-yellow-400 to-amber-500 hover:from-amber-200 hover:to-yellow-300 text-amber-950 font-extrabold px-4 sm:px-5 py-2.5 rounded-full shadow-lg shadow-amber-500/30 hover:shadow-amber-400/50 hover:scale-105 active:scale-95 border-2 border-yellow-200 inline-flex items-center gap-2 transition-all cursor-pointer text-xs sm:text-sm group"
+                  >
+                    <i className="fas fa-bell text-amber-950 text-sm group-hover:rotate-12 transition-transform"></i>
+                    <span>{t('playChime', lang)}</span>
+                    <span className="text-sm">🔔</span>
+                  </button>
+
+                  {/* Sacred Conch (Shonkho) Button */}
+                  <button
+                    onClick={() => {
+                      playSacredShankhSound();
+                      if (showToast) showToast(t('shankhBlownToast', lang));
+                    }}
+                    className="btn-shine bg-gradient-to-b from-white via-amber-50 to-orange-100 hover:from-white hover:to-amber-100 text-amber-950 font-extrabold px-4 sm:px-5 py-2.5 rounded-full shadow-lg shadow-amber-300/30 hover:shadow-amber-200/50 hover:scale-105 active:scale-95 border-2 border-amber-300/80 inline-flex items-center gap-2 transition-all cursor-pointer text-xs sm:text-sm group"
+                  >
+                    <span className="text-lg leading-none group-hover:scale-110 transition-transform">🐚</span>
+                    <span>{t('playShankh', lang)}</span>
+                    <i className="fas fa-volume-up text-amber-800 text-[10px]"></i>
+                  </button>
+
+                  {/* Sacred Mantras Page Link */}
+                  <button
+                    onClick={() => navigateTo('mantras')}
+                    className="bg-white/10 hover:bg-white/20 text-amber-100 hover:text-white border border-amber-400/40 hover:border-amber-300 px-4 sm:px-5 py-2.5 rounded-full font-bold transition-all hover:scale-105 active:scale-95 inline-flex items-center gap-2 shadow-md cursor-pointer text-xs sm:text-sm"
+                  >
+                    <i className="fas fa-book-open text-amber-300 text-xs"></i>
+                    <span>{t('viewMantrasBtn', lang)}</span>
+                    <i className="fas fa-arrow-right text-[10px]"></i>
+                  </button>
+                </div>
+
               </div>
-
-              {/* Interactive Ghonta, Shonkho & Mantras Buttons */}
-              <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
-                {/* Sacred Bell (Ghonta) Button */}
-                <button
-                  onClick={() => {
-                    playSacredBellSound();
-                    if (showToast) showToast(t('bellRungToast', lang));
-                  }}
-                  className="btn-shine bg-gradient-to-b from-amber-300 via-yellow-400 to-amber-500 hover:from-amber-200 hover:to-yellow-300 text-amber-950 font-extrabold px-6 py-3 rounded-full shadow-lg shadow-amber-500/30 hover:shadow-amber-400/50 hover:scale-105 active:scale-95 border-2 border-yellow-200 inline-flex items-center gap-2.5 transition-all cursor-pointer text-sm sm:text-base group"
-                >
-                  <i className="fas fa-bell text-amber-950 text-base group-hover:rotate-12 transition-transform"></i>
-                  <span>{t('playChime', lang)}</span>
-                  <span className="text-base">🔔</span>
-                </button>
-
-                {/* Sacred Conch (Shonkho) Button */}
-                <button
-                  onClick={() => {
-                    playSacredShankhSound();
-                    if (showToast) showToast(t('shankhBlownToast', lang));
-                  }}
-                  className="btn-shine bg-gradient-to-b from-white via-amber-50 to-orange-100 hover:from-white hover:to-amber-100 text-amber-950 font-extrabold px-6 py-3 rounded-full shadow-lg shadow-amber-300/30 hover:shadow-amber-200/50 hover:scale-105 active:scale-95 border-2 border-amber-300/80 inline-flex items-center gap-2.5 transition-all cursor-pointer text-sm sm:text-base group"
-                >
-                  <span className="text-xl leading-none group-hover:scale-110 transition-transform">🐚</span>
-                  <span>{t('playShankh', lang)}</span>
-                  <i className="fas fa-volume-up text-amber-800 text-xs"></i>
-                </button>
-
-                {/* Sacred Mantras Page Link */}
-                <button
-                  onClick={() => navigateTo('mantras')}
-                  className="bg-white/10 hover:bg-white/20 text-amber-100 hover:text-white border border-amber-400/40 hover:border-amber-300 px-6 py-3 rounded-full font-bold transition-all hover:scale-105 active:scale-95 inline-flex items-center gap-2.5 shadow-md cursor-pointer text-sm sm:text-base"
-                >
-                  <i className="fas fa-book-open text-amber-300 text-xs"></i>
-                  <span>{t('viewMantrasBtn', lang)}</span>
-                  <i className="fas fa-arrow-right text-xs"></i>
-                </button>
-              </div>
-
             </div>
           </div>
         </div>
@@ -2359,7 +2914,7 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
           <SectionHeader
             tag={lang === 'en' ? 'Sacred Ceremonies' : 'বাৎসরিক মহোৎসব'}
             title={t('latestEvents', lang)}
-            subtitle={lang === 'en' ? 'Upcoming pujas, annual fairs, and religious gatherings at Goila Dham.' : 'বাৎসরিক পূজা, বৈশাখী মেলা ও মন্দিরের সকল ধর্মীয় কর্মসূচীর তালিকা।'}
+            subtitle={lang === 'en' ? 'Upcoming pujas, annual fairs, and religious gatherings at Goila Dham.' : 'বাৎসরিক পূজা, বৈশাখী মেলা ও মন্দিরের সকল ধর্মীয় কর্মসূচীর তালিকা।'}
             icon="fa-calendar-alt"
             className="text-center mb-12"
           />
@@ -2493,12 +3048,15 @@ const amountInEnglishWords = (num) => {
 };
 
 // ==========================================
-// 2. Panjika & Upcoming Festival Countdown Widget
+// 2. Real Active Interactive Bangla Panjika Calendar Widget
 // ==========================================
 const PanjikaWidget = ({ navigateTo, lang = 'bn' }) => {
+  const [currentDate, setCurrentDate] = useState(() => new Date());
+  const [selectedDay, setSelectedDay] = useState(null);
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
+    // Annual Festival Target: August 18, 2026, 06:00:00 AM BST
     const targetDate = new Date('2026-08-18T06:00:00+06:00').getTime();
     const updateCountdown = () => {
       const now = new Date().getTime();
@@ -2517,172 +3075,396 @@ const PanjikaWidget = ({ navigateTo, lang = 'bn' }) => {
     return () => clearInterval(interval);
   }, []);
 
-  const festivals = [
-    {
-      tithiBn: 'শ্রাবণী শুক্লা পঞ্চমী',
-      tithiEn: 'Shravani Shukla Panchami',
-      eventBn: 'পবিত্র নাগ পঞ্চমী মহাপূজা ও বিশেষ অভিষেক',
-      eventEn: 'Nag Panchami Mahapuja & Sacred Abhishekam',
-      dateBn: '১৮ জুলাই ২০২৬',
-      dateEn: '18 July 2026'
-    },
-    {
-      tithiBn: 'বাৎসরিক মহোৎসব তিথি',
-      tithiEn: 'Annual Mahotsav Day',
-      eventBn: 'শ্রীশ্রী মা মনসা পূজা ও অষ্টপ্রহর রয়ানী গান',
-      eventEn: 'Annual Maa Manasa Puja & Royani Folk Gaan',
-      dateBn: '১৮ আগস্ট ২০২৬',
-      dateEn: '18 August 2026',
-      isGrand: true
-    },
-    {
-      tithiBn: 'ভাদ্র সংক্রান্তি',
-      tithiEn: 'Bhadra Sankranti',
-      eventBn: 'বাৎসরিক মনসা পূজা মহা সমাপন ও প্রসাদ বিতরণ',
-      eventEn: 'Grand Concluding Puja & Mahaprasad Distribution',
-      dateBn: '১৭ সেপ্টেম্বর ২০২৬',
-      dateEn: '17 September 2026'
-    },
-    {
-      tithiBn: 'অগ্রহায়ণ পূর্ণিমা',
-      tithiEn: 'Agrahayana Purnima',
-      eventBn: 'নবান্ন উৎসব ও দেবী মনসার অন্নভোগ নিবেদন',
-      eventEn: 'Nabanna Festival & Sacred Anna-Bhog Offering',
-      dateBn: '২৪ নভেম্বর ২০২৬',
-      dateEn: '24 November 2026'
+  const curYear = currentDate.getFullYear();
+  const curMonth = currentDate.getMonth(); // 0 to 11
+
+  // Days in month calculation
+  const daysInMonth = new Date(curYear, curMonth + 1, 0).getDate();
+  const firstDayIndex = new Date(curYear, curMonth, 1).getDay(); // 0 = Sun
+
+  const monthNamesEn = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const monthNamesBn = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'];
+
+  // Approximate Bengali month mapping based on Gregorian month & day
+  const getBengaliMonthInfo = (year, month, day = 15) => {
+    // Bengali months table with Gregorian start dates (approx)
+    const map = [
+      { nameBn: 'পৌষ - মাঘ', nameEn: 'Poush - Magh', bnYearOffset: 594 },      // Jan
+      { nameBn: 'মাঘ - ফাল্গুন', nameEn: 'Magh - Falgun', bnYearOffset: 594 },  // Feb
+      { nameBn: 'ফাল্গুন - চৈত্র', nameEn: 'Falgun - Chaitra', bnYearOffset: 594 },// Mar
+      { nameBn: 'চৈত্র - বৈশাখ', nameEn: 'Chaitra - Boishakh', bnYearOffset: 593 },// Apr
+      { nameBn: 'বৈশাখ - জ্যৈষ্ঠ', nameEn: 'Boishakh - Jyoishtho', bnYearOffset: 593 },// May
+      { nameBn: 'জ্যৈষ্ঠ - আষাঢ়', nameEn: 'Jyoishtho - Asharh', bnYearOffset: 593 }, // Jun
+      { nameBn: 'আষাঢ় - শ্রাবণ', nameEn: 'Asharh - Shravan', bnYearOffset: 593 }, // Jul
+      { nameBn: 'শ্রাবণ - ভাদ্র', nameEn: 'Shravan - Bhadra', bnYearOffset: 593 }, // Aug
+      { nameBn: 'ভাদ্র - আশ্বিন', nameEn: 'Bhadra - Ashwin', bnYearOffset: 593 }, // Sep
+      { nameBn: 'আশ্বিন - কার্তিক', nameEn: 'Ashwin - Kartik', bnYearOffset: 593 }, // Oct
+      { nameBn: 'কার্তিক - অগ্রহায়ণ', nameEn: 'Kartik - Agrahayana', bnYearOffset: 593 },// Nov
+      { nameBn: 'অগ্রহায়ণ - পৌষ', nameEn: 'Agrahayana - Poush', bnYearOffset: 594 } // Dec
+    ];
+    const item = map[month] || map[0];
+    const bYear = year - item.bnYearOffset;
+    return {
+      monthStr: lang === 'en' ? item.nameEn : item.nameBn,
+      yearStr: formatNumber(bYear, lang) + (lang === 'en' ? ' Bangabda' : ' বঙ্গাব্দ')
+    };
+  };
+
+  const bnMonthInfo = getBengaliMonthInfo(curYear, curMonth);
+
+  // Notable recurring and specific Hindu tithis/festivals
+  const getSpecialDayInfo = (day) => {
+    // Check specific known festival dates
+    if (curMonth === 7 && day === 18) {
+      return {
+        badge: 'মহোৎসব',
+        badgeEn: 'Annual Festival',
+        titleBn: 'শ্রীশ্রী মা মনসা মন্দিরের বাৎসরিক মহোৎসব ও রয়ানী গান',
+        titleEn: 'Annual Maa Manasa Mahotsav & Royani Gaan',
+        descBn: 'মন্দিরের সবচেয়ে পবিত্র বাৎসরিক মহা উৎসব ও রাতভর রয়ানী গান।',
+        descEn: 'The supreme annual festival of Goila Manasa Temple with all-night Royani.',
+        isGrand: true,
+        icon: 'fa-om'
+      };
     }
-  ];
+    if (curMonth === 6 && (day === 18 || day === 19)) {
+      return {
+        badge: 'নাগ পঞ্চমী',
+        badgeEn: 'Nag Panchami',
+        titleBn: 'পবিত্র নাগ পঞ্চমী ব্রত ও মনসা পূজা',
+        titleEn: 'Sacred Nag Panchami Fasting & Puja',
+        descBn: 'সর্পভয় নিবারণ ও দেবীর বিশেষ অভিষেক তিথি।',
+        descEn: 'Devotees observe fasting and worship for protection from serpents.',
+        isGrand: true,
+        icon: 'fa-shield-virus'
+      };
+    }
+    if (curMonth === 8 && day === 17) {
+      return {
+        badge: 'ভাদ্র সংক্রান্তি',
+        badgeEn: 'Bhadra Sankranti',
+        titleBn: 'ভাদ্র সংক্রান্তি বাৎসরিক মনসাপূজা সমাপন',
+        titleEn: 'Bhadra Sankranti Concluding Puja',
+        descBn: 'শ্রাবণী মনসা পূজার শুভ সমাপন ও মহাপ্রসাদ বিতরণ।',
+        descEn: 'Auspicious conclusion of Shravani puja with mahaprasad.',
+        isGrand: true,
+        icon: 'fa-praying-hands'
+      };
+    }
+
+    // Cyclical tithis based on day of month for demonstration
+    if (day === 15) {
+      return {
+        badge: 'পূর্ণিমা 🌕',
+        badgeEn: 'Purnima 🌕',
+        titleBn: 'পবিত্র পূর্ণিমা তিথি ও সত্যনারায়ণ পূজা',
+        titleEn: 'Holy Purnima & Satyanarayan Puja',
+        descBn: 'পূর্ণিমার পরম পুণ্য তিথিতে মন্দিরে বিশেষ ভোগরাগ ও আরতি অনুষ্ঠিত হয়।',
+        descEn: 'Special Bhog and sandhya arati offered on the full moon day.',
+        icon: 'fa-moon'
+      };
+    }
+    if (day === 30 || day === 1) {
+      return {
+        badge: 'অমাবস্যা 🌑',
+        badgeEn: 'Amavasya 🌑',
+        titleBn: 'পবিত্র অমাবস্যা তিথি',
+        titleEn: 'Holy Amavasya Day',
+        descBn: 'পবিত্র নিশীথ আরাধনা ও দেবী দর্শনের শুভ সময়।',
+        descEn: 'Auspicious new moon day for deep meditation and prayers.',
+        icon: 'fa-circle'
+      };
+    }
+    if (day === 11 || day === 26) {
+      return {
+        badge: 'একাদশী 🔱',
+        badgeEn: 'Ekadashi 🔱',
+        titleBn: 'পবিত্র একাদশী ব্রত ও হরিনাম সংকীর্তন',
+        titleEn: 'Holy Ekadashi Fast & Harinam Kirtan',
+        descBn: 'সর্বপাপক্ষয়কারী একাদশী উপবাস ও মন্দির নাটমন্দিরে কীর্তন।',
+        descEn: 'Devotees observe fast and participate in sacred kirtan chants.',
+        icon: 'fa-pray'
+      };
+    }
+    if (day === 5 || day === 20) {
+      return {
+        badge: 'পঞ্চমী তিথি 🐍',
+        badgeEn: 'Panchami 🐍',
+        titleBn: 'শ্রী শ্রী মা মনসার বিশেষ তিথি পূজা',
+        titleEn: 'Maa Manasa Special Tithi Puja',
+        descBn: 'দেবী মনসার পবিত্র পঞ্চমী পূজায় মানত শোধ ও দুগ্ধ নিবেদন।',
+        descEn: 'Devotees offer milk and pushpanjali at the lotus feet of the Goddess.',
+        icon: 'fa-feather-alt'
+      };
+    }
+    return null;
+  };
+
+  const prevMonth = () => {
+    setCurrentDate(new Date(curYear, curMonth - 1, 1));
+    setSelectedDay(null);
+  };
+
+  const nextMonth = () => {
+    setCurrentDate(new Date(curYear, curMonth + 1, 1));
+    setSelectedDay(null);
+  };
+
+  const goToToday = () => {
+    const today = new Date();
+    setCurrentDate(today);
+    setSelectedDay(today.getDate());
+  };
+
+  const todayDate = new Date();
+  const isCurrentMonth = todayDate.getFullYear() === curYear && todayDate.getMonth() === curMonth;
+  const todayDay = todayDate.getDate();
+
+  const weekDaysBn = ['রবি', 'সোম', 'মঙ্গল', 'বুধ', 'বৃহঃ', 'শুক্র', 'শনি'];
+  const weekDaysEn = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
-    <div className="bg-gradient-to-r from-orange-950 via-red-950 to-amber-950 text-white rounded-3xl p-6 sm:p-8 shadow-2xl border-2 border-yellow-400/40 relative overflow-hidden my-10 card-hover-glow">
-      <div className="absolute -right-10 -bottom-10 opacity-10 text-yellow-300 text-9xl pointer-events-none">
-        <i className="fas fa-om"></i>
-      </div>
+    <div className="relative w-full h-full rounded-[2.5rem] p-1 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 shadow-[0_20px_50px_-15px_rgba(217,119,6,0.35)] flex flex-col">
+      <div className="bg-gradient-to-br from-[#240606] via-[#331102] to-[#1a0404] text-white rounded-[2.35rem] p-4 sm:p-6 md:p-7 relative overflow-hidden border border-amber-300/30 flex-1 flex flex-col justify-between card-hover-glow">
 
-      {/* Top Header Badge */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-yellow-400/20 pb-4 mb-6">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-yellow-400/20 border border-yellow-400/40 flex items-center justify-center text-yellow-300 text-2xl shadow-inner">
-            <i className="fas fa-calendar-check"></i>
-          </div>
+        {/* Sacred Om Watermark & Background Glow */}
+        <div className="absolute -right-6 -bottom-8 opacity-10 text-9xl text-amber-300 pointer-events-none select-none">
+          <i className="fas fa-om"></i>
+        </div>
+        <div className="absolute -left-10 -top-10 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        {/* Corner Flourish Motifs */}
+        <span className="absolute top-4 left-5 text-amber-400/40 text-sm pointer-events-none select-none">❖</span>
+        <span className="absolute top-4 right-5 text-amber-400/40 text-sm pointer-events-none select-none">❖</span>
+        <span className="absolute bottom-4 left-5 text-amber-400/40 text-sm pointer-events-none select-none">❖</span>
+        <span className="absolute bottom-4 right-5 text-amber-400/40 text-sm pointer-events-none select-none">❖</span>
+
+        <div className="relative z-10 flex-1 flex flex-col justify-between">
           <div>
-            <span className="inline-block text-[11px] uppercase tracking-wider text-yellow-300 font-bold bg-yellow-400/20 px-2.5 py-0.5 rounded-full border border-yellow-400/30">
-              {lang === 'en' ? 'Sacred Tithi & Panjika' : 'শুভ পঞ্জিকা ও তিথি নির্ঘণ্ট'}
-            </span>
-            <h3 className="text-xl sm:text-2xl font-bold font-serif text-yellow-300 mt-0.5">
-              {t('annualFestivalTarget', lang)}
-            </h3>
-          </div>
-        </div>
-        <div className="text-right">
-          <p className="text-xs text-orange-200">
-            {lang === 'en' ? 'Historic Goila Temple Mahotsav' : 'গৈলার ঐতিহ্যবাহী বাৎসরিক মহোৎসব'}
-          </p>
-          <p className="text-sm sm:text-base font-bold text-yellow-300 font-serif">
-            {lang === 'en' ? 'Tuesday, 18 August 2026' : '১৮ আগস্ট ২০২৬ (মঙ্গলবার)'}
-          </p>
-        </div>
-      </div>
-
-      {/* Countdown Grid */}
-      <div className="mb-8">
-        <p className="text-center text-xs sm:text-sm text-yellow-200/90 font-medium mb-3 flex items-center justify-center gap-2">
-          <i className="fas fa-hourglass-half text-yellow-400 animate-spin" style={{ animationDuration: '6s' }}></i>
-          {t('festivalCountdown', lang)}:
-        </p>
-        <div className="grid grid-cols-4 gap-2 sm:gap-4 max-w-xl mx-auto text-center">
-          <div className="bg-black/50 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-yellow-400/30 shadow-lg">
-            <span className="block text-2xl sm:text-4xl font-extrabold text-yellow-300 font-mono">
-              {formatNumber(timeLeft.days, lang)}
-            </span>
-            <span className="text-[10px] sm:text-xs text-orange-200 font-medium uppercase tracking-wider">
-              {t('daysUnit', lang)}
-            </span>
-          </div>
-          <div className="bg-black/50 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-yellow-400/30 shadow-lg">
-            <span className="block text-2xl sm:text-4xl font-extrabold text-yellow-300 font-mono">
-              {formatNumber(timeLeft.hours, lang)}
-            </span>
-            <span className="text-[10px] sm:text-xs text-orange-200 font-medium uppercase tracking-wider">
-              {t('hoursUnit', lang)}
-            </span>
-          </div>
-          <div className="bg-black/50 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-yellow-400/30 shadow-lg">
-            <span className="block text-2xl sm:text-4xl font-extrabold text-yellow-300 font-mono">
-              {formatNumber(timeLeft.minutes, lang)}
-            </span>
-            <span className="text-[10px] sm:text-xs text-orange-200 font-medium uppercase tracking-wider">
-              {t('minsUnit', lang)}
-            </span>
-          </div>
-          <div className="bg-black/50 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-yellow-400/30 shadow-lg">
-            <span className="block text-2xl sm:text-4xl font-extrabold text-yellow-300 font-mono">
-              {formatNumber(timeLeft.seconds, lang)}
-            </span>
-            <span className="text-[10px] sm:text-xs text-orange-200 font-medium uppercase tracking-wider">
-              {t('secsUnit', lang)}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Auspicious Tithis Calendar List */}
-      <div className="bg-black/40 backdrop-blur-md rounded-2xl p-4 sm:p-5 border border-yellow-400/20 mb-6">
-        <h4 className="text-sm font-bold text-yellow-300 uppercase tracking-wider mb-3 flex items-center gap-2">
-          <i className="fas fa-star text-xs text-yellow-400"></i>
-          {lang === 'en' ? 'Auspicious Annual Tithis & Ceremonies' : 'বার্ষিক পবিত্র তিথি ও পূজানুষ্ঠান'}
-        </h4>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
-          {festivals.map((fest, idx) => (
-            <div
-              key={idx}
-              className={`p-3 rounded-xl border flex items-start justify-between gap-3 ${
-                fest.isGrand
-                  ? 'bg-amber-500/20 border-yellow-400/50 text-yellow-100 shadow-md'
-                  : 'bg-white/5 border-white/10 text-gray-200'
-              }`}
-            >
-              <div>
-                <span className="text-yellow-300 font-bold block">
-                  {lang === 'en' ? fest.tithiEn : fest.tithiBn}
-                </span>
-                <p className="text-white font-medium text-xs mt-0.5">
-                  {lang === 'en' ? fest.eventEn : fest.eventBn}
-                </p>
+            {/* Devotional Top Badge */}
+            <div className="text-center mb-2.5">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-widest text-amber-200 bg-amber-400/15 border border-amber-400/40 backdrop-blur-md shadow-xs">
+                <i className="fas fa-calendar-alt text-amber-400"></i>
+                <span>{lang === 'en' ? 'Sacred Temple Panjika' : 'পবিত্র দিনপঞ্জি ও তিথি'}</span>
+                <i className="fas fa-om text-amber-400"></i>
               </div>
-              <span className="text-[11px] bg-black/50 text-yellow-300 font-semibold px-2 py-1 rounded-md shrink-0 border border-yellow-400/30">
-                {lang === 'en' ? fest.dateEn : fest.dateBn}
-              </span>
             </div>
-          ))}
-        </div>
-      </div>
 
-      {/* Action CTA Buttons */}
-      <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 no-print">
-        <button
-          onClick={() => navigateTo('booking')}
-          className="btn-shine bg-gradient-to-r from-amber-400 to-yellow-500 text-orange-950 px-6 py-2.5 rounded-full font-bold shadow-lg hover:shadow-yellow-500/50 flex items-center gap-2 text-sm active:scale-95 cursor-pointer"
-        >
-          <i className="fas fa-hands-praying text-xs"></i>
-          {lang === 'en' ? 'Book Holy Puja & Sankalpa' : 'পূজা ও সংকল্প বুকিং করুন'}
-        </button>
-        <button
-          onClick={() => navigateTo('royani')}
-          className="bg-white/10 hover:bg-white/20 text-yellow-200 border border-yellow-400/40 px-6 py-2.5 rounded-full font-semibold flex items-center gap-2 text-sm transition-all active:scale-95 cursor-pointer"
-        >
-          <i className="fas fa-music text-xs"></i>
-          {lang === 'en' ? 'Explore Royani Gaan Epic' : 'ঐতিহ্যবাহী রয়ানী গান দর্শন'}
-        </button>
+            {/* Title with Divine Glowing Gold Text */}
+            <h3 className="text-xl sm:text-2xl font-extrabold font-serif text-yellow-300 drop-shadow-[0_2px_8px_rgba(245,158,11,0.5)] mb-3.5 text-center tracking-normal leading-normal py-1">
+              {lang === 'en' ? 'Shree Shree Maa Manasa Daily Panjika' : 'শ্রীশ্রী মা মনসা নিত্য শুভ পঞ্জিকা'}
+            </h3>
+
+            {/* Streamlined Header & Navigation Controls */}
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-500/30 pb-2 mb-2.5">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-400/50 flex items-center justify-center text-amber-300 text-sm shadow-inner shrink-0">
+                  <i className="fas fa-calendar-check"></i>
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] text-amber-200/90 font-medium">
+                      {lang === 'en' ? `${monthNamesEn[curMonth]} ${curYear}` : `${monthNamesBn[curMonth]} ${formatNumber(curYear, lang)}`}
+                    </span>
+                  </div>
+                  <h4 className="text-sm sm:text-base font-bold font-serif text-yellow-300">
+                    {bnMonthInfo.monthStr} • {bnMonthInfo.yearStr}
+                  </h4>
+                </div>
+              </div>
+
+              {/* Minimalist Controls */}
+              <div className="flex items-center gap-1 no-print">
+                <button
+                  onClick={prevMonth}
+                  className="bg-white/10 hover:bg-white/20 text-amber-300 hover:text-white px-2 py-0.5 rounded border border-amber-500/40 text-[10px] font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1"
+                  title="Previous Month"
+                >
+                  <i className="fas fa-chevron-left text-[9px]"></i>
+                  <span className="hidden sm:inline">{lang === 'en' ? 'Prev' : 'পূর্ববর্তী'}</span>
+                </button>
+                <button
+                  onClick={goToToday}
+                  className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-stone-950 px-2 py-0.5 rounded text-[10px] font-black shadow-xs transition-all active:scale-95 cursor-pointer flex items-center gap-1"
+                  title="Today"
+                >
+                  <i className="fas fa-dot-circle text-[8px] text-red-700"></i>
+                  <span>{lang === 'en' ? 'Today' : 'আজ'}</span>
+                </button>
+                <button
+                  onClick={nextMonth}
+                  className="bg-white/10 hover:bg-white/20 text-amber-300 hover:text-white px-2 py-0.5 rounded border border-amber-500/40 text-[10px] font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1"
+                  title="Next Month"
+                >
+                  <span className="hidden sm:inline">{lang === 'en' ? 'Next' : 'পরবর্তী'}</span>
+                  <i className="fas fa-chevron-right text-[9px]"></i>
+                </button>
+              </div>
+            </div>
+
+            {/* Slender Live Countdown Bar */}
+            <div className="mb-2.5 px-2.5 py-1 rounded-lg bg-black/60 border border-amber-500/30 flex flex-wrap items-center justify-between gap-1.5">
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span>
+                <span className="text-[11px] sm:text-xs font-serif font-bold text-amber-200">
+                  {t('annualFestivalTarget', lang)} • ১৮ আগস্ট ২০২৬
+                </span>
+              </div>
+              <div className="flex items-center gap-1 font-mono text-[10px] sm:text-[11px] font-bold text-amber-200">
+                <span className="bg-amber-500/25 text-yellow-300 px-1 py-0.2 rounded border border-amber-500/40">{formatNumber(timeLeft.days, lang)} {t('daysUnit', lang)}</span>
+                <span className="text-amber-400/80">:</span>
+                <span className="bg-amber-500/25 text-yellow-300 px-1 py-0.2 rounded border border-amber-500/40">{formatNumber(timeLeft.hours, lang)} {t('hoursUnit', lang)}</span>
+                <span className="text-amber-400/80">:</span>
+                <span className="bg-amber-500/25 text-yellow-300 px-1 py-0.2 rounded border border-amber-500/40">{formatNumber(timeLeft.minutes, lang)} {t('minsUnit', lang)}</span>
+                <span className="text-amber-400/80">:</span>
+                <span className="bg-amber-500/25 text-yellow-300 px-1 py-0.2 rounded border border-amber-500/40">{formatNumber(timeLeft.seconds, lang)} {t('secsUnit', lang)}</span>
+              </div>
+            </div>
+
+            {/* Compact Panjika Grid */}
+            <div className="bg-black/50 backdrop-blur-md rounded-xl p-1.5 sm:p-2 border border-amber-500/30 mb-2">
+              {/* Days of Week Header with high contrast readable colors */}
+              <div className="grid grid-cols-7 gap-1 text-center mb-1">
+                {(lang === 'en' ? weekDaysEn : weekDaysBn).map((wd, i) => (
+                  <div
+                    key={i}
+                    className={`py-0.5 rounded text-[10px] sm:text-[11px] font-black uppercase tracking-wider border shadow-2xs ${
+                      i === 0
+                        ? 'text-rose-100 bg-rose-700 border-rose-500'
+                        : (i === 6 ? 'text-amber-100 bg-amber-600 border-amber-500' : 'text-amber-100 bg-stone-800 border-stone-700')
+                    }`}
+                  >
+                    {wd}
+                  </div>
+                ))}
+              </div>
+
+              {/* Days Grid Cells */}
+              <div className="grid grid-cols-7 gap-1">
+                {Array.from({ length: firstDayIndex }).map((_, i) => (
+                  <div key={`empty-${i}`} className="min-h-[26px] sm:min-h-[30px] rounded-lg bg-transparent"></div>
+                ))}
+
+                {Array.from({ length: daysInMonth }).map((_, i) => {
+                  const dayNum = i + 1;
+                  const isToday = isCurrentMonth && dayNum === todayDay;
+                  const isSelected = selectedDay === dayNum;
+                  const special = getSpecialDayInfo(dayNum);
+
+                  return (
+                    <div
+                      key={dayNum}
+                      onClick={() => setSelectedDay(dayNum)}
+                      className={`min-h-[26px] sm:min-h-[30px] p-0.5 sm:p-1 rounded-lg border transition-all cursor-pointer flex flex-col justify-between relative group select-none ${
+                        isSelected
+                          ? 'border-yellow-300 bg-amber-600/60 ring-2 ring-yellow-400 shadow-md scale-[1.02]'
+                          : isToday
+                          ? 'border-2 border-amber-400 bg-amber-500/40 shadow-sm shadow-amber-500/30'
+                          : special
+                          ? (special.isGrand ? 'border-amber-400 bg-amber-950/80 hover:bg-amber-900/90' : 'border-amber-500/50 bg-stone-900 hover:bg-amber-950/60')
+                          : 'border-stone-800 bg-stone-900/90 hover:border-amber-400/80 hover:bg-amber-950/40'
+                      }`}
+                    >
+                      <div className="flex justify-between items-center text-[10px] sm:text-[11px] leading-none">
+                        <span className={`font-mono font-black ${isToday ? 'text-yellow-200' : 'text-white'}`}>
+                          {dayNum}
+                        </span>
+                        <span className="text-[9px] sm:text-[10px] text-amber-300 font-extrabold">
+                          {formatNumber(dayNum, lang)}
+                        </span>
+                      </div>
+
+                      {isToday && (
+                        <div className="absolute top-0.5 right-1/2 translate-x-1/2 w-1.5 h-1.5 rounded-full bg-yellow-400 animate-ping"></div>
+                      )}
+
+                      {special ? (
+                        <div className="mt-auto pt-0.5">
+                          <span
+                            className={`block text-[7.5px] sm:text-[8.5px] font-black px-0.5 py-0.2 rounded text-center truncate ${
+                              special.isGrand
+                                ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-stone-950 font-black shadow-xs'
+                                : 'bg-amber-400 text-stone-950 font-black shadow-2xs'
+                            }`}
+                          >
+                            {lang === 'en' ? special.badgeEn : special.badge}
+                          </span>
+                        </div>
+                      ) : null}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Selected Day Drawer */}
+          {selectedDay && (() => {
+            const special = getSpecialDayInfo(selectedDay);
+            const dayDate = new Date(curYear, curMonth, selectedDay);
+            const dayStr = dayDate.toLocaleDateString(lang === 'bn' ? 'bn-BD' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+            return (
+              <div className="mt-2 p-3 sm:p-3.5 rounded-2xl bg-amber-500/15 border border-amber-400/40 anim-fade-up">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-400/20 pb-1.5 mb-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs uppercase font-extrabold text-yellow-300">
+                      <i className="fas fa-om text-xs mr-1"></i> {dayStr}
+                    </span>
+                    {special && (
+                      <span className="text-[10px] bg-amber-400 text-stone-950 font-bold px-2 py-0.5 rounded-full">
+                        {lang === 'en' ? special.badgeEn : special.badge}
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => setSelectedDay(null)}
+                    className="text-gray-400 hover:text-white text-xs p-1"
+                    title="Close"
+                  >
+                    <i className="fas fa-times"></i>
+                  </button>
+                </div>
+
+                <p className="text-xs text-yellow-100/90 leading-relaxed mb-2.5">
+                  {special
+                    ? (lang === 'en' ? special.descEn : special.descBn)
+                    : (lang === 'en'
+                        ? 'Auspicious day for Darshan, daily Puja offering, and peace sankalpa at Maa Manasa Temple.'
+                        : 'শ্রী শ্রী মা মনসা মন্দিরের নিত্য পূজা, অঞ্জলি নিবেদন ও সর্বমঙ্গলের সংকল্প গ্রহণের পুণ্য সময়।')}
+                </p>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    onClick={() => {
+                      navigateTo('booking');
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="btn-shine bg-gradient-to-r from-amber-400 to-yellow-500 text-stone-950 font-bold px-3.5 py-1 rounded-full text-xs shadow-md active:scale-95 cursor-pointer flex items-center gap-1.5"
+                  >
+                    <i className="fas fa-hands-praying text-[11px]"></i>
+                    {lang === 'en' ? 'Book Puja for This Date' : 'এই তিথিতে পূজা ও সংকল্প বুক করুন'}
+                  </button>
+                  <button
+                    onClick={() => navigateTo('timings')}
+                    className="bg-black/50 hover:bg-black/70 text-yellow-200 font-semibold px-2.5 py-1 rounded-full border border-amber-400/30 text-xs transition-colors cursor-pointer"
+                  >
+                    <i className="fas fa-clock text-[10px] mr-1"></i>
+                    {lang === 'en' ? 'Timings' : 'সময়সূচী'}
+                  </button>
+                </div>
+              </div>
+            );
+          })()}
+        </div>
       </div>
     </div>
   );
 };
 
-// ==========================================
 // 3. Online Puja & Sankalpa Booking Page
 // ==========================================
-const BookingPage = ({ navigateTo, showToast, lang = 'bn' }) => {
+const BookingPage = ({ pujaBookings, setPujaBookings, supabaseClient, navigateTo, showToast, lang = 'bn' }) => {
   const [formData, setFormData] = useState({
     devoteeName: '',
     gotra: '',
@@ -2735,7 +3517,7 @@ const BookingPage = ({ navigateTo, showToast, lang = 'bn' }) => {
     }
   ];
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.devoteeName.trim() || !formData.phone.trim()) {
       if (showToast) showToast(lang === 'en' ? 'Please enter Devotee Name and Phone number' : 'অনুগ্রহ করে ভক্তের নাম ও মোবাইল নম্বর লিখুন');
@@ -2743,15 +3525,40 @@ const BookingPage = ({ navigateTo, showToast, lang = 'bn' }) => {
     }
     const token = 'MMG-PUJA-' + Math.floor(100000 + Math.random() * 900000);
     const booking = {
+      id: 'book_' + Date.now(),
       ...formData,
       token,
+      status: 'pending',
       timestamp: new Date().toISOString()
     };
+
+    // Save to local storage
     try {
       const existing = JSON.parse(localStorage.getItem('mmg_puja_bookings') || '[]');
-      existing.unshift(booking);
-      localStorage.setItem('mmg_puja_bookings', JSON.stringify(existing.slice(0, 50)));
+      const updated = [booking, ...existing];
+      localStorage.setItem('mmg_puja_bookings', JSON.stringify(updated.slice(0, 50)));
+      if (setPujaBookings) setPujaBookings(updated);
     } catch (err) {}
+
+    // Sync to Supabase
+    if (supabaseClient) {
+      try {
+        const { data: existingRow } = await supabaseClient.from('settings').select('id, value').eq('key', 'puja_bookings').maybeSingle();
+        let currentList = [];
+        if (existingRow && existingRow.value) {
+          try { currentList = JSON.parse(existingRow.value); } catch (e) {}
+        }
+        const updatedCloud = [booking, ...currentList];
+        if (existingRow) {
+          await supabaseClient.from('settings').update({ value: JSON.stringify(updatedCloud) }).eq('id', existingRow.id);
+        } else {
+          await supabaseClient.from('settings').insert({ key: 'puja_bookings', value: JSON.stringify(updatedCloud) });
+        }
+      } catch (err) {
+        console.error('Booking sync error:', err);
+      }
+    }
+
     setConfirmedBooking(booking);
     if (showToast) showToast(lang === 'en' ? 'Sacred Puja Booking Confirmed! Token generated.' : 'পূজা ও সংকল্প বুকিং সম্পন্ন হয়েছে! সংকল্প পত্র তৈরি হয়েছে।');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -3036,64 +3843,11 @@ const BookingPage = ({ navigateTo, showToast, lang = 'bn' }) => {
 // ==========================================
 // 4. Royani Gaan & Padma Purana Archive Page
 // ==========================================
-const RoyaniPage = ({ navigateTo, showToast, lang = 'bn' }) => {
+const RoyaniPage = ({ royaniPalas, navigateTo, showToast, lang = 'bn' }) => {
   const [activePala, setActivePala] = useState(0);
   const [japaCount, setJapaCount] = useState(0);
 
-  const palas = [
-    {
-      id: 1,
-      titleBn: 'প্রথম পর্ব: দেবী মনসার জন্ম ও মর্ত্যে পূজার আকাঙ্ক্ষা',
-      titleEn: 'Episode 1: Emergence of Devi Manasa & Desire for Worship',
-      tagBn: 'স্বর্গ ও মর্ত্যের মেলবন্ধন',
-      tagEn: 'Heavenly Origins',
-      verseBn: `পূর্বেতে বন্দনা করি দেব পদ্মনাভ।
-যাহার নাভিকমলে ব্রহ্মার প্রভাব ॥
-দক্ষিণ চরণে বন্দো গৈলা যে নগর।
-মনসা মঙ্গল কবি বিজয় গুপ্ত সুর ॥`,
-      storyBn: `মধ্যযুগের অমর কবি বিজয় গুপ্ত তাঁর কাব্যে বর্ণনা করেছেন কীভাবে শিবের তেজ ও পদ্মবনে দেবী মনসার অলৌকিক আবির্ভাব ঘটে। দেবলোকে স্থান পেলেও মর্ত্যভূমিতে ভক্তবৃন্দের অকৃত্রিম ভক্তি ও পূজাই দেবীর মহিমাকে পূর্ণতা দান করে। গৈলার এই পবিত্র মন্দির সেই ভক্তিধারার আদি ও জাগ্রত সাক্ষী।`,
-      storyEn: `Poet Bijoy Gupta depicts the divine emergence of Devi Manasa from the lotus lake through the spiritual energy of Lord Shiva. Though revered in the heavens, the Goddess desires worship among mortals on earth, beginning the historic narrative in Bengal.`
-    },
-    {
-      id: 2,
-      titleBn: 'দ্বিতীয় পর্ব: শিবভক্ত চাঁদ সওদাগরের সংঘাত ও সপ্তডিঙা নিমজ্জন',
-      titleEn: 'Episode 2: Conflict with Chand Sadagar & Sinking of Seven Ships',
-      tagBn: 'অহংকার বনাম দেবীর পরীক্ষা',
-      tagEn: 'Ego vs Divine Test',
-      verseBn: `শিবের পরম ভক্ত চাঁদ সওদাগর।
-মনসার চরণে কভু না নোয়ায় শির ॥
-কালিদহে ডুবিল সপ্ত মধুকর তরণী।
-চারিদিকে হাহাকার শুনি নিদারুণ বাণী ॥`,
-      storyBn: `চম্পকনগরের অধিপতি শিবের একনিষ্ঠ ভক্ত চাঁদ সওদাগর দেবী মনসাকে পূজা করতে অস্বীকার করেন। দেবীর মায়ায় কালিদহ সাগরে তাঁর বাণিজ্যের সাতটি জাহাজ (সপ্তডিঙা মধুকর) অতল জলে নিমজ্জিত হয় এবং ছয় পুত্র প্রাণ হারায়। তবুও অটল চাঁদ সওদাগর মাথা নোয়ান না।`,
-      storyEn: `Chand Sadagar, a staunch devotee of Lord Shiva, adamantly refuses to worship Manasa. Through divine trials, his seven merchant vessels sink in the Kalidaha sea and his sons perish, yet his resolve remains unbroken.`
-    },
-    {
-      id: 3,
-      titleBn: 'তৃতীয় পর্ব: লখিন্দর-বেহুলার অমর প্রেম ও সাঁতালির লোহার বাসর',
-      titleEn: 'Episode 3: Wedding of Lakhindar-Behula & Iron Chamber',
-      tagBn: 'অমর প্রেম ও বিষের দংশন',
-      tagEn: 'Sacred Love & Destiny',
-      verseBn: `সাঁতালী পর্বতে বাড়ি লোহার বাসর।
-ছিদ্র দিয়া প্রবেশিল কালনাগিনী ঘোর ॥
-নিদ্রায় লখিন্দর ছটফট অঙ্গ জ্বলে।
-বেহুলা জাগিয়া দেখে স্বামী পড়ে ভূমিতলে ॥`,
-      storyBn: `সর্পদংশন এড়াতে সাঁতালী পর্বতের চূড়ায় নিশ্ছিদ্র লোহার বাসর ঘর নির্মাণ করা হয়। কিন্তু বিধিলিপি অলঙ্ঘ্য—সূক্ষ্ম এক ছিদ্রপথে কালনাগিনী প্রবেশ করে লখিন্দরকে দংশন করে। সদ্য বিবাহিতা বেহুলা শোকে মুহ্যমান না হয়ে মৃত স্বামীকে বাঁচাতে এক অভূতপূর্ব অলৌকিক সংকল্প গ্রহণ করে।`,
-      storyEn: `To avert the snakebite prophecy, an impenetrable iron bridal chamber is erected. Yet destiny unfolds as Kalnagini slips through a needle-thin crevice to bite Lakhindar. Newlywed Behula undertakes a legendary vow to resurrect her husband.`
-    },
-    {
-      id: 4,
-      titleBn: 'চতুর্থ পর্ব: কলার ভেলায় বেহুলার দেবযাত্রা ও চাঁদ সওদাগরের মনসাপূজা',
-      titleEn: 'Episode 4: Behula\'s Heavenly Voyage & Historic Worship',
-      tagBn: 'সতীত্বের জয় ও ভক্তির প্রতিষ্ঠা',
-      tagEn: 'Triumph of Devotion',
-      verseBn: `কলার মান্দাসে ভাসে সতী রূপবতী।
-স্বর্গে গিয়া নৃত্য করে সাধ্বী মহামতী ॥
-তুষ্ট হইয়া হর-গৌরী দিলেন বরদান।
-সপ্ত ভাই জীয়ন্ত হৈল ফিরিল ধনমান ॥`,
-      storyBn: `গঙ্গাবক্ষে কলার মান্দাসে মৃত লখিন্দরকে কোলে নিয়ে বেহুলা অন্তহীন বিপদ অতিক্রম করে স্বর্গে দেবতাদের সভায় পৌঁছান। তাঁর অনুপম নৃত্য ও সতীধর্মে মহাদেব ও মনসাদেবী প্রসন্ন হন। লখিন্দর জীবন ফিরে পান, নিমজ্জিত জাহাজ ভেসে ওঠে, এবং চাঁদ সওদাগর বামহস্তে দেবীর চরণে পদ্মফুল অর্পণ করে মনসাপূজা প্রবর্তন করেন।`,
-      storyEn: `Floating down the river on a banana raft with Lakhindar\'s body, Behula endures perilous trials to reach Indra\'s celestial court. Her dance and unwavering devotion move Shiva and Manasa; life is restored to Lakhindar, and Chand Sadagar offers worship with a lotus flower.`
-    }
-  ];
+  const palas = (royaniPalas && royaniPalas.length > 0) ? royaniPalas : DEFAULT_ROYANI_PALAS;
 
   const handleJapa = () => {
     setJapaCount((prev) => {
@@ -3973,13 +4727,11 @@ const NoticeBoardPage = ({ notices, navigateTo, lang }) => (
   </div>
 );
 
-const DonationPage = ({ donations, navigateTo, showToast, lang, defaultTab = 'methods' }) => {
-  const [activeTab, setActiveTab] = useState(defaultTab); // 'methods' or 'receipt'
+const DonationPage = ({ donations, donationReceipts, setDonationReceipts, supabaseClient, navigateTo, showToast, lang, defaultTab = 'methods' }) => {
+  const [activeTab, setActiveTab] = useState(defaultTab || 'methods'); // 'methods' or 'receipt'
 
   useEffect(() => {
-    if (defaultTab) {
-      setActiveTab(defaultTab);
-    }
+    if (defaultTab) setActiveTab(defaultTab);
   }, [defaultTab]);
 
   const [receiptForm, setReceiptForm] = useState({
@@ -4008,7 +4760,7 @@ const DonationPage = ({ donations, navigateTo, showToast, lang, defaultTab = 'me
     if (showToast) showToast(label + ' ' + t('copiedToast', lang));
   };
 
-  const handleGenerateReceipt = (e) => {
+  const handleGenerateReceipt = async (e) => {
     e.preventDefault();
     if (!receiptForm.name.trim() || !receiptForm.amount || parseFloat(receiptForm.amount) <= 0) {
       if (showToast) showToast(lang === 'en' ? 'Please enter Donor Name and Valid Amount' : 'অনুগ্রহ করে দাতার নাম ও সঠিক দানের পরিমাণ লিখুন');
@@ -4016,12 +4768,41 @@ const DonationPage = ({ donations, navigateTo, showToast, lang, defaultTab = 'me
     }
     const receiptNo = 'MMG-REC-' + Math.floor(100000 + Math.random() * 900000);
     const receipt = {
+      id: 'rec_' + Date.now(),
       ...receiptForm,
       receiptNo,
       amountWords: lang === 'en' ? amountInEnglishWords(receiptForm.amount) : amountInBengaliWords(receiptForm.amount),
       timestamp: new Date().toISOString()
     };
     setGeneratedReceipt(receipt);
+
+    // Save to local storage
+    try {
+      const existing = JSON.parse(localStorage.getItem('mmg_donation_receipts') || '[]');
+      const updated = [receipt, ...existing];
+      localStorage.setItem('mmg_donation_receipts', JSON.stringify(updated.slice(0, 100)));
+      if (setDonationReceipts) setDonationReceipts(updated);
+    } catch (err) {}
+
+    // Sync to Supabase settings key donation_receipts
+    if (supabaseClient) {
+      try {
+        const { data: existingRow } = await supabaseClient.from('settings').select('id, value').eq('key', 'donation_receipts').maybeSingle();
+        let currentList = [];
+        if (existingRow && existingRow.value) {
+          try { currentList = JSON.parse(existingRow.value); } catch (e) {}
+        }
+        const updatedCloud = [receipt, ...currentList];
+        if (existingRow) {
+          await supabaseClient.from('settings').update({ value: JSON.stringify(updatedCloud) }).eq('id', existingRow.id);
+        } else {
+          await supabaseClient.from('settings').insert({ key: 'donation_receipts', value: JSON.stringify(updatedCloud) });
+        }
+      } catch (err) {
+        console.error('Receipt sync error:', err);
+      }
+    }
+
     if (showToast) showToast(lang === 'en' ? 'Official Memorial Receipt Generated!' : 'পবিত্র স্মারক দান রসিদ তৈরি হয়েছে!');
   };
 
@@ -4162,11 +4943,11 @@ const DonationPage = ({ donations, navigateTo, showToast, lang, defaultTab = 'me
                 {/* Print & Action Buttons */}
                 <div className="flex flex-wrap items-center justify-center gap-3 pt-6 border-t border-gray-200 no-print">
                   <button
-                    onClick={() => window.print()}
+                    onClick={() => printReceiptDirectly(generatedReceipt, lang)}
                     className="btn-shine bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-bold px-6 py-2.5 rounded-full shadow-md flex items-center gap-2 active:scale-95 cursor-pointer text-sm"
                   >
                     <i className="fas fa-print"></i>
-                    {lang === 'en' ? 'Print / Download Receipt' : 'রসিদ প্রিন্ট / PDF সংরক্ষণ'}
+                    {lang === 'en' ? 'Print / Download Official Receipt' : 'স্মারক রসিদ প্রিন্ট / PDF সংরক্ষণ'}
                   </button>
                   <button
                     onClick={copyReceiptDetails}
@@ -4281,6 +5062,62 @@ const DonationPage = ({ donations, navigateTo, showToast, lang, defaultTab = 'me
                     </button>
                   </div>
                 </form>
+              </div>
+            )}
+
+            {/* Issued / Verified Receipts List */}
+            {donationReceipts && donationReceipts.length > 0 && (
+              <div className="mt-8 bg-white rounded-3xl p-6 sm:p-8 shadow-lg border-2 border-amber-100">
+                <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-amber-100">
+                  <h4 className="text-lg font-bold font-serif text-gray-900 flex items-center gap-2">
+                    <i className="fas fa-receipt text-amber-600"></i>
+                    {lang === 'en' ? 'Previously Issued Memorial Receipts' : 'সম্প্রতি সংগৃহীত স্মারক দান রসিদসমূহ'}
+                  </h4>
+                  <span className="text-xs font-bold text-amber-800 bg-amber-100 px-3 py-1 rounded-full">
+                    {donationReceipts.length} {lang === 'en' ? 'Receipts' : 'টি রসিদ'}
+                  </span>
+                </div>
+                <div className="overflow-x-auto rounded-xl border border-gray-200">
+                  <table className="w-full text-left border-collapse text-sm">
+                    <thead>
+                      <tr className="bg-amber-50/70 text-gray-700 font-bold border-b border-amber-200">
+                        <th className="p-3">{lang === 'en' ? 'Receipt No' : 'রসিদ নং'}</th>
+                        <th className="p-3">{lang === 'en' ? 'Donor Name' : 'দাতার নাম'}</th>
+                        <th className="p-3">{lang === 'en' ? 'Amount' : 'পরিমাণ'}</th>
+                        <th className="p-3">{lang === 'en' ? 'Method & TrxID' : 'মাধ্যম ও TrxID'}</th>
+                        <th className="p-3">{lang === 'en' ? 'Date' : 'তারিখ'}</th>
+                        <th className="p-3 text-center">{lang === 'en' ? 'Action' : 'প্রিন্ট'}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {donationReceipts.slice(0, 10).map((r, i) => (
+                        <tr key={r.id || r.receiptNo || i} className="border-b border-gray-100 hover:bg-orange-50/40 transition-colors">
+                          <td className="p-3 font-mono font-bold text-amber-900">{r.receiptNo}</td>
+                          <td className="p-3 font-semibold text-gray-900">
+                            {r.name}
+                            {r.gotra && <span className="block text-xs text-gray-500 font-normal">গোত্র: {r.gotra}</span>}
+                          </td>
+                          <td className="p-3 font-bold text-emerald-700 font-mono">৳ {r.amount} /-</td>
+                          <td className="p-3 text-xs text-gray-600">
+                            <span className="font-semibold text-gray-800 block">{r.method}</span>
+                            <span className="font-mono text-gray-500">{r.trxId || '-'}</span>
+                          </td>
+                          <td className="p-3 text-xs text-gray-500">{r.date}</td>
+                          <td className="p-3 text-center">
+                            <button
+                              onClick={() => printReceiptDirectly(r, lang)}
+                              className="bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-3 py-1.5 rounded-lg text-xs transition-all active:scale-95 flex items-center gap-1.5 mx-auto cursor-pointer"
+                              title="প্রিন্ট করুন"
+                            >
+                              <i className="fas fa-print text-amber-700"></i>
+                              {lang === 'en' ? 'Print' : 'প্রিন্ট'}
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
           </div>
@@ -4401,7 +5238,9 @@ const DonationPage = ({ donations, navigateTo, showToast, lang, defaultTab = 'me
   );
 };
 
-const HistoryPage = ({ navigateTo, lang }) => (
+const HistoryPage = ({ templeHistory, navigateTo, lang }) => {
+  const hist = templeHistory || DEFAULT_TEMPLE_HISTORY;
+  return (
   <div className="bg-orange-50 min-h-screen py-12 anim-fade-up">
     <div className="container mx-auto px-4 max-w-4xl">
       <BackButton navigateTo={navigateTo} lang={lang} />
@@ -4424,13 +5263,13 @@ const HistoryPage = ({ navigateTo, lang }) => (
         <div className="absolute -top-12 -right-12 w-32 h-32 bg-gradient-to-br from-yellow-300 to-orange-400 rounded-full opacity-20 blur-2xl pointer-events-none"></div>
         <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-gradient-to-tr from-amber-400 to-red-400 rounded-full opacity-20 blur-2xl pointer-events-none"></div>
 
-        {/* Existing Core Introduction (Preserved) */}
+        {/* Existing Core Introduction (Dynamic & Preserved) */}
         <div className="bg-gradient-to-br from-amber-50/70 to-orange-50/50 p-6 rounded-2xl border-l-[5px] border-amber-500 mb-8 shadow-sm">
           <p className="text-gray-800 text-lg leading-relaxed text-justify mb-3">
-            {t('historyP1', lang)}
+            {lang === 'en' ? t('historyP1', lang) : (hist.p1 || t('historyP1', lang))}
           </p>
           <p className="text-gray-800 text-lg leading-relaxed text-justify">
-            {t('historyP2', lang)}
+            {lang === 'en' ? t('historyP2', lang) : (hist.p2 || t('historyP2', lang))}
           </p>
         </div>
 
@@ -4533,7 +5372,8 @@ const HistoryPage = ({ navigateTo, lang }) => (
       </div>
     </div>
   </div>
-);
+  );
+};
 
 // --- Admin Panel ---
 const AdminPanel = ({
@@ -4550,7 +5390,12 @@ const AdminPanel = ({
   timings, setTimings,
   travelInfo, setTravelInfo,
   mantras, setMantras,
+  pujaBookings, setPujaBookings,
+  donationReceipts, setDonationReceipts,
+  royaniPalas, setRoyaniPalas,
+  templeHistory, setTempleHistory,
   adminCredentials, setAdminCredentials,
+  galleryItems, setGalleryItems,
   showToast
 }) => {
   const [loginEmail, setLoginEmail] = useState('');
@@ -4566,6 +5411,7 @@ const AdminPanel = ({
   const [editingEventId, setEditingEventId] = useState(null);
   const [editingDonationId, setEditingDonationId] = useState(null);
   const [editingMantraId, setEditingMantraId] = useState(null);
+  const [editingGalleryId, setEditingGalleryId] = useState(null);
 
   // Form States
   const [newMember, setNewMember] = useState({ name: '', role: '', phone: '', image: null });
@@ -4573,6 +5419,8 @@ const AdminPanel = ({
   const [newNotice, setNewNotice] = useState({ title: '', date: '', text: '' });
   const [newEvent, setNewEvent] = useState({ title: '', date: '', description: '', image: null });
   const [newDonation, setNewDonation] = useState({ name: '', address: '', type: 'নগদ অর্থ', amount: '', date: '', is_hidden: false });
+  const [newGalleryPhoto, setNewGalleryPhoto] = useState({ url: '', captionBn: '', captionEn: '', image: null });
+  const [editGalleryPhoto, setEditGalleryPhoto] = useState({ url: '', captionBn: '', captionEn: '', image: null });
 
   // Timings, Travel & Mantras Form States
   const [timingsForm, setTimingsForm] = useState(timings || PRELOADED_DATA.timings);
@@ -4627,6 +5475,7 @@ const AdminPanel = ({
     setEditingEventId(null);
     setEditingDonationId(null);
     setEditingMantraId(null);
+    setEditingGalleryId(null);
   };
 
   const handleLogin = async (e) => {
@@ -5284,6 +6133,381 @@ const AdminPanel = ({
     }
   };
 
+  // -- Online Puja & Sankalpa Bookings Handlers --
+  const [bookingSearch, setBookingSearch] = useState('');
+  const [bookingFilter, setBookingFilter] = useState('all'); // all, pending, completed
+
+  const handleToggleBookingStatus = async (id, currentStatus) => {
+    setIsSaving(true);
+    setErrorMsg('');
+    try {
+      const nextStatus = currentStatus === 'completed' ? 'pending' : 'completed';
+      const updated = (pujaBookings || []).map(b => (b.id === id || b.token === id) ? { ...b, status: nextStatus } : b);
+      if (setPujaBookings) setPujaBookings(updated);
+      try { localStorage.setItem('mmg_puja_bookings', JSON.stringify(updated)); } catch (e) { }
+
+      const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'puja_bookings').maybeSingle();
+      if (existing) {
+        await supabaseClient.from('settings').update({ value: JSON.stringify(updated) }).eq('id', existing.id);
+      } else {
+        await supabaseClient.from('settings').insert({ key: 'puja_bookings', value: JSON.stringify(updated) });
+      }
+      showToast(nextStatus === 'completed' ? 'পূজা বুকিং সম্পন্ন হিসেবে চিহ্নিত করা হয়েছে!' : 'বুকিং পুনরায় পেন্ডিং করা হয়েছে!');
+    } catch (err) {
+      setErrorMsg("বুকিং স্ট্যাটাস পরিবর্তন করতে সমস্যা হয়েছে।");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteBooking = async (id) => {
+    if (!confirm('আপনি কি নিশ্চিত যে এই পূজা বুকিং তালিকা থেকে মুছে ফেলতে চান?')) return;
+    setIsSaving(true);
+    setErrorMsg('');
+    try {
+      const updated = (pujaBookings || []).filter(b => b.id !== id && b.token !== id);
+      if (setPujaBookings) setPujaBookings(updated);
+      try { localStorage.setItem('mmg_puja_bookings', JSON.stringify(updated)); } catch (e) { }
+
+      const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'puja_bookings').maybeSingle();
+      if (existing) {
+        await supabaseClient.from('settings').update({ value: JSON.stringify(updated) }).eq('id', existing.id);
+      }
+      showToast('পূজা বুকিং মুছে ফেলা হয়েছে!');
+    } catch (err) {
+      setErrorMsg("বুকিং মুছে ফেলতে সমস্যা হয়েছে।");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Direct Booking Token Voucher Printer
+  const printBookingDirectly = (b) => {
+    if (!b) return;
+    const printWindow = window.open('', '_blank', 'width=850,height=950');
+    if (!printWindow) {
+      alert('অনুগ্রহ করে পপ-আপ ব্লকার নিষ্ক্রিয় করুন যাতে সংকল্প পত্র প্রিন্ট হতে পারে।');
+      return;
+    }
+    const html = `<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8" />
+  <title>পবিত্র সংকল্প পত্র ও পূজা বুকিং - ${b.token || 'MMG'}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700;800&family=Noto+Serif+Bengali:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    @page { size: A4 portrait; margin: 12mm; }
+    * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    body { margin: 0; padding: 24px; font-family: 'Hind Siliguri', 'Noto Serif Bengali', sans-serif; background: #fffcf7; color: #261605; }
+    .card { max-width: 740px; margin: 0 auto; background: #fff; border: 3px double #b45309; border-radius: 16px; padding: 32px; position: relative; }
+    .card::before { content: ""; position: absolute; inset: 6px; border: 1px dashed #d97706; border-radius: 12px; pointer-events: none; }
+    .header { text-align: center; border-bottom: 2px solid #fef3c7; padding-bottom: 16px; margin-bottom: 20px; }
+    .om { font-size: 32px; color: #b45309; margin-bottom: 4px; }
+    .sloka { font-family: 'Noto Serif Bengali', serif; font-size: 13px; color: #92400e; font-weight: 700; }
+    .title { font-size: 24px; font-weight: 800; color: #78350f; margin: 4px 0; }
+    .subtitle { font-size: 12px; color: #57534e; }
+    .token-badge { display: inline-block; background: #b45309; color: #fff; padding: 4px 16px; border-radius: 9999px; font-size: 13px; font-weight: 700; margin-top: 8px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 20px 0; }
+    .item { padding: 10px 14px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; font-size: 13.5px; }
+    .item .lbl { color: #78350f; font-weight: 600; display: block; font-size: 12px; }
+    .item .val { color: #1c1917; font-weight: 800; }
+    .sankalpa-box { background: #fef3c7; border: 2px solid #f59e0b; border-radius: 10px; padding: 14px; margin: 20px 0; font-size: 14px; color: #78350f; }
+    .footer { display: flex; justify-content: space-between; align-items: flex-end; padding-top: 40px; }
+    .sig-line { border-top: 1.5px dashed #a8a29e; width: 160px; text-align: center; font-size: 12px; font-weight: 700; color: #44403c; padding-top: 4px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <div class="om">ॐ</div>
+      <div class="sloka">"ওঁ হ্রীং শ্রীং ক্লীং ঐং মনসাদেব্যৈ স্বাহা"</div>
+      <div class="title">শ্রী শ্রী মা মনসা মন্দির, গৈলা</div>
+      <div class="subtitle">পো: গৈলা, উপজেলা: আগৈলঝাড়া, জেলা: বরিশাল • বাৎসরিক পূজা ও সেবা পরিষদ</div>
+      <div class="token-badge">পবিত্র পূজা ও সংকল্প গ্রহণ প্রমাণপত্র • টোকেন: ${b.token}</div>
+    </div>
+    <div class="grid">
+      <div class="item"><span class="lbl">ভক্তের নাম:</span><span class="val">${b.devoteeName}</span></div>
+      <div class="item"><span class="lbl">গোত্র (Lineage):</span><span class="val">${b.gotra || 'অনুল্লিখিত'}</span></div>
+      <div class="item"><span class="lbl">মোবাইল নম্বর:</span><span class="val">${b.phone || '-'}</span></div>
+      <div class="item"><span class="lbl">ঠিকানা / জেলা:</span><span class="val">${b.address || '-'}</span></div>
+      <div class="item" style="grid-column: span 2;"><span class="lbl">পূজার ধরণ:</span><span class="val">${b.pujaType}</span></div>
+      ${b.pujaDate ? `<div class="item"><span class="lbl">পূজার নির্ধারিত তারিখ:</span><span class="val">${b.pujaDate}</span></div>` : ''}
+      <div class="item"><span class="lbl">বুকিং তারিখ ও সময়:</span><span class="val">${b.timestamp ? new Date(b.timestamp).toLocaleString('bn-BD') : new Date().toLocaleDateString('bn-BD')}</span></div>
+    </div>
+    ${b.sankalpa ? `<div class="sankalpa-box"><strong>বিশেষ সংকল্প ও প্রার্থনা:</strong><br>${b.sankalpa}</div>` : ''}
+    <div class="footer">
+      <div class="sig-line">ভক্তের স্বাক্ষর</div>
+      <div style="text-align: center; border: 2px dashed #b45309; border-radius: 50%; width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; color: #b45309;">মা মনসা<br>মন্দির গৈলা</div>
+      <div class="sig-line">প্রধান পুরোহিত / সেবাধ্যক্ষ</div>
+    </div>
+  </div>
+  <script>window.onload = function() { setTimeout(function() { window.print(); }, 400); };<\/script>
+</body>
+</html>`;
+    printWindow.document.open();
+    printWindow.document.write(html);
+    printWindow.document.close();
+  };
+
+  // -- Donation Receipts Handlers --
+  const [receiptSearch, setReceiptSearch] = useState('');
+  const [showNewReceiptModal, setShowNewReceiptModal] = useState(false);
+  const [adminReceiptForm, setAdminReceiptForm] = useState({
+    name: '',
+    phone: '',
+    gotra: '',
+    amount: '',
+    method: 'bKash',
+    trxId: '',
+    purpose: 'সাধারণ প্রণামী ও সেবা',
+    date: new Date().toISOString().split('T')[0]
+  });
+
+  const handleAdminIssueReceipt = async (e) => {
+    e.preventDefault();
+    if (!adminReceiptForm.name.trim() || !adminReceiptForm.amount || parseFloat(adminReceiptForm.amount) <= 0) {
+      setErrorMsg("অনুগ্রহ করে দাতার নাম ও সঠিক দানের পরিমাণ লিখুন।");
+      return;
+    }
+    setIsSaving(true);
+    setErrorMsg('');
+    const receiptNo = 'MMG-REC-' + Math.floor(100000 + Math.random() * 900000);
+    const receipt = {
+      id: 'rec_' + Date.now(),
+      ...adminReceiptForm,
+      receiptNo,
+      amountWords: amountInBengaliWords(adminReceiptForm.amount),
+      timestamp: new Date().toISOString()
+    };
+
+    try {
+      const updated = [receipt, ...(donationReceipts || [])];
+      if (setDonationReceipts) setDonationReceipts(updated);
+      try { localStorage.setItem('mmg_donation_receipts', JSON.stringify(updated.slice(0, 100))); } catch (e) { }
+
+      const { data: existing } = await supabaseClient.from('settings').select('id, value').eq('key', 'donation_receipts').maybeSingle();
+      if (existing) {
+        await supabaseClient.from('settings').update({ value: JSON.stringify(updated) }).eq('id', existing.id);
+      } else {
+        await supabaseClient.from('settings').insert({ key: 'donation_receipts', value: JSON.stringify(updated) });
+      }
+
+      showToast('নতুন স্মারক দান রসিদ ইস্যু ও সংরক্ষিত হয়েছে!');
+      setAdminReceiptForm({
+        name: '',
+        phone: '',
+        gotra: '',
+        amount: '',
+        method: 'bKash',
+        trxId: '',
+        purpose: 'সাধারণ প্রণামী ও সেবা',
+        date: new Date().toISOString().split('T')[0]
+      });
+      setShowNewReceiptModal(false);
+      printReceiptDirectly(receipt, 'bn');
+    } catch (err) {
+      setErrorMsg("রসিদ সংরক্ষণ করতে সমস্যা হয়েছে।");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteReceipt = async (id) => {
+    if (!confirm('আপনি কি নিশ্চিত যে এই রসিদটি তালিকা থেকে মুছে ফেলতে চান?')) return;
+    setIsSaving(true);
+    setErrorMsg('');
+    try {
+      const updated = (donationReceipts || []).filter(r => r.id !== id && r.receiptNo !== id);
+      if (setDonationReceipts) setDonationReceipts(updated);
+      try { localStorage.setItem('mmg_donation_receipts', JSON.stringify(updated)); } catch (e) { }
+
+      const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'donation_receipts').maybeSingle();
+      if (existing) {
+        await supabaseClient.from('settings').update({ value: JSON.stringify(updated) }).eq('id', existing.id);
+      }
+      showToast('রসিদ মুছে ফেলা হয়েছে!');
+    } catch (err) {
+      setErrorMsg("রসিদ মুছতে সমস্যা হয়েছে।");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // -- Royani Palas Form & Save Handler --
+  const [royaniForm, setRoyaniForm] = useState(royaniPalas && royaniPalas.length > 0 ? royaniPalas : DEFAULT_ROYANI_PALAS);
+  useEffect(() => {
+    if (royaniPalas && royaniPalas.length > 0) setRoyaniForm(royaniPalas);
+  }, [royaniPalas]);
+
+  const handleRoyaniPalaChange = (idx, field, value) => {
+    const updated = [...royaniForm];
+    updated[idx] = { ...updated[idx], [field]: value };
+    setRoyaniForm(updated);
+  };
+
+  const handleSaveRoyani = async (e) => {
+    e.preventDefault();
+    setIsSaving(true);
+    setErrorMsg('');
+    try {
+      if (setRoyaniPalas) setRoyaniPalas(royaniForm);
+      try { localStorage.setItem('temple_royani_palas', JSON.stringify(royaniForm)); } catch (e) { }
+
+      const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'royani_palas').maybeSingle();
+      if (existing) {
+        await supabaseClient.from('settings').update({ value: JSON.stringify(royaniForm) }).eq('id', existing.id);
+      } else {
+        await supabaseClient.from('settings').insert({ key: 'royani_palas', value: JSON.stringify(royaniForm) });
+      }
+      showToast('ঐতিহ্যবাহী রয়ানী গানের চার পালা সফলভাবে সংরক্ষিত হয়েছে!');
+    } catch (err) {
+      setErrorMsg("রয়ানী পালা সংরক্ষণ করতে সমস্যা হয়েছে।");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // -- Temple History Form & Save Handler --
+  const [historyForm, setHistoryForm] = useState(templeHistory || DEFAULT_TEMPLE_HISTORY);
+  useEffect(() => {
+    if (templeHistory) setHistoryForm(templeHistory);
+  }, [templeHistory]);
+
+  const handleSaveHistory = async (e) => {
+    e.preventDefault();
+    setIsSaving(true);
+    setErrorMsg('');
+    try {
+      if (setTempleHistory) setTempleHistory(historyForm);
+      try { localStorage.setItem('temple_history_data', JSON.stringify(historyForm)); } catch (e) { }
+
+      const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'temple_history').maybeSingle();
+      if (existing) {
+        await supabaseClient.from('settings').update({ value: JSON.stringify(historyForm) }).eq('id', existing.id);
+      } else {
+        await supabaseClient.from('settings').insert({ key: 'temple_history', value: JSON.stringify(historyForm) });
+      }
+      showToast('মন্দিরের ঐতিহাসিক পটভূমি ও পরিচিতি সংরক্ষিত হয়েছে!');
+    } catch (err) {
+      setErrorMsg("ইতিহাস তথ্য সংরক্ষণ করতে সমস্যা হয়েছে।");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // -- Photo Gallery Management Handlers --
+  const handleSaveGalleryToCloud = async (updatedList) => {
+    if (setGalleryItems) setGalleryItems(updatedList);
+    try {
+      localStorage.setItem('temple_gallery_items', JSON.stringify(updatedList));
+    } catch (e) { }
+
+    try {
+      const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'gallery_items').maybeSingle();
+      if (existing) {
+        await supabaseClient.from('settings').update({ value: JSON.stringify(updatedList) }).eq('id', existing.id);
+      } else {
+        await supabaseClient.from('settings').insert({ key: 'gallery_items', value: JSON.stringify(updatedList) });
+      }
+    } catch (err) {
+      console.warn("Could not save gallery to Supabase:", err);
+    }
+  };
+
+  const handleAddGalleryPhoto = async (e) => {
+    e.preventDefault();
+    const photoUrl = (newGalleryPhoto.image || newGalleryPhoto.url || '').trim();
+    if (!photoUrl) {
+      setErrorMsg("অনুগ্রহ করে একটি ছবি আপলোড করুন অথবা ছবির ওয়েব লিংক প্রদান করুন।");
+      return;
+    }
+    setIsSaving(true);
+    setErrorMsg('');
+    try {
+      const newEntry = {
+        id: 'gal_' + Date.now(),
+        url: photoUrl,
+        captionBn: newGalleryPhoto.captionBn.trim() || 'শ্রীশ্রী মা মনসা মন্দির প্রাঙ্গণ',
+        captionEn: newGalleryPhoto.captionEn.trim() || 'Maa Manasa Temple Premises'
+      };
+      const updated = [...(galleryItems || DEFAULT_GALLERY_ITEMS), newEntry];
+      await handleSaveGalleryToCloud(updated);
+      setNewGalleryPhoto({ url: '', captionBn: '', captionEn: '', image: null });
+      showToast('নতুন ছবি সফলভাবে গ্যালারিতে যোগ করা হয়েছে!');
+    } catch (err) {
+      setErrorMsg('গ্যালারির ছবি সংরক্ষণে ত্রুটি: ' + (err.message || ''));
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleStartEditGalleryPhoto = (item) => {
+    setEditingGalleryId(item.id);
+    setEditGalleryPhoto({
+      url: item.url || '',
+      captionBn: item.captionBn || '',
+      captionEn: item.captionEn || '',
+      image: null
+    });
+  };
+
+  const handleUpdateGalleryPhoto = async (e) => {
+    e.preventDefault();
+    setIsSaving(true);
+    setErrorMsg('');
+    try {
+      const updated = (galleryItems || DEFAULT_GALLERY_ITEMS).map(item => {
+        if (item.id === editingGalleryId) {
+          return {
+            ...item,
+            url: editGalleryPhoto.image || editGalleryPhoto.url || item.url,
+            captionBn: editGalleryPhoto.captionBn.trim() || item.captionBn,
+            captionEn: editGalleryPhoto.captionEn.trim() || item.captionEn
+          };
+        }
+        return item;
+      });
+      await handleSaveGalleryToCloud(updated);
+      setEditingGalleryId(null);
+      showToast('গ্যালারির ছবি ও ক্যাপশন হালনাগাদ করা হয়েছে!');
+    } catch (err) {
+      setErrorMsg('ছবি আপডেট করতে সমস্যা হয়েছে: ' + (err.message || ''));
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteGalleryPhoto = async (id) => {
+    if (!window.confirm("আপনি কি নিশ্চিত এই ছবিটি গ্যালারি থেকে মুছে ফেলতে চান?")) return;
+    setIsSaving(true);
+    try {
+      const currentList = galleryItems || DEFAULT_GALLERY_ITEMS;
+      if (currentList.length <= 1) {
+        setErrorMsg("গ্যালারিতে কমপক্ষে একটি ছবি থাকতে হবে!");
+        setIsSaving(false);
+        return;
+      }
+      const updated = currentList.filter(item => item.id !== id);
+      await handleSaveGalleryToCloud(updated);
+      showToast('ছবিটি গ্যালারি থেকে মুছে ফেলা হয়েছে।');
+    } catch (err) {
+      setErrorMsg('ছবি মুছতে সমস্যা হয়েছে: ' + (err.message || ''));
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleMoveGalleryPhoto = async (index, direction) => {
+    const list = [...(galleryItems || DEFAULT_GALLERY_ITEMS)];
+    const targetIdx = index + direction;
+    if (targetIdx < 0 || targetIdx >= list.length) return;
+    const temp = list[index];
+    list[index] = list[targetIdx];
+    list[targetIdx] = temp;
+    await handleSaveGalleryToCloud(list);
+    showToast('গ্যালারির ছবির ক্রম পরিবর্তিত হয়েছে!');
+  };
+
   if (!isAdminAuthenticated) {
     return (
       <div className="bg-gray-100 min-h-screen flex items-center justify-center px-4 relative py-12">
@@ -5371,7 +6595,7 @@ const AdminPanel = ({
 
       {/* Quick Overview Stats Ribbon */}
       <div className="container mx-auto px-4 mt-6">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-9 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 xl:grid-cols-13 gap-2.5">
           <div onClick={() => handleTabSwitch('marquee')} className="cursor-pointer bg-white p-3 rounded-2xl border border-gray-200 shadow-xs hover:border-orange-400 hover:shadow-sm transition-all text-center">
             <i className="fas fa-scroll text-orange-500 text-base mb-1"></i>
             <div className="text-[10px] text-gray-500 font-bold">স্ক্রলিং নোটিশ</div>
@@ -5417,6 +6641,31 @@ const AdminPanel = ({
             <div className="text-[10px] text-gray-500 font-bold">মোট অনুদান</div>
             <div className="text-xs font-extrabold text-gray-800">{donations ? donations.length : 0} টি</div>
           </div>
+          <div onClick={() => handleTabSwitch('bookings')} className="cursor-pointer bg-white p-3 rounded-2xl border border-gray-200 shadow-xs hover:border-amber-500 hover:shadow-sm transition-all text-center">
+            <i className="fas fa-hands-praying text-amber-500 text-base mb-1"></i>
+            <div className="text-[10px] text-gray-500 font-bold">পূজা বুকিং</div>
+            <div className="text-xs font-extrabold text-amber-700">{(pujaBookings || []).length} টি</div>
+          </div>
+          <div onClick={() => handleTabSwitch('receipts')} className="cursor-pointer bg-white p-3 rounded-2xl border border-gray-200 shadow-xs hover:border-emerald-500 hover:shadow-sm transition-all text-center">
+            <i className="fas fa-file-invoice text-emerald-500 text-base mb-1"></i>
+            <div className="text-[10px] text-gray-500 font-bold">ইস্যুকৃত রসিদ</div>
+            <div className="text-xs font-extrabold text-emerald-700">{(donationReceipts || []).length} টি</div>
+          </div>
+          <div onClick={() => handleTabSwitch('royani')} className="cursor-pointer bg-white p-3 rounded-2xl border border-gray-200 shadow-xs hover:border-yellow-500 hover:shadow-sm transition-all text-center">
+            <i className="fas fa-music text-yellow-500 text-base mb-1"></i>
+            <div className="text-[10px] text-gray-500 font-bold">রয়ানী পালা</div>
+            <div className="text-xs font-extrabold text-yellow-700">{(royaniPalas || []).length} টি</div>
+          </div>
+          <div onClick={() => handleTabSwitch('history')} className="cursor-pointer bg-white p-3 rounded-2xl border border-gray-200 shadow-xs hover:border-amber-600 hover:shadow-sm transition-all text-center">
+            <i className="fas fa-landmark text-amber-600 text-base mb-1"></i>
+            <div className="text-[10px] text-gray-500 font-bold">মন্দির ইতিহাস</div>
+            <div className="text-xs font-extrabold text-amber-900">৫৩১ বছর</div>
+          </div>
+          <div onClick={() => handleTabSwitch('gallery')} className="cursor-pointer bg-white p-3 rounded-2xl border border-gray-200 shadow-xs hover:border-pink-500 hover:shadow-sm transition-all text-center">
+            <i className="fas fa-images text-pink-500 text-base mb-1"></i>
+            <div className="text-[10px] text-gray-500 font-bold">ফটোগ্যালারি</div>
+            <div className="text-xs font-extrabold text-pink-700">{(galleryItems || DEFAULT_GALLERY_ITEMS).length} টি</div>
+          </div>
         </div>
       </div>
 
@@ -5449,6 +6698,21 @@ const AdminPanel = ({
             </button>
             <button onClick={() => handleTabSwitch('donations')} className={`px-5 py-3 text-left font-bold text-sm border-b ${activeTab === 'donations' ? 'bg-orange-50 text-orange-700 border-l-[5px] border-l-orange-600' : 'text-gray-600 hover:bg-gray-50 border-l-[5px] border-transparent'}`}>
               <i className="fas fa-hand-holding-usd w-5 text-green-500"></i> অনুদান ম্যানেজমেন্ট
+            </button>
+            <button onClick={() => handleTabSwitch('bookings')} className={`px-5 py-3 text-left font-bold text-sm border-b ${activeTab === 'bookings' ? 'bg-orange-50 text-orange-700 border-l-[5px] border-l-orange-600' : 'text-gray-600 hover:bg-gray-50 border-l-[5px] border-transparent'}`}>
+              <i className="fas fa-hands-praying w-5 text-amber-500"></i> পূজা ও সংকল্প বুকিং
+            </button>
+            <button onClick={() => handleTabSwitch('receipts')} className={`px-5 py-3 text-left font-bold text-sm border-b ${activeTab === 'receipts' ? 'bg-orange-50 text-orange-700 border-l-[5px] border-l-orange-600' : 'text-gray-600 hover:bg-gray-50 border-l-[5px] border-transparent'}`}>
+              <i className="fas fa-file-invoice w-5 text-emerald-500"></i> দান ও প্রণামী রসিদসমূহ
+            </button>
+            <button onClick={() => handleTabSwitch('royani')} className={`px-5 py-3 text-left font-bold text-sm border-b ${activeTab === 'royani' ? 'bg-orange-50 text-orange-700 border-l-[5px] border-l-orange-600' : 'text-gray-600 hover:bg-gray-50 border-l-[5px] border-transparent'}`}>
+              <i className="fas fa-music w-5 text-yellow-500"></i> ঐতিহ্যবাহী রয়ানী গান
+            </button>
+            <button onClick={() => handleTabSwitch('history')} className={`px-5 py-3 text-left font-bold text-sm border-b ${activeTab === 'history' ? 'bg-orange-50 text-orange-700 border-l-[5px] border-l-orange-600' : 'text-gray-600 hover:bg-gray-50 border-l-[5px] border-transparent'}`}>
+              <i className="fas fa-landmark w-5 text-amber-600"></i> মন্দির ইতিহাস ও ঐতিহ্য
+            </button>
+            <button onClick={() => handleTabSwitch('gallery')} className={`px-5 py-3 text-left font-bold text-sm border-b ${activeTab === 'gallery' ? 'bg-orange-50 text-orange-700 border-l-[5px] border-l-orange-600' : 'text-gray-600 hover:bg-gray-50 border-l-[5px] border-transparent'}`}>
+              <i className="fas fa-images w-5 text-pink-500"></i> ফটোগ্যালারি ও চিত্রশালা
             </button>
             <button onClick={() => handleTabSwitch('security')} className={`px-5 py-3 text-left font-bold text-sm ${activeTab === 'security' ? 'bg-orange-50 text-orange-700 border-l-[5px] border-l-orange-600' : 'text-gray-600 hover:bg-gray-50 border-l-[5px] border-transparent'}`}>
               <i className="fas fa-shield-halved w-5 text-rose-600"></i> এডমিন আইডি ও পাসওয়ার্ড
@@ -6602,6 +7866,927 @@ const AdminPanel = ({
               </form>
             </div>
           )}
+
+          {/* 11. Puja & Sankalpa Bookings Tab */}
+          {activeTab === 'bookings' && (
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 pb-4 border-b">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <i className="fas fa-calendar-check text-amber-600"></i> পূজা ও সংকল্প বুকিং ব্যবস্থাপনা
+                  </h3>
+                  <p className="text-xs text-gray-500 mt-1">ভক্তদের অনলাইন পূজা বুকিং ও সংকল্প আবেদনসমূহের তালিকা</p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="bg-amber-100 text-amber-800 text-xs px-3 py-1.5 rounded-full font-bold">
+                    মোট বুকিং: {(pujaBookings || []).length}
+                  </span>
+                  <span className="bg-orange-100 text-orange-800 text-xs px-3 py-1.5 rounded-full font-bold">
+                    পেন্ডিং: {(pujaBookings || []).filter(b => b.status !== 'completed').length}
+                  </span>
+                </div>
+              </div>
+
+              {/* Filter and Search */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+                <div className="sm:col-span-2">
+                  <div className="relative">
+                    <i className="fas fa-search absolute left-3.5 top-3.5 text-gray-400 text-sm"></i>
+                    <input
+                      type="text"
+                      placeholder="নাম, ফোন নম্বর, গোত্র বা টোকেন লিখে খুঁজুন..."
+                      value={bookingSearch}
+                      onChange={(e) => setBookingSearch(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  {['all', 'pending', 'completed'].map(f => (
+                    <button
+                      key={f}
+                      onClick={() => setBookingFilter(f)}
+                      className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${bookingFilter === f ? 'bg-amber-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                    >
+                      {f === 'all' ? 'সকল' : f === 'pending' ? 'পেন্ডিং' : 'সম্পন্ন'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Bookings List */}
+              {(() => {
+                const searchQ = (bookingSearch || '').toLowerCase().trim();
+                const filtered = (pujaBookings || []).filter(b => {
+                  const matchFilter = bookingFilter === 'all' || (bookingFilter === 'completed' ? b.status === 'completed' : b.status !== 'completed');
+                  const matchSearch = !searchQ ||
+                    (b.devoteeName && b.devoteeName.toLowerCase().includes(searchQ)) ||
+                    (b.phone && b.phone.includes(searchQ)) ||
+                    (b.gotra && b.gotra.toLowerCase().includes(searchQ)) ||
+                    (b.token && b.token.toLowerCase().includes(searchQ)) ||
+                    (b.pujaType && b.pujaType.toLowerCase().includes(searchQ));
+                  return matchFilter && matchSearch;
+                });
+
+                if (filtered.length === 0) {
+                  return (
+                    <div className="text-center py-12 bg-amber-50/50 rounded-2xl border border-dashed border-amber-200">
+                      <i className="fas fa-pray text-4xl text-amber-300 mb-2"></i>
+                      <p className="text-gray-500 font-medium">কোনো পূজা বুকিং পাওয়া যায়নি</p>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {filtered.map(b => (
+                      <div key={b.id || b.token} className="p-5 rounded-2xl border border-amber-100 bg-amber-50/20 hover:border-amber-300 transition-all flex flex-col justify-between shadow-sm">
+                        <div>
+                          <div className="flex items-center justify-between gap-2 mb-2">
+                            <span className="font-mono text-xs font-bold bg-amber-100 text-amber-900 px-2.5 py-1 rounded-lg">
+                              {b.token || 'MMG-PUJA'}
+                            </span>
+                            <span className={`text-xs px-2.5 py-1 rounded-full font-bold flex items-center gap-1 ${b.status === 'completed' ? 'bg-emerald-100 text-emerald-800' : 'bg-orange-100 text-orange-800'}`}>
+                              <i className={`fas ${b.status === 'completed' ? 'fa-check-circle' : 'fa-clock'}`}></i>
+                              {b.status === 'completed' ? 'সম্পন্ন' : 'পেন্ডিং'}
+                            </span>
+                          </div>
+                          <h4 className="font-bold text-gray-900 text-base">{b.devoteeName}</h4>
+                          <div className="text-xs text-gray-600 space-y-1 mt-2">
+                            <p><span className="font-semibold text-gray-700">পূজা:</span> {b.pujaType}</p>
+                            <p><span className="font-semibold text-gray-700">গোত্র:</span> {b.gotra || 'অনুল্লিখিত'} • <span className="font-semibold text-gray-700">ফোন:</span> <a href={`tel:${b.phone}`} className="text-amber-700 font-bold hover:underline">{b.phone}</a></p>
+                            {b.pujaDate && <p><span className="font-semibold text-gray-700">পূজার তারিখ:</span> {b.pujaDate}</p>}
+                            {b.address && <p><span className="font-semibold text-gray-700">ঠিকানা:</span> {b.address}</p>}
+                            {b.sankalpa && (
+                              <p className="bg-white p-2.5 rounded-lg border border-amber-100 mt-2 italic text-gray-700 text-xs">
+                                <span className="font-semibold not-italic text-amber-800">সংকল্প/প্রার্থনা:</span> "{b.sankalpa}"
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between gap-2 pt-4 mt-4 border-t border-amber-100">
+                          <button
+                            type="button"
+                            onClick={() => printBookingDirectly(b)}
+                            className="text-xs font-bold px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg flex items-center gap-1.5 transition-colors shadow-sm"
+                            title="সংকল্প প্রমাণপত্র প্রিন্ট করুন"
+                          >
+                            <i className="fas fa-print"></i> সংকল্প পত্র
+                          </button>
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => handleToggleBookingStatus(b.id || b.token, b.status)}
+                              className={`text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors ${b.status === 'completed' ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' : 'bg-emerald-600 text-white hover:bg-emerald-700'}`}
+                            >
+                              <i className={`fas ${b.status === 'completed' ? 'fa-undo' : 'fa-check'}`}></i>
+                              {b.status === 'completed' ? 'পেন্ডিং করুন' : 'সম্পন্ন করুন'}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteBooking(b.id || b.token)}
+                              className="text-xs text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors"
+                              title="মুছে ফেলুন"
+                            >
+                              <i className="fas fa-trash-alt"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+            </div>
+          )}
+
+          {/* 12. Donation & Pranami Receipts Tab */}
+          {activeTab === 'receipts' && (
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 pb-4 border-b">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <i className="fas fa-receipt text-orange-600"></i> স্মারক দান ও প্রণামী রসিদসমূহ
+                  </h3>
+                  <p className="text-xs text-gray-500 mt-1">ভক্তদের ইস্যুকৃত ডিজিটাল দান রসিদ ও হিসাব ভাউচার</p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="bg-emerald-100 text-emerald-800 text-xs px-3 py-1.5 rounded-full font-bold">
+                    মোট রসিদ: {(donationReceipts || []).length} টি
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowNewReceiptModal(!showNewReceiptModal)}
+                    className="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition-all shadow-sm flex items-center gap-1.5"
+                  >
+                    <i className={`fas ${showNewReceiptModal ? 'fa-times' : 'fa-plus'}`}></i>
+                    {showNewReceiptModal ? 'ফর্ম বন্ধ করুন' : 'নতুন রসিদ ইস্যু করুন'}
+                  </button>
+                </div>
+              </div>
+
+              {/* In-Panel New Receipt Creation Form */}
+              {showNewReceiptModal && (
+                <form onSubmit={handleAdminIssueReceipt} className="mb-8 p-6 bg-gradient-to-br from-amber-50/70 to-orange-50/50 rounded-2xl border-2 border-amber-200">
+                  <h4 className="font-bold text-amber-950 mb-4 flex items-center gap-2 text-sm">
+                    <i className="fas fa-file-invoice text-amber-600"></i> ভক্তের জন্য নতুন অফিসিয়াল রসিদ প্রস্তুত করুন
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">দাতার পূর্ণ নাম *</label>
+                      <input
+                        type="text"
+                        required
+                        value={adminReceiptForm.name}
+                        onChange={(e) => setAdminReceiptForm({ ...adminReceiptForm, name: e.target.value })}
+                        placeholder="উদা: সুব্রত রায়"
+                        className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">মোবাইল নম্বর</label>
+                      <input
+                        type="tel"
+                        value={adminReceiptForm.phone}
+                        onChange={(e) => setAdminReceiptForm({ ...adminReceiptForm, phone: e.target.value })}
+                        placeholder="০১৭১..."
+                        className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">গোত্র (ঐচ্ছিক)</label>
+                      <input
+                        type="text"
+                        value={adminReceiptForm.gotra}
+                        onChange={(e) => setAdminReceiptForm({ ...adminReceiptForm, gotra: e.target.value })}
+                        placeholder="উদা: কশ্যপ"
+                        className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">দানের পরিমাণ (টাকা) *</label>
+                      <input
+                        type="number"
+                        required
+                        min="1"
+                        value={adminReceiptForm.amount}
+                        onChange={(e) => setAdminReceiptForm({ ...adminReceiptForm, amount: e.target.value })}
+                        placeholder="উদা: ৫০০"
+                        className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">পরিশোধের মাধ্যম</label>
+                      <select
+                        value={adminReceiptForm.method}
+                        onChange={(e) => setAdminReceiptForm({ ...adminReceiptForm, method: e.target.value })}
+                        className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                      >
+                        <option value="bKash">বিকাশ (bKash)</option>
+                        <option value="Nagad">নগদ (Nagad)</option>
+                        <option value="Rocket">রকেট (Rocket)</option>
+                        <option value="Bank">ব্যাংক ডিপোজিট</option>
+                        <option value="নগদ ক্যাশ">মন্দির অফিসে নগদ প্রদান</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">ট্রানজেকশন আইডি / মেমো নং</label>
+                      <input
+                        type="text"
+                        value={adminReceiptForm.trxId}
+                        onChange={(e) => setAdminReceiptForm({ ...adminReceiptForm, trxId: e.target.value })}
+                        placeholder="উদা: BKL897312"
+                        className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">দানের উদ্দেশ্য / খাত</label>
+                      <input
+                        type="text"
+                        value={adminReceiptForm.purpose}
+                        onChange={(e) => setAdminReceiptForm({ ...adminReceiptForm, purpose: e.target.value })}
+                        placeholder="উদা: সাধারণ প্রণামী ও সেবা"
+                        className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowNewReceiptModal(false)}
+                      className="px-4 py-2 border rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-100"
+                    >
+                      বাতিল
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSaving}
+                      className="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-6 py-2 rounded-xl transition-all shadow-md flex items-center gap-1.5"
+                    >
+                      {isSaving ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-check-circle"></i>}
+                      রসিদ ইস্যু ও স্বয়ংক্রিয় প্রিন্ট করুন
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* Search Bar */}
+              <div className="mb-6">
+                <div className="relative">
+                  <i className="fas fa-search absolute left-3.5 top-3.5 text-gray-400 text-sm"></i>
+                  <input
+                    type="text"
+                    placeholder="রসিদ নম্বর, দাতার নাম, ফোন বা ট্রানজেকশন আইডি লিখে খুঁজুন..."
+                    value={receiptSearch}
+                    onChange={(e) => setReceiptSearch(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Receipts Table */}
+              {(() => {
+                const searchQ = (receiptSearch || '').toLowerCase().trim();
+                const filtered = (donationReceipts || []).filter(r => {
+                  if (!searchQ) return true;
+                  return (r.receiptNo && r.receiptNo.toLowerCase().includes(searchQ)) ||
+                    (r.name && r.name.toLowerCase().includes(searchQ)) ||
+                    (r.phone && r.phone.includes(searchQ)) ||
+                    (r.gotra && r.gotra.toLowerCase().includes(searchQ)) ||
+                    (r.trxId && r.trxId.toLowerCase().includes(searchQ));
+                });
+
+                if (filtered.length === 0) {
+                  return (
+                    <div className="text-center py-12 bg-orange-50/50 rounded-2xl border border-dashed border-orange-200">
+                      <i className="fas fa-receipt text-4xl text-orange-300 mb-2"></i>
+                      <p className="text-gray-500 font-medium">কোনো দান রসিদ পাওয়া যায়নি</p>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-amber-50/80 text-amber-950 text-xs font-bold uppercase tracking-wider border-b border-amber-200">
+                          <th className="py-3 px-4">রসিদ নম্বর</th>
+                          <th className="py-3 px-4">দাতার নাম ও পরিচয়</th>
+                          <th className="py-3 px-4">পরিমাণ</th>
+                          <th className="py-3 px-4">মাধ্যম ও TrxID</th>
+                          <th className="py-3 px-4">তারিখ</th>
+                          <th className="py-3 px-4 text-right">কার্যক্রম</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100 text-sm">
+                        {filtered.map(r => (
+                          <tr key={r.id || r.receiptNo} className="hover:bg-amber-50/30 transition-colors">
+                            <td className="py-3 px-4">
+                              <span className="font-mono text-xs font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded">
+                                {r.receiptNo}
+                              </span>
+                            </td>
+                            <td className="py-3 px-4">
+                              <p className="font-bold text-gray-900">{r.name}</p>
+                              <p className="text-xs text-gray-500">{r.gotra ? `গোত্র: ${r.gotra} • ` : ''}{r.phone || '-'}</p>
+                            </td>
+                            <td className="py-3 px-4">
+                              <span className="font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+                                ৳ {typeof r.amount === 'number' ? r.amount.toLocaleString() : r.amount}
+                              </span>
+                            </td>
+                            <td className="py-3 px-4">
+                              <p className="text-xs font-semibold text-gray-700">{r.method || 'বিকাশ'}</p>
+                              {r.trxId && <p className="font-mono text-[11px] text-gray-500">{r.trxId}</p>}
+                            </td>
+                            <td className="py-3 px-4 text-xs text-gray-500">
+                              {r.date || (r.timestamp ? new Date(r.timestamp).toLocaleDateString('bn-BD') : '-')}
+                            </td>
+                            <td className="py-3 px-4 text-right">
+                              <div className="inline-flex items-center gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => printReceiptDirectly(r, 'bn')}
+                                  className="text-xs font-bold px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors flex items-center gap-1 shadow-sm"
+                                  title="রসিদ প্রিন্ট করুন"
+                                >
+                                  <i className="fas fa-print"></i> প্রিন্ট
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteReceipt(r.id || r.receiptNo)}
+                                  className="text-xs text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors"
+                                  title="মুছে ফেলুন"
+                                >
+                                  <i className="fas fa-trash-alt"></i>
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                );
+              })()}
+            </div>
+          )}
+
+          {/* 13. Royani Gaan 4 Palas Tab */}
+          {activeTab === 'royani' && (
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 pb-4 border-b">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <i className="fas fa-music text-purple-600"></i> ঐতিহ্যবাহী রয়ানী গানের চার পালা
+                  </h3>
+                  <p className="text-xs text-gray-500 mt-1">পদ্মাপুরাণ ও মনসামঙ্গলের ৪টি পবিত্র পর্বের শ্লোক ও কাহিনী সম্পাদনা</p>
+                </div>
+              </div>
+
+              <form onSubmit={handleSaveRoyani} className="space-y-6">
+                {(royaniForm || []).map((pala, idx) => (
+                  <div key={pala.id || idx} className="p-6 rounded-2xl border border-purple-100 bg-purple-50/20 space-y-4">
+                    <div className="flex items-center justify-between pb-2 border-b border-purple-100">
+                      <span className="font-bold text-purple-900 text-sm flex items-center gap-2">
+                        <span className="w-6 h-6 rounded-full bg-purple-600 text-white inline-flex items-center justify-center text-xs font-bold">
+                          {idx + 1}
+                        </span>
+                        পর্ব {idx + 1}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 mb-1">বাংলা শিরোনাম</label>
+                        <input
+                          type="text"
+                          value={pala.titleBn || ''}
+                          onChange={(e) => handleRoyaniPalaChange(idx, 'titleBn', e.target.value)}
+                          className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 mb-1">English Title</label>
+                        <input
+                          type="text"
+                          value={pala.titleEn || ''}
+                          onChange={(e) => handleRoyaniPalaChange(idx, 'titleEn', e.target.value)}
+                          className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 mb-1">বাংলা উপশিরোনাম (Tag)</label>
+                        <input
+                          type="text"
+                          value={pala.tagBn || ''}
+                          onChange={(e) => handleRoyaniPalaChange(idx, 'tagBn', e.target.value)}
+                          className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 mb-1">English Tag</label>
+                        <input
+                          type="text"
+                          value={pala.tagEn || ''}
+                          onChange={(e) => handleRoyaniPalaChange(idx, 'tagEn', e.target.value)}
+                          className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">অমর পয়ার শ্লোক (পদ্মাপুরাণ)</label>
+                      <textarea
+                        rows={3}
+                        value={pala.verseBn || ''}
+                        onChange={(e) => handleRoyaniPalaChange(idx, 'verseBn', e.target.value)}
+                        className="w-full px-3 py-2 border rounded-xl text-sm font-serif focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 mb-1">বাংলা কাহিনী সারাংশ</label>
+                        <textarea
+                          rows={4}
+                          value={pala.storyBn || ''}
+                          onChange={(e) => handleRoyaniPalaChange(idx, 'storyBn', e.target.value)}
+                          className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 mb-1">English Narrative</label>
+                        <textarea
+                          rows={4}
+                          value={pala.storyEn || ''}
+                          onChange={(e) => handleRoyaniPalaChange(idx, 'storyEn', e.target.value)}
+                          className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                <div className="pt-4 border-t flex items-center justify-end gap-3">
+                  <button
+                    type="submit"
+                    disabled={isSaving}
+                    className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold px-8 py-3 rounded-xl transition-all shadow-md flex items-center gap-2 text-sm disabled:opacity-50"
+                  >
+                    {isSaving ? <><i className="fas fa-spinner fa-spin"></i> সংরক্ষণ হচ্ছে...</> : <><i className="fas fa-save"></i> রয়ানী গানের পালা সংরক্ষণ করুন</>}
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* 14. Temple History & Heritage Tab */}
+          {activeTab === 'history' && (
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 pb-4 border-b">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <i className="fas fa-landmark text-amber-700"></i> মন্দিরের ইতিহাস ও পটভূমি ব্যবস্থাপনা
+                  </h3>
+                  <p className="text-xs text-gray-500 mt-1">৫৩০+ বছরের প্রাচীন মন্দির পরিচিতি ও মহাকবি বিজয় গুপ্তের তথ্য</p>
+                </div>
+              </div>
+
+              <form onSubmit={handleSaveHistory} className="space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">মন্দির প্রতিষ্ঠাতা</label>
+                    <input
+                      type="text"
+                      value={historyForm.founder || ''}
+                      onChange={(e) => setHistoryForm({ ...historyForm, founder: e.target.value })}
+                      placeholder="মহাকবি বিজয় গুপ্ত"
+                      className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">প্রতিষ্ঠা সাল</label>
+                    <input
+                      type="text"
+                      value={historyForm.established || ''}
+                      onChange={(e) => setHistoryForm({ ...historyForm, established: e.target.value })}
+                      placeholder="১৪৯৪ খ্রিষ্টাব্দ (১৪১৬ শকাব্দ)"
+                      className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">প্রারম্ভিক পটভূমি (অনুচ্ছেদ ১)</label>
+                  <textarea
+                    rows={4}
+                    value={historyForm.p1 || ''}
+                    onChange={(e) => setHistoryForm({ ...historyForm, p1: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">ঐতিহাসিক গুরুত্ব ও মহিমা (অনুচ্ছেদ ২)</label>
+                  <textarea
+                    rows={4}
+                    value={historyForm.p2 || ''}
+                    onChange={(e) => setHistoryForm({ ...historyForm, p2: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">বিজয় গুপ্তের অমর শ্লোক (Immortal Verse)</label>
+                  <textarea
+                    rows={3}
+                    value={historyForm.shloka || ''}
+                    onChange={(e) => setHistoryForm({ ...historyForm, shloka: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-xl text-sm font-serif focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">শ্লোকের মর্মার্থ ও বঙ্গানুবাদ</label>
+                  <textarea
+                    rows={3}
+                    value={historyForm.shlokaMeaning || ''}
+                    onChange={(e) => setHistoryForm({ ...historyForm, shlokaMeaning: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                  />
+                </div>
+
+                <div className="pt-4 border-t flex items-center justify-end gap-3">
+                  <button
+                    type="submit"
+                    disabled={isSaving}
+                    className="bg-gradient-to-r from-amber-700 to-orange-700 hover:from-amber-800 hover:to-orange-800 text-white font-bold px-8 py-3 rounded-xl transition-all shadow-md flex items-center gap-2 text-sm disabled:opacity-50"
+                  >
+                    {isSaving ? <><i className="fas fa-spinner fa-spin"></i> সংরক্ষণ হচ্ছে...</> : <><i className="fas fa-save"></i> ঐতিহাসিক তথ্য সংরক্ষণ করুন</>}
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* 15. Photo Gallery Management Tab */}
+          {activeTab === 'gallery' && (
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100 space-y-8">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <i className="fas fa-images text-pink-600"></i> ফটোগ্যালারি ও চিত্রশালা ব্যবস্থাপনা
+                  </h3>
+                  <p className="text-xs text-gray-500 mt-1">
+                    ওয়েবসাইটের প্রধান ফটো গ্যালারি ও পূর্ণদৈর্ঘ্য লাইটবক্সের আলোকচিত্র, ক্যাপশন ও প্রদর্শন ক্রম পরিচালনা করুন
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-pink-700 bg-pink-50 px-3 py-1.5 rounded-full border border-pink-200">
+                    মোট ছবি: {(galleryItems || DEFAULT_GALLERY_ITEMS).length} টি
+                  </span>
+                </div>
+              </div>
+
+              {/* Add New Gallery Photo Form */}
+              <div className="bg-pink-50/40 p-6 rounded-2xl border border-pink-100">
+                <h4 className="text-base font-bold text-pink-950 mb-3 flex items-center gap-2">
+                  <i className="fas fa-plus-circle text-pink-600"></i> নতুন ছবি যোগ করুন
+                </h4>
+                <form onSubmit={handleAddGalleryPhoto} className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">
+                        ছবির ফাইল আপলোড (কম্প্রেসড ও অপ্টিমাইজড)
+                      </label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleImageChange(e, setNewGalleryPhoto, newGalleryPhoto)}
+                        className="w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-pink-100 file:text-pink-700 hover:file:bg-pink-200 cursor-pointer"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">
+                        অথবা ছবির অনলাইন URL / লিংক
+                      </label>
+                      <input
+                        type="text"
+                        value={newGalleryPhoto.url}
+                        onChange={(e) => setNewGalleryPhoto({ ...newGalleryPhoto, url: e.target.value })}
+                        placeholder="উদা: header image.jpg বা https://..."
+                        className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-pink-500 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Photo Preview if selected */}
+                  {(newGalleryPhoto.image || newGalleryPhoto.url) && (
+                    <div className="flex items-center gap-4 p-3 bg-white rounded-xl border border-pink-200">
+                      <img
+                        src={newGalleryPhoto.image || newGalleryPhoto.url}
+                        alt="Preview"
+                        className="w-24 h-16 object-cover rounded-lg border shadow-xs"
+                      />
+                      <div className="text-xs text-gray-600">
+                        <span className="font-bold text-pink-700">ছবি প্রাকদর্শন:</span> {newGalleryPhoto.image ? 'ডিভাইস ফাইল আপলোড' : 'ওয়েব লিংক'}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">বাংলা ক্যাপশন *</label>
+                      <input
+                        type="text"
+                        value={newGalleryPhoto.captionBn}
+                        onChange={(e) => setNewGalleryPhoto({ ...newGalleryPhoto, captionBn: e.target.value })}
+                        placeholder="উদা: শ্রীশ্রী মা মনসা মন্দির তোরণ ও মূল প্রাঙ্গণ"
+                        className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-pink-500 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">English Caption (ঐচ্ছিক)</label>
+                      <input
+                        type="text"
+                        value={newGalleryPhoto.captionEn}
+                        onChange={(e) => setNewGalleryPhoto({ ...newGalleryPhoto, captionEn: e.target.value })}
+                        placeholder="e.g. Temple Entrance & Main Courtyard"
+                        className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-pink-500 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end">
+                    <button
+                      type="submit"
+                      disabled={isSaving}
+                      className="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white font-bold px-6 py-2.5 rounded-xl transition-all shadow-md flex items-center gap-2 text-sm disabled:opacity-50"
+                    >
+                      {isSaving ? <><i className="fas fa-spinner fa-spin"></i> সংরক্ষণ হচ্ছে...</> : <><i className="fas fa-plus"></i> গ্যালারিতে ছবি যোগ করুন</>}
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              {/* Existing Gallery Photos List / Grid */}
+              <div>
+                <h4 className="text-base font-bold text-gray-800 mb-4 flex items-center justify-between">
+                  <span className="flex items-center gap-2">
+                    <i className="fas fa-layer-group text-pink-600"></i> বর্তমান গ্যালারি আলোকচিত্র তালিকা
+                  </span>
+                  <span className="text-xs font-normal text-gray-500">
+                    (বাম/ডান অ্যারো দিয়ে হোমপেজে প্রদর্শনের ক্রম পরিবর্তন করতে পারেন)
+                  </span>
+                </h4>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {(galleryItems || DEFAULT_GALLERY_ITEMS).map((item, index) => {
+                    const isEditing = editingGalleryId === item.id;
+                    const totalCount = (galleryItems || DEFAULT_GALLERY_ITEMS).length;
+
+                    return (
+                      <div
+                        key={item.id || index}
+                        className={`p-4 rounded-2xl border transition-all ${
+                          isEditing
+                            ? 'border-pink-500 bg-pink-50/50 shadow-md ring-2 ring-pink-300'
+                            : 'border-gray-200 bg-white hover:border-pink-200 shadow-xs'
+                        }`}
+                      >
+                        {isEditing ? (
+                          /* Edit Form */
+                          <form onSubmit={handleUpdateGalleryPhoto} className="space-y-3">
+                            <div className="flex items-center justify-between pb-2 border-b">
+                              <span className="text-xs font-bold text-pink-700">ছবি সম্পাদনা #{index + 1}</span>
+                              <button
+                                type="button"
+                                onClick={() => setEditingGalleryId(null)}
+                                className="text-gray-400 hover:text-gray-600 text-xs"
+                              >
+                                <i className="fas fa-times"></i> বাতিল
+                              </button>
+                            </div>
+
+                            <div className="flex gap-3 items-center">
+                              <img
+                                src={editGalleryPhoto.image || editGalleryPhoto.url || item.url}
+                                alt="Current"
+                                className="w-20 h-14 object-cover rounded-lg border shadow-xs shrink-0"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <label className="block text-[11px] font-bold text-gray-600 mb-0.5">নতুন ছবি ফাইল (ঐচ্ছিক)</label>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => handleImageChange(e, setEditGalleryPhoto, editGalleryPhoto)}
+                                  className="w-full text-[11px] text-gray-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-pink-100 file:text-pink-700 cursor-pointer"
+                                />
+                              </div>
+                            </div>
+
+                            <div>
+                              <label className="block text-[11px] font-bold text-gray-700 mb-0.5">বাংলা ক্যাপশন</label>
+                              <input
+                                type="text"
+                                value={editGalleryPhoto.captionBn}
+                                onChange={(e) => setEditGalleryPhoto({ ...editGalleryPhoto, captionBn: e.target.value })}
+                                className="w-full px-2.5 py-1.5 border rounded-lg text-xs focus:ring-2 focus:ring-pink-500 focus:outline-none"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-[11px] font-bold text-gray-700 mb-0.5">English Caption</label>
+                              <input
+                                type="text"
+                                value={editGalleryPhoto.captionEn}
+                                onChange={(e) => setEditGalleryPhoto({ ...editGalleryPhoto, captionEn: e.target.value })}
+                                className="w-full px-2.5 py-1.5 border rounded-lg text-xs focus:ring-2 focus:ring-pink-500 focus:outline-none"
+                              />
+                            </div>
+
+                            <div className="flex items-center justify-end gap-2 pt-2 border-t">
+                              <button
+                                type="button"
+                                onClick={() => setEditingGalleryId(null)}
+                                className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-xs font-bold transition-colors"
+                              >
+                                বাতিল
+                              </button>
+                              <button
+                                type="submit"
+                                disabled={isSaving}
+                                className="px-4 py-1.5 bg-pink-600 hover:bg-pink-700 text-white rounded-lg text-xs font-bold shadow-xs transition-colors"
+                              >
+                                {isSaving ? 'সংরক্ষণ...' : 'আপডেট করুন'}
+                              </button>
+                            </div>
+                          </form>
+                        ) : (
+                          /* View Card */
+                          <div>
+                            <div className="relative aspect-[16/10] rounded-xl overflow-hidden bg-gray-100 mb-3 border">
+                              <img
+                                src={item.url}
+                                alt={item.captionBn || `Gallery ${index + 1}`}
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute top-2 left-2 bg-black/70 backdrop-blur-xs text-white px-2 py-0.5 rounded-full text-[10px] font-mono font-bold">
+                                #{index + 1}
+                              </div>
+                            </div>
+
+                            <div className="mb-3 space-y-1">
+                              <p className="font-bold text-gray-900 text-sm line-clamp-1">{item.captionBn || 'ক্যাপশন নেই'}</p>
+                              {item.captionEn && (
+                                <p className="text-xs text-gray-500 italic line-clamp-1">{item.captionEn}</p>
+                              )}
+                            </div>
+
+                            <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                              <div className="flex items-center gap-1">
+                                <button
+                                  type="button"
+                                  onClick={() => handleMoveGalleryPhoto(index, -1)}
+                                  disabled={index === 0}
+                                  className="w-7 h-7 rounded-lg bg-gray-100 hover:bg-pink-100 text-gray-600 hover:text-pink-700 flex items-center justify-center transition-colors disabled:opacity-30 disabled:pointer-events-none"
+                                  title="বামে / পূর্বে সরান"
+                                >
+                                  <i className="fas fa-arrow-left text-[11px]"></i>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleMoveGalleryPhoto(index, 1)}
+                                  disabled={index === totalCount - 1}
+                                  className="w-7 h-7 rounded-lg bg-gray-100 hover:bg-pink-100 text-gray-600 hover:text-pink-700 flex items-center justify-center transition-colors disabled:opacity-30 disabled:pointer-events-none"
+                                  title="ডানে / পরে সরান"
+                                >
+                                  <i className="fas fa-arrow-right text-[11px]"></i>
+                                </button>
+                              </div>
+
+                              <div className="flex items-center gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => handleStartEditGalleryPhoto(item)}
+                                  className="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded-lg text-xs font-bold transition-colors flex items-center gap-1"
+                                >
+                                  <i className="fas fa-edit text-[10px]"></i> সম্পাদনা
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteGalleryPhoto(item.id)}
+                                  className="w-7 h-7 rounded-lg text-red-500 hover:bg-red-50 flex items-center justify-center transition-colors"
+                                  title="মুছে ফেলুন"
+                                >
+                                  <i className="fas fa-trash-alt text-xs"></i>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 16. Security & Credentials Tab */}
+          {activeTab === 'security' && (
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100 max-w-xl mx-auto">
+              <div className="flex items-center gap-3 pb-4 border-b mb-6">
+                <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-xl border border-rose-200">
+                  <i className="fas fa-shield-halved"></i>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-800">এডমিন আইডি ও পাসওয়ার্ড পরিবর্তন</h3>
+                  <p className="text-xs text-gray-500 mt-0.5">প্যানেলে প্রবেশের ইউজার আইডি ও নিরাপদ পাসওয়ার্ড হালনাগাদ করুন</p>
+                </div>
+              </div>
+
+              {credMsg.text && (
+                <div className={`p-4 rounded-xl mb-5 text-sm font-medium border flex items-center gap-2.5 ${
+                  credMsg.type === 'success'
+                    ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                    : 'bg-rose-50 text-rose-800 border-rose-200'
+                }`}>
+                  <i className={`fas ${credMsg.type === 'success' ? 'fa-check-circle text-emerald-600' : 'fa-circle-exclamation text-rose-600'}`}></i>
+                  <span>{credMsg.text}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleUpdateCredentials} className="space-y-5">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                    এডমিন ইউজার আইডি / ইমেইল *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={credForm.username}
+                    onChange={(e) => setCredForm({ ...credForm, username: e.target.value })}
+                    placeholder="admin@manasamondirgoila.com"
+                    className="w-full px-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none"
+                  />
+                  <p className="text-[11px] text-gray-500 mt-1">লগইনের জন্য এই ইউজার আইডিটি ব্যবহার করা হবে।</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                    নতুন পাসওয়ার্ড (পরিবর্তন করতে চাইলে লিখুন)
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showCredPass ? 'text' : 'password'}
+                      value={credForm.newPassword}
+                      onChange={(e) => setCredForm({ ...credForm, newPassword: e.target.value })}
+                      placeholder="কমপক্ষে ৪ অক্ষরের নতুন পাসওয়ার্ড"
+                      className="w-full px-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowCredPass(!showCredPass)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs p-1"
+                    >
+                      <i className={`fas ${showCredPass ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                    নতুন পাসওয়ার্ড নিশ্চিত করুন
+                  </label>
+                  <input
+                    type={showCredPass ? 'text' : 'password'}
+                    value={credForm.confirmPassword}
+                    onChange={(e) => setCredForm({ ...credForm, confirmPassword: e.target.value })}
+                    placeholder="নতুন পাসওয়ার্ডটি আবার লিখুন"
+                    className="w-full px-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none"
+                  />
+                </div>
+
+                <div className="pt-3 border-t flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={isSaving}
+                    className="bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white font-bold px-7 py-3 rounded-xl transition-all shadow-md flex items-center gap-2 text-sm disabled:opacity-50"
+                  >
+                    {isSaving ? <><i className="fas fa-spinner fa-spin"></i> সংরক্ষণ হচ্ছে...</> : <><i className="fas fa-key"></i> পাসওয়ার্ড সংরক্ষণ করুন</>}
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -6660,6 +8845,51 @@ function App() {
       return saved ? JSON.parse(saved) : PRELOADED_DATA.mantras;
     } catch (e) {
       return PRELOADED_DATA.mantras;
+    }
+  });
+
+  const [pujaBookings, setPujaBookings] = useState(() => {
+    try {
+      const saved = localStorage.getItem('mmg_puja_bookings');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+
+  const [donationReceipts, setDonationReceipts] = useState(() => {
+    try {
+      const saved = localStorage.getItem('mmg_donation_receipts') || localStorage.getItem('temple_donation_receipts');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+
+  const [royaniPalas, setRoyaniPalas] = useState(() => {
+    try {
+      const saved = localStorage.getItem('temple_royani_palas');
+      return saved ? JSON.parse(saved) : DEFAULT_ROYANI_PALAS;
+    } catch (e) {
+      return DEFAULT_ROYANI_PALAS;
+    }
+  });
+
+  const [templeHistory, setTempleHistory] = useState(() => {
+    try {
+      const saved = localStorage.getItem('temple_history_data');
+      return saved ? JSON.parse(saved) : DEFAULT_TEMPLE_HISTORY;
+    } catch (e) {
+      return DEFAULT_TEMPLE_HISTORY;
+    }
+  });
+
+  const [galleryItems, setGalleryItems] = useState(() => {
+    try {
+      const saved = localStorage.getItem('temple_gallery_items');
+      return saved ? JSON.parse(saved) : DEFAULT_GALLERY_ITEMS;
+    } catch (e) {
+      return DEFAULT_GALLERY_ITEMS;
     }
   });
 
@@ -6853,6 +9083,53 @@ function App() {
             localStorage.setItem('temple_admin_credentials', ac.value);
           } catch (e) { }
         }
+
+        const pb = settingsData.find(s => s.key === 'puja_bookings');
+        if (pb && pb.value) {
+          try {
+            const parsed = JSON.parse(pb.value);
+            setPujaBookings(parsed);
+            localStorage.setItem('mmg_puja_bookings', pb.value);
+          } catch (e) { }
+        }
+
+        const dr = settingsData.find(s => s.key === 'donation_receipts');
+        if (dr && dr.value) {
+          try {
+            const parsed = JSON.parse(dr.value);
+            setDonationReceipts(parsed);
+            localStorage.setItem('mmg_donation_receipts', dr.value);
+          } catch (e) { }
+        }
+
+        const rp = settingsData.find(s => s.key === 'royani_palas');
+        if (rp && rp.value) {
+          try {
+            const parsed = JSON.parse(rp.value);
+            setRoyaniPalas(parsed);
+            localStorage.setItem('temple_royani_palas', rp.value);
+          } catch (e) { }
+        }
+
+        const th = settingsData.find(s => s.key === 'temple_history');
+        if (th && th.value) {
+          try {
+            const parsed = JSON.parse(th.value);
+            setTempleHistory(parsed);
+            localStorage.setItem('temple_history_data', th.value);
+          } catch (e) { }
+        }
+
+        const gi = settingsData.find(s => s.key === 'gallery_items');
+        if (gi && gi.value) {
+          try {
+            const parsed = JSON.parse(gi.value);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setGalleryItems(parsed);
+              localStorage.setItem('temple_gallery_items', gi.value);
+            }
+          } catch (e) { }
+        }
       }
 
       const { data: committeeData } = await supabaseClient.from('committee').select('id, name, role, phone, order_idx, image').order('order_idx', { ascending: true }).order('id', { ascending: true });
@@ -6904,17 +9181,16 @@ function App() {
 
   const renderPage = () => {
     switch (currentPage) {
-      case 'home': return <Home dbError={dbError} marqueeText={marqueeText} marqueeTextEn={marqueeTextEn} testimonials={testimonials} featuredTestimonialIds={featuredTestimonialIds} committeeMembers={committeeMembers} events={events} notices={notices} timings={timings} travelInfo={travelInfo} mantras={mantras} navigateTo={navigateTo} showToast={showToast} lang={lang} />;
+      case 'home': return <Home dbError={dbError} marqueeText={marqueeText} marqueeTextEn={marqueeTextEn} testimonials={testimonials} featuredTestimonialIds={featuredTestimonialIds} committeeMembers={committeeMembers} events={events} notices={notices} timings={timings} travelInfo={travelInfo} mantras={mantras} galleryItems={galleryItems} navigateTo={navigateTo} showToast={showToast} lang={lang} />;
       case 'timings': return <TimingsPage timings={timings} navigateTo={navigateTo} lang={lang} />;
       case 'travel': return <TravelPage travelInfo={travelInfo} navigateTo={navigateTo} lang={lang} showToast={showToast} />;
       case 'mantras': return <MantrasPage mantras={mantras} navigateTo={navigateTo} lang={lang} showToast={showToast} />;
       case 'committee': return <CommitteePage committeeMembers={committeeMembers} navigateTo={navigateTo} lang={lang} />;
       case 'testimonials': return <TestimonialsPage testimonials={testimonials} navigateTo={navigateTo} lang={lang} />;
-      case 'donation': return <DonationPage donations={donations} navigateTo={navigateTo} showToast={showToast} lang={lang} defaultTab="methods" />;
-      case 'receipt': return <DonationPage donations={donations} navigateTo={navigateTo} showToast={showToast} lang={lang} defaultTab="receipt" />;
-      case 'history': return <HistoryPage navigateTo={navigateTo} lang={lang} />;
-      case 'booking': return <BookingPage navigateTo={navigateTo} showToast={showToast} lang={lang} />;
-      case 'royani': return <RoyaniPage navigateTo={navigateTo} showToast={showToast} lang={lang} />;
+      case 'donation': return <DonationPage donations={donations} donationReceipts={donationReceipts} setDonationReceipts={setDonationReceipts} supabaseClient={supabaseClient} navigateTo={navigateTo} showToast={showToast} lang={lang} />;
+      case 'history': return <HistoryPage templeHistory={templeHistory} navigateTo={navigateTo} lang={lang} />;
+      case 'booking': return <BookingPage pujaBookings={pujaBookings} setPujaBookings={setPujaBookings} supabaseClient={supabaseClient} navigateTo={navigateTo} showToast={showToast} lang={lang} />;
+      case 'royani': return <RoyaniPage royaniPalas={royaniPalas} navigateTo={navigateTo} showToast={showToast} lang={lang} />;
       case 'event': return <EventsPage events={events} navigateTo={navigateTo} showToast={showToast} lang={lang} />;
       case 'notice': return <NoticeBoardPage notices={notices} navigateTo={navigateTo} lang={lang} />;
       case 'admin': return <AdminPanel
@@ -6930,10 +9206,15 @@ function App() {
         timings={timings} setTimings={setTimings}
         travelInfo={travelInfo} setTravelInfo={setTravelInfo}
         mantras={mantras} setMantras={setMantras}
+        pujaBookings={pujaBookings} setPujaBookings={setPujaBookings}
+        donationReceipts={donationReceipts} setDonationReceipts={setDonationReceipts}
+        royaniPalas={royaniPalas} setRoyaniPalas={setRoyaniPalas}
+        templeHistory={templeHistory} setTempleHistory={setTempleHistory}
         adminCredentials={adminCredentials} setAdminCredentials={setAdminCredentials}
+        galleryItems={galleryItems} setGalleryItems={setGalleryItems}
         showToast={showToast}
       />;
-      default: return <Home dbError={dbError} marqueeText={marqueeText} marqueeTextEn={marqueeTextEn} testimonials={testimonials} featuredTestimonialIds={featuredTestimonialIds} committeeMembers={committeeMembers} events={events} notices={notices} timings={timings} travelInfo={travelInfo} mantras={mantras} navigateTo={navigateTo} showToast={showToast} lang={lang} />;
+      default: return <Home dbError={dbError} marqueeText={marqueeText} marqueeTextEn={marqueeTextEn} testimonials={testimonials} featuredTestimonialIds={featuredTestimonialIds} committeeMembers={committeeMembers} events={events} notices={notices} timings={timings} travelInfo={travelInfo} mantras={mantras} galleryItems={galleryItems} navigateTo={navigateTo} showToast={showToast} lang={lang} />;
     }
   };
 

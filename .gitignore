@@ -3,3 +3,7 @@ node_modules/
 *.log
 .env
 .vercel
+*.lock
+supabase_data.json
+*.sql
+
