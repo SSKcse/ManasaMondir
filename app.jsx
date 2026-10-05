@@ -731,12 +731,110 @@ const printReceiptDirectly = (receipt, currentLang = 'bn') => {
   printWindow.document.close();
 };
 
+// --- Media & Video Helpers ---
+const isVideoUrl = (url) => {
+  if (!url) return false;
+  const str = String(url).toLowerCase().trim();
+  return (
+    str.startsWith('data:video/') ||
+    str.endsWith('.mp4') ||
+    str.endsWith('.webm') ||
+    str.endsWith('.ogg') ||
+    str.endsWith('.mov') ||
+    str.includes('youtube.com') ||
+    str.includes('youtu.be')
+  );
+};
+
+const getYouTubeEmbedUrl = (url) => {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/)([^#\&\?]*).*/;
+  const match = String(url).match(regExp);
+  return (match && match[2].length === 11) ? `https://www.youtube-nocookie.com/embed/${match[2]}` : null;
+};
+
+const compressImageFile = (file) => {
+  return new Promise((resolve, reject) => {
+    if (!file) return resolve(null);
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => resolve(reader.result);
+      img.onload = () => {
+        const maxDim = 1280;
+        let w = img.width;
+        let h = img.height;
+        if (w > maxDim || h > maxDim) {
+          if (w > h) {
+            h = Math.round((h * maxDim) / w);
+            w = maxDim;
+          } else {
+            w = Math.round((w * maxDim) / h);
+            h = maxDim;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.82));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+};
+
+const readVideoFile = (file) => {
+  return new Promise((resolve, reject) => {
+    if (!file) return resolve(null);
+    if (file.size > 40 * 1024 * 1024) {
+      return reject(new Error('ভিডিও ফাইলটি ৪০MB এর চেয়ে ছোট হতে হবে। বড় ভিডিওর জন্য অনুগ্রহ করে YouTube বা অনলাইন ভিডিও লিংক দিন।'));
+    }
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = () => resolve(reader.result);
+    reader.readAsDataURL(file);
+  });
+};
+
+const MediaViewer = ({ url, isVideo, alt = "Media", className = "w-full h-full object-cover", controls = true, autoPlay = false, loop = false }) => {
+  const isVid = isVideo || isVideoUrl(url);
+  if (isVid) {
+    const ytEmbed = getYouTubeEmbedUrl(url);
+    if (ytEmbed) {
+      return (
+        <iframe
+          src={`${ytEmbed}?autoplay=${autoPlay ? 1 : 0}&loop=${loop ? 1 : 0}&rel=0`}
+          className="w-full h-full border-0 rounded-inherit"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          title={alt}
+        />
+      );
+    }
+    return (
+      <video
+        src={url}
+        controls={controls}
+        playsInline
+        autoPlay={autoPlay}
+        loop={loop}
+        className={`${className} bg-black`}
+      />
+    );
+  }
+  return <img src={url} alt={alt} className={className} />;
+};
+
 // গ্যালারির ছবিগুলো
 const DEFAULT_GALLERY_ITEMS = [
-  { id: 'gal_1', url: 'header image.jpg', captionBn: 'শ্রীশ্রী মা মনসা মন্দির তোরণ ও মূল প্রাঙ্গণ', captionEn: 'Temple Entrance & Main Courtyard' },
-  { id: 'gal_2', url: 'gallary image.png', captionBn: 'ঐতিহাসিক শ্রীশ্রী মা মনসা মন্দির নাটমন্দির', captionEn: 'Historic Natmandir of Manasa Temple' },
-  { id: 'gal_3', url: 'ma manasa mondir font.jpg', captionBn: 'শ্রীশ্রী মা মনসা মন্দিরের পবিত্র সম্মুখভাগ', captionEn: 'Front Façade of Sacred Sanctum' },
-  { id: 'gal_4', url: 'ma manasa mondir lake dighi view.jpg', captionBn: 'মনসা মন্দিরের পবিত্র ঘটের দীঘি ও মনোরম পরিবেশ', captionEn: 'Sacred Temple Lake (Ghoter Dighi)' }
+  { id: 'gal_1', url: 'header image.jpg', captionBn: 'শ্রীশ্রী মা মনসা মন্দির তোরণ ও মূল প্রাঙ্গণ', captionEn: 'Temple Entrance & Main Courtyard', mediaType: 'image' },
+  { id: 'gal_2', url: 'gallary image.png', captionBn: 'ঐতিহাসিক শ্রীশ্রী মা মনসা মন্দির নাটমন্দির', captionEn: 'Historic Natmandir of Manasa Temple', mediaType: 'image' },
+  { id: 'gal_3', url: 'ma manasa mondir font.jpg', captionBn: 'শ্রীশ্রী মা মনসা মন্দিরের পবিত্র সম্মুখভাগ', captionEn: 'Front Façade of Sacred Sanctum', mediaType: 'image' },
+  { id: 'gal_4', url: 'ma manasa mondir lake dighi view.jpg', captionBn: 'মনসা মন্দিরের পবিত্র ঘটের দীঘি ও মনোরম পরিবেশ', captionEn: 'Sacred Temple Lake (Ghoter Dighi)', mediaType: 'image' }
 ];
 
 const galleryImages = DEFAULT_GALLERY_ITEMS.map(g => g.url);
@@ -1948,11 +2046,15 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
   const displayTests = featuredTests.length > 0 ? featuredTests : testimonials.slice(0, 3);
 
   useEffect(() => {
+    const currentItem = activeGallery[currentImg];
+    const isVid = currentItem && (currentItem.mediaType === 'video' || isVideoUrl(currentItem.url));
+    if (isVid) return; // Do not auto-advance if user is watching a video
+
     const timer = setInterval(() => {
       setCurrentImg((prev) => (prev + 1) % currentGalleryImages.length);
-    }, 4000);
+    }, 4500);
     return () => clearInterval(timer);
-  }, [currentGalleryImages.length]);
+  }, [currentImg, currentGalleryImages.length, activeGallery]);
 
   useEffect(() => {
     if (displayTests.length <= 1) return;
@@ -2191,25 +2293,34 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
           {/* Main Showcase Frame with Gold Rim & Ambient Glow */}
           <div className="relative p-2 sm:p-3 bg-gradient-to-br from-amber-200 via-amber-400/50 to-orange-300 rounded-[2rem] shadow-[0_20px_50px_-15px_rgba(234,88,12,0.22)] border border-amber-300/80 group">
             <div
-              onClick={(e) => openLightbox(currentImg, e)}
+              onClick={(e) => {
+                const currentItem = activeGallery[currentImg];
+                const isVid = currentItem && (currentItem.mediaType === 'video' || isVideoUrl(currentItem.url));
+                if (!isVid) openLightbox(currentImg, e);
+              }}
               className="relative w-full aspect-[16/10] sm:aspect-video rounded-[1.4rem] overflow-hidden bg-stone-900 select-none shadow-inner cursor-pointer"
-              title={lang === 'en' ? 'Click to open full screen preview' : 'পূর্ণ আকারে ছবি দেখতে ক্লিক করুন'}
+              title={lang === 'en' ? 'Click to open full screen preview' : 'পূর্ণ আকারে দেখতে ক্লিক করুন'}
             >
-              {currentGalleryImages.map((img, index) => (
-                <div
-                  key={index}
-                  onClick={(e) => openLightbox(currentImg, e)}
-                  className={`absolute inset-0 w-full h-full transition-opacity duration-700 flex items-center justify-center bg-stone-900 cursor-pointer ${index === currentImg ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}
-                >
-                  <img
-                    src={img}
-                    alt={currentGalleryCaptions[index] ? (lang === 'en' ? currentGalleryCaptions[index].en : currentGalleryCaptions[index].bn) : `Gallery ${index + 1}`}
-                    className="w-full h-full object-cover transform duration-700 ease-out group-hover:scale-103 pointer-events-none"
-                  />
-                </div>
-              ))}
+              {activeGallery.map((item, index) => {
+                const isVid = item.mediaType === 'video' || isVideoUrl(item.url);
+                const caption = lang === 'en' ? (item.captionEn || item.captionBn) : (item.captionBn || item.captionEn);
+                return (
+                  <div
+                    key={item.id || index}
+                    className={`absolute inset-0 w-full h-full transition-opacity duration-700 flex items-center justify-center bg-stone-900 ${index === currentImg ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'}`}
+                  >
+                    <MediaViewer
+                      url={item.url}
+                      isVideo={isVid}
+                      alt={caption || `Gallery ${index + 1}`}
+                      className="w-full h-full object-cover"
+                      controls={true}
+                    />
+                  </div>
+                );
+              })}
 
-              {/* Prev / Next Chevrons - Positioned cleanly on edges without blocking the photo */}
+              {/* Prev / Next Chevrons */}
               <button
                 onClick={(e) => { e.stopPropagation(); prevImg(); }}
                 aria-label={t('prevPhoto', lang)}
@@ -2225,25 +2336,25 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
                 <i className="fas fa-chevron-right text-xs sm:text-base"></i>
               </button>
 
-              {/* Subtle Zoom Pill on Hover (non-obstructive corner cue) */}
+              {/* Zoom Pill on Hover */}
               <div className="absolute bottom-3 right-3 z-20 opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
                 <button
                   onClick={(e) => openLightbox(currentImg, e)}
                   className="bg-black/70 hover:bg-amber-500 text-amber-200 hover:text-amber-950 text-xs px-2.5 py-1 rounded-full border border-white/20 flex items-center gap-1.5 shadow-md cursor-pointer transition-colors"
                 >
                   <i className="fas fa-expand text-[10px]"></i>
-                  <span>{lang === 'en' ? 'Full View' : 'পূর্ণ ছবি'}</span>
+                  <span>{lang === 'en' ? 'Full View' : 'পূর্ণ পর্দা'}</span>
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Dedicated Photo Caption & Control Bar (Outside photo for 100% unobstructed image visibility) */}
+          {/* Dedicated Media Caption & Control Bar */}
           <div className="mt-3.5 bg-white/95 backdrop-blur-md rounded-2xl px-4 py-3 sm:py-3.5 border border-amber-200/90 shadow-md flex flex-col sm:flex-row items-center justify-between gap-3">
-            {/* Photo Caption */}
+            {/* Media Caption */}
             <div className="flex items-center gap-3 text-center sm:text-left min-w-0">
               <span className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-white flex items-center justify-center shrink-0 shadow-xs">
-                <i className="fas fa-camera text-xs"></i>
+                <i className={(activeGallery[currentImg]?.mediaType === 'video' || isVideoUrl(activeGallery[currentImg]?.url)) ? "fas fa-video text-xs" : "fas fa-camera text-xs"}></i>
               </span>
               <p className="text-sm sm:text-base font-bold text-amber-950 font-serif truncate">
                 {currentGalleryCaptions[currentImg] ? (lang === 'en' ? currentGalleryCaptions[currentImg].en : currentGalleryCaptions[currentImg].bn) : ''}
@@ -2254,11 +2365,11 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
             <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
               {/* Pagination Dots */}
               <div className="flex items-center gap-1.5 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-200/80 shadow-2xs">
-                {currentGalleryImages.map((_, i) => (
+                {activeGallery.map((_, i) => (
                   <button
                     key={i}
                     onClick={() => setCurrentImg(i)}
-                    aria-label={`Photo ${i + 1}`}
+                    aria-label={`Media ${i + 1}`}
                     className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${i === currentImg
                         ? 'w-6 bg-gradient-to-r from-amber-500 to-orange-500 shadow-xs'
                         : 'w-2 bg-amber-300 hover:bg-amber-400'
@@ -2267,18 +2378,18 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
                 ))}
               </div>
 
-              {/* Photo Counter */}
+              {/* Counter */}
               <span className="bg-amber-100 text-amber-900 font-bold text-xs sm:text-sm px-3 py-1 rounded-full border border-amber-300 font-mono tracking-wider shadow-2xs">
                 <span className="text-amber-700">{toBengaliDigits(currentImg + 1)}</span>
                 <span className="text-amber-400 font-normal mx-1">/</span>
-                <span>{toBengaliDigits(currentGalleryImages.length)}</span>
+                <span>{toBengaliDigits(activeGallery.length)}</span>
               </span>
 
               {/* Fullscreen Button */}
               <button
                 onClick={(e) => openLightbox(currentImg, e)}
                 className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-xs sm:text-sm flex items-center gap-1.5 shadow-md hover:shadow-lg active:scale-95 transition-all cursor-pointer"
-                title={lang === 'en' ? 'Open Full Screen Preview' : 'পূর্ণ আকারে ছবি দেখুন'}
+                title={lang === 'en' ? 'Open Full Screen Preview' : 'পূর্ণ আকারে দেখুন'}
               >
                 <i className="fas fa-expand text-xs"></i>
                 <span>{lang === 'en' ? 'Full Screen' : 'ফুল স্ক্রিন'}</span>
@@ -2286,35 +2397,49 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
             </div>
           </div>
 
-          {/* Interactive Thumbnail Strip */}
+          {/* Interactive Thumbnail Strip with Video Badges */}
           <div className="grid grid-cols-4 gap-2.5 sm:gap-4 mt-3.5 px-1">
-            {currentGalleryImages.map((img, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentImg(i)}
-                onDoubleClick={(e) => openLightbox(i, e)}
-                className={`relative aspect-[16/10] rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-300 cursor-pointer border-2 ${i === currentImg
-                    ? 'border-amber-500 ring-2 ring-amber-400/40 shadow-md scale-[1.02]'
-                    : 'border-white/80 hover:border-amber-300 opacity-70 hover:opacity-100'
-                  }`}
-              >
-                <img src={img} alt={`Thumb ${i}`} className="w-full h-full object-cover" />
-                {i === currentImg && (
-                  <div className="absolute inset-0 bg-amber-500/15 pointer-events-none"></div>
-                )}
-              </button>
-            ))}
+            {activeGallery.map((item, i) => {
+              const isVid = item.mediaType === 'video' || isVideoUrl(item.url);
+              return (
+                <button
+                  key={item.id || i}
+                  onClick={() => setCurrentImg(i)}
+                  onDoubleClick={(e) => openLightbox(i, e)}
+                  className={`relative aspect-[16/10] rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-300 cursor-pointer border-2 ${i === currentImg
+                      ? 'border-amber-500 ring-2 ring-amber-400/40 shadow-md scale-[1.02]'
+                      : 'border-white/80 hover:border-amber-300 opacity-70 hover:opacity-100'
+                    }`}
+                >
+                  {isVid ? (
+                    <div className="w-full h-full bg-stone-900 flex flex-col items-center justify-center relative group">
+                      <div className="w-8 h-8 rounded-full bg-amber-500/80 text-white flex items-center justify-center shadow-md">
+                        <i className="fas fa-play text-xs ml-0.5"></i>
+                      </div>
+                      <span className="absolute bottom-1 right-1 bg-black/80 text-amber-300 text-[9px] px-1.5 py-0.5 rounded font-bold flex items-center gap-0.5">
+                        <i className="fas fa-video text-[8px]"></i> ভিডিও
+                      </span>
+                    </div>
+                  ) : (
+                    <img src={item.url} alt={`Thumb ${i}`} className="w-full h-full object-cover" />
+                  )}
+                  {i === currentImg && (
+                    <div className="absolute inset-0 bg-amber-500/15 pointer-events-none"></div>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Fullscreen Image Lightbox Modal (Portaled directly to document.body) */}
+        {/* Fullscreen Media Lightbox Modal (Portaled directly to document.body) */}
         {lightboxImg !== null && typeof document !== 'undefined' && ReactDOM.createPortal(
           <div
             id="fullscreen-lightbox"
             className="fixed inset-0 z-[999999] flex flex-col items-center justify-between p-3 sm:p-6 bg-black/95 select-none"
             style={{ backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}
           >
-            {/* Dedicated Backdrop (Clicking background closes modal) */}
+            {/* Dedicated Backdrop */}
             <div
               className="absolute inset-0 bg-black/85 cursor-pointer -z-10"
               onClick={closeLightbox}
@@ -2325,7 +2450,7 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
             <div className="w-full max-w-6xl flex items-center justify-between text-white py-2 px-2 z-20">
               <div className="flex items-center gap-3">
                 <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 px-3.5 py-1 rounded-full text-xs sm:text-sm font-mono font-bold tracking-wider">
-                  {toBengaliDigits(lightboxImg + 1)} / {toBengaliDigits(currentGalleryImages.length)}
+                  {toBengaliDigits(lightboxImg + 1)} / {toBengaliDigits(activeGallery.length)}
                 </span>
                 <span className="text-sm sm:text-base font-semibold text-amber-100 font-serif hidden md:inline truncate max-w-md">
                   {currentGalleryCaptions[lightboxImg] ? (lang === 'en' ? currentGalleryCaptions[lightboxImg].en : currentGalleryCaptions[lightboxImg].bn) : ''}
@@ -2362,35 +2487,40 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
               </div>
             </div>
 
-            {/* Lightbox Main Image Display */}
+            {/* Lightbox Main Media Display */}
             <div className="relative w-full max-w-5xl flex-1 flex items-center justify-center min-h-0 my-2 px-2 sm:px-14">
-              <img
-                src={currentGalleryImages[lightboxImg]}
-                alt={currentGalleryCaptions[lightboxImg] ? (lang === 'en' ? currentGalleryCaptions[lightboxImg].en : currentGalleryCaptions[lightboxImg].bn) : `Full view ${lightboxImg + 1}`}
-                className="max-w-full max-h-[72vh] sm:max-h-[78vh] object-contain rounded-xl shadow-2xl transition-all duration-300"
-              />
+              <div className="w-full h-full max-h-[72vh] sm:max-h-[78vh] flex items-center justify-center rounded-xl overflow-hidden">
+                <MediaViewer
+                  url={activeGallery[lightboxImg]?.url}
+                  isVideo={activeGallery[lightboxImg]?.mediaType === 'video' || isVideoUrl(activeGallery[lightboxImg]?.url)}
+                  alt={currentGalleryCaptions[lightboxImg] ? (lang === 'en' ? currentGalleryCaptions[lightboxImg].en : currentGalleryCaptions[lightboxImg].bn) : `Full view ${lightboxImg + 1}`}
+                  className="max-w-full max-h-[72vh] sm:max-h-[78vh] object-contain rounded-xl shadow-2xl"
+                  controls={true}
+                  autoPlay={true}
+                />
+              </div>
 
-              {/* Previous Photo Button */}
+              {/* Previous Media Button */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  setLightboxImg((prev) => (prev === 0 ? currentGalleryImages.length - 1 : prev - 1));
+                  setLightboxImg((prev) => (prev === 0 ? activeGallery.length - 1 : prev - 1));
                 }}
                 className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-amber-500 text-white hover:text-amber-950 border border-white/30 hover:border-amber-400 w-11 h-11 sm:w-14 sm:h-14 rounded-full flex items-center justify-center cursor-pointer transition-all shadow-2xl z-30 active:scale-90"
                 aria-label="Previous"
-                title={lang === 'en' ? 'Previous Photo' : 'পূর্ববর্তী ছবি'}
+                title={lang === 'en' ? 'Previous' : 'পূর্ববর্তী'}
               >
                 <i className="fas fa-chevron-left text-lg sm:text-xl"></i>
               </button>
-              {/* Next Photo Button */}
+              {/* Next Media Button */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  setLightboxImg((prev) => (prev + 1) % currentGalleryImages.length);
+                  setLightboxImg((prev) => (prev + 1) % activeGallery.length);
                 }}
                 className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-amber-500 text-white hover:text-amber-950 border border-white/30 hover:border-amber-400 w-11 h-11 sm:w-14 sm:h-14 rounded-full flex items-center justify-center cursor-pointer transition-all shadow-2xl z-30 active:scale-90"
                 aria-label="Next"
-                title={lang === 'en' ? 'Next Photo' : 'পরবর্তী ছবি'}
+                title={lang === 'en' ? 'Next' : 'পরবর্তী'}
               >
                 <i className="fas fa-chevron-right text-lg sm:text-xl"></i>
               </button>
@@ -2404,19 +2534,28 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
 
               {/* Thumbnails in Lightbox */}
               <div className="flex items-center gap-2 overflow-x-auto p-1 max-w-full">
-                {currentGalleryImages.map((img, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setLightboxImg(i)}
-                    className={`w-14 h-10 sm:w-18 sm:h-12 rounded-lg overflow-hidden border-2 transition-all cursor-pointer shrink-0 ${
-                      i === lightboxImg
-                        ? 'border-amber-400 scale-105 shadow-md shadow-amber-400/50'
-                        : 'border-white/30 opacity-60 hover:opacity-100'
-                    }`}
-                  >
-                    <img src={img} alt={`Thumb ${i}`} className="w-full h-full object-cover" />
-                  </button>
-                ))}
+                {activeGallery.map((item, i) => {
+                  const isVid = item.mediaType === 'video' || isVideoUrl(item.url);
+                  return (
+                    <button
+                      key={item.id || i}
+                      onClick={() => setLightboxImg(i)}
+                      className={`w-14 h-10 sm:w-18 sm:h-12 rounded-lg overflow-hidden border-2 transition-all cursor-pointer shrink-0 relative ${
+                        i === lightboxImg
+                          ? 'border-amber-400 scale-105 shadow-md shadow-amber-400/50'
+                          : 'border-white/30 opacity-60 hover:opacity-100'
+                      }`}
+                    >
+                      {isVid ? (
+                        <div className="w-full h-full bg-stone-900 flex items-center justify-center text-amber-400">
+                          <i className="fas fa-play text-xs"></i>
+                        </div>
+                      ) : (
+                        <img src={item.url} alt={`Thumb ${i}`} className="w-full h-full object-cover" />
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>,
@@ -4630,7 +4769,193 @@ const TestimonialsPage = ({ testimonials, navigateTo, lang }) => (
   </div>
 );
 
-// 6. Events Page (Upgraded with Rich Animations)
+// Event Card Component with Multi-Image Slider & Video Modal
+const EventCard = ({ event, showToast, lang }) => {
+  const [activeImgIdx, setActiveImgIdx] = useState(0);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+
+  const imagesList = (event.images && event.images.length > 0)
+    ? event.images
+    : (event.image ? [event.image] : []);
+
+  const hasVideo = !!event.video;
+
+  return (
+    <div className="bg-white rounded-3xl shadow-md border-2 border-orange-100/90 flex flex-col md:flex-row overflow-hidden card-hover-glow transition-all duration-300 group">
+      {/* Media Column (Image carousel or Video placeholder or Date block) */}
+      {imagesList.length > 0 ? (
+        <div className="md:w-5/12 h-72 md:h-auto relative overflow-hidden bg-gray-900 flex-shrink-0 select-none">
+          <img
+            src={imagesList[activeImgIdx]}
+            alt={`${event.title} ${activeImgIdx + 1}`}
+            className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
+            onError={(e) => { e.target.src = 'images/events/event_4.jpg'; }}
+          />
+
+          {/* Date Badge */}
+          <span className="absolute bottom-3 left-4 z-20 text-white text-xs font-bold bg-orange-600/90 backdrop-blur-sm px-3 py-1 rounded-md shadow flex items-center gap-1.5 border border-orange-500/50">
+            <i className="fas fa-calendar-alt"></i> {formatDate(event.date, lang)}
+          </span>
+
+          {/* Multiple Image Controls */}
+          {imagesList.length > 1 && (
+            <>
+              {/* Image Count Pill */}
+              <div className="absolute top-3 right-3 z-20 bg-black/70 backdrop-blur-md text-amber-300 text-xs px-2.5 py-1 rounded-full font-bold border border-white/20 flex items-center gap-1 shadow">
+                <i className="fas fa-images text-[11px]"></i>
+                <span>{toBengaliDigits(activeImgIdx + 1)} / {toBengaliDigits(imagesList.length)}</span>
+              </div>
+
+              {/* Prev / Next Arrows */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveImgIdx(prev => (prev === 0 ? imagesList.length - 1 : prev - 1));
+                }}
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 hover:bg-orange-600 text-white flex items-center justify-center transition-all z-20 shadow cursor-pointer active:scale-90"
+                aria-label="Previous Photo"
+              >
+                <i className="fas fa-chevron-left text-xs"></i>
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveImgIdx(prev => (prev + 1) % imagesList.length);
+                }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 hover:bg-orange-600 text-white flex items-center justify-center transition-all z-20 shadow cursor-pointer active:scale-90"
+                aria-label="Next Photo"
+              >
+                <i className="fas fa-chevron-right text-xs"></i>
+              </button>
+
+              {/* Indicator Dots */}
+              <div className="absolute bottom-3 right-3 z-20 flex gap-1 bg-black/40 px-2 py-1 rounded-full backdrop-blur-xs">
+                {imagesList.map((_, dotIdx) => (
+                  <button
+                    key={dotIdx}
+                    onClick={() => setActiveImgIdx(dotIdx)}
+                    className={`h-1.5 rounded-full transition-all cursor-pointer ${dotIdx === activeImgIdx ? 'w-4 bg-amber-400' : 'w-1.5 bg-white/60 hover:bg-white'}`}
+                  ></button>
+                ))}
+              </div>
+            </>
+          )}
+
+          {/* Video Quick Play Badge overlay on image if event has video */}
+          {hasVideo && (
+            <button
+              onClick={() => setIsVideoModalOpen(true)}
+              className="absolute top-3 left-3 z-20 bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white text-xs px-3 py-1 rounded-full font-bold shadow-lg flex items-center gap-1.5 border border-white/30 cursor-pointer active:scale-95 transition-transform"
+            >
+              <i className="fas fa-play text-[10px]"></i>
+              <span>{lang === 'en' ? 'Watch Video' : 'ভিডিও দেখুন'}</span>
+            </button>
+          )}
+        </div>
+      ) : hasVideo ? (
+        <div className="md:w-5/12 h-64 md:h-auto relative overflow-hidden bg-black flex-shrink-0 flex items-center justify-center p-2">
+          <MediaViewer
+            url={event.video}
+            isVideo={true}
+            alt={event.title}
+            className="w-full h-full object-cover rounded-xl"
+            controls={true}
+          />
+        </div>
+      ) : (
+        <div className="bg-gradient-to-br from-orange-500 to-red-600 text-white p-8 md:w-5/12 flex flex-col justify-center items-center text-center flex-shrink-0">
+          <i className="fas fa-calendar-alt text-6xl mb-4 opacity-90 drop-shadow-md"></i>
+          <span className="font-bold text-2xl">{formatDate(event.date, lang)}</span>
+        </div>
+      )}
+
+      {/* Details Column */}
+      <div className="p-7 md:p-8 flex flex-col justify-between w-full">
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-xs font-bold text-orange-600 bg-orange-50 border border-orange-200 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-xs w-fit">
+              <i className="fas fa-calendar-day"></i> {formatDate(event.date, lang)}
+            </span>
+            {imagesList.length > 1 && (
+              <span className="text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full flex items-center gap-1">
+                <i className="fas fa-images text-[11px]"></i> {toBengaliDigits(imagesList.length)} {lang === 'en' ? 'Photos' : 'টি ছবি'}
+              </span>
+            )}
+            {hasVideo && (
+              <span className="text-xs font-bold text-red-700 bg-red-50 border border-red-200 px-2.5 py-1 rounded-full flex items-center gap-1">
+                <i className="fas fa-video text-[10px]"></i> {lang === 'en' ? 'Video' : 'ভিডিও অন্তর্ভুক্ত'}
+              </span>
+            )}
+          </div>
+          <h3 className="text-2xl font-bold font-serif text-gray-900 mb-3">{event.title}</h3>
+          <div className="text-gray-700 leading-relaxed text-justify mb-5 rich-text" dangerouslySetInnerHTML={{ __html: event.description }}></div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="mt-4 pt-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3">
+          {hasVideo ? (
+            <button
+              onClick={() => setIsVideoModalOpen(true)}
+              className="btn-shine bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white px-5 py-2.5 rounded-full font-bold text-xs sm:text-sm flex items-center gap-2 shadow-md hover:shadow-lg active:scale-95 transition-all cursor-pointer"
+            >
+              <i className="fas fa-play-circle text-sm"></i> {lang === 'en' ? 'Watch Festival Video' : 'উৎসবের ভিডিও দেখুন'}
+            </button>
+          ) : <div />}
+
+          <button
+            onClick={() => shareEvent(event, showToast, lang)}
+            className="btn-shine bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white border border-blue-200 px-5 py-2.5 rounded-full transition-all shadow-sm flex items-center gap-2 font-bold cursor-pointer text-xs sm:text-sm"
+          >
+            <i className="fas fa-share-alt"></i> {t('shareAction', lang)}
+          </button>
+        </div>
+      </div>
+
+      {/* Video Modal */}
+      {hasVideo && isVideoModalOpen && typeof document !== 'undefined' && ReactDOM.createPortal(
+        <div
+          className="fixed inset-0 z-[999999] flex items-center justify-center p-3 sm:p-6 bg-black/90 backdrop-blur-md"
+          onClick={() => setIsVideoModalOpen(false)}
+        >
+          <div
+            className="relative w-full max-w-4xl bg-stone-950 rounded-2xl overflow-hidden border border-amber-500/40 shadow-2xl flex flex-col max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="p-4 bg-stone-900 border-b border-stone-800 flex items-center justify-between text-white">
+              <div className="flex items-center gap-2">
+                <i className="fas fa-video text-amber-400"></i>
+                <h4 className="font-bold font-serif text-sm sm:text-base text-amber-200 truncate">{event.title}</h4>
+              </div>
+              <button
+                onClick={() => setIsVideoModalOpen(false)}
+                className="w-8 h-8 rounded-full bg-red-600/80 hover:bg-red-600 text-white flex items-center justify-center transition-colors cursor-pointer"
+                title="Close"
+              >
+                <i className="fas fa-times text-xs"></i>
+              </button>
+            </div>
+
+            {/* Video View */}
+            <div className="aspect-video w-full bg-black">
+              <MediaViewer
+                url={event.video}
+                isVideo={true}
+                alt={event.title}
+                className="w-full h-full"
+                controls={true}
+                autoPlay={true}
+              />
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+    </div>
+  );
+};
+
+// 6. Events Page (Upgraded with Rich Animations & Multi-Media Support)
 const EventsPage = ({ events, navigateTo, showToast, lang }) => (
   <div className="bg-orange-50 min-h-screen py-12 anim-fade-up">
     <div className="container mx-auto px-4 max-w-5xl">
@@ -4649,36 +4974,7 @@ const EventsPage = ({ events, navigateTo, showToast, lang }) => (
 
       <div className="space-y-8">
         {events.map((event) => (
-          <div key={event.id} className="bg-white rounded-3xl shadow-md border-2 border-orange-100/90 flex flex-col md:flex-row overflow-hidden card-hover-glow transition-all duration-300 group">
-            {event.image ? (
-              <div className="md:w-1/3 h-64 md:h-auto relative overflow-hidden bg-gray-100 flex-shrink-0">
-                <img src={event.image} alt={event.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onError={(e) => { e.target.src = 'images/events/event_4.jpg'; }} />
-                <span className="absolute bottom-3 left-4 z-20 text-white text-xs font-bold bg-orange-600/90 backdrop-blur-sm px-3 py-1 rounded-md shadow flex items-center gap-1.5 border border-orange-500/50">
-                  <i className="fas fa-calendar-alt"></i> {formatDate(event.date, lang)}
-                </span>
-              </div>
-            ) : (
-              <div className="bg-gradient-to-br from-orange-500 to-red-600 text-white p-8 md:w-1/3 flex flex-col justify-center items-center text-center flex-shrink-0">
-                <i className="fas fa-calendar-alt text-6xl mb-4 opacity-90 drop-shadow-md"></i>
-                <span className="font-bold text-2xl">{formatDate(event.date, lang)}</span>
-              </div>
-            )}
-            <div className="p-7 md:p-9 flex flex-col justify-center w-full">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-xs font-bold text-orange-600 bg-orange-50 border border-orange-200 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-xs w-fit">
-                  <i className="fas fa-calendar-day"></i> {formatDate(event.date, lang)}
-                </span>
-              </div>
-              <h3 className="text-2xl font-bold font-serif text-gray-900 mb-4">{event.title}</h3>
-              <div className="text-gray-700 leading-relaxed text-justify mb-5 rich-text" dangerouslySetInnerHTML={{ __html: event.description }}></div>
-
-              <div className="mt-auto pt-4 border-t border-gray-100 flex justify-end">
-                <button onClick={() => shareEvent(event, showToast, lang)} className="btn-shine bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white border border-blue-200 px-5 py-2.5 rounded-full transition-all shadow-sm flex items-center gap-2 font-bold cursor-pointer text-sm">
-                  <i className="fas fa-share-alt"></i> {t('shareAction', lang)}
-                </button>
-              </div>
-            </div>
-          </div>
+          <EventCard key={event.id} event={event} showToast={showToast} lang={lang} />
         ))}
         {events.length === 0 && (
           <p className="text-center text-gray-500 p-12 bg-white rounded-3xl shadow-sm">{t('noEvents', lang)}</p>
@@ -5417,10 +5713,12 @@ const AdminPanel = ({
   const [newMember, setNewMember] = useState({ name: '', role: '', phone: '', image: null });
   const [newTestimonial, setNewTestimonial] = useState({ name: '', designation: '', text: '', date: '' });
   const [newNotice, setNewNotice] = useState({ title: '', date: '', text: '' });
-  const [newEvent, setNewEvent] = useState({ title: '', date: '', description: '', image: null });
+  const [newEvent, setNewEvent] = useState({ title: '', date: '', description: '', image: null, images: [], video: '' });
   const [newDonation, setNewDonation] = useState({ name: '', address: '', type: 'নগদ অর্থ', amount: '', date: '', is_hidden: false });
-  const [newGalleryPhoto, setNewGalleryPhoto] = useState({ url: '', captionBn: '', captionEn: '', image: null });
-  const [editGalleryPhoto, setEditGalleryPhoto] = useState({ url: '', captionBn: '', captionEn: '', image: null });
+  const [newGalleryPhoto, setNewGalleryPhoto] = useState({ url: '', captionBn: '', captionEn: '', image: null, mediaType: 'image' });
+  const [newGalleryBatch, setNewGalleryBatch] = useState([]);
+  const [galleryTabMode, setGalleryTabMode] = useState('image');
+  const [editGalleryPhoto, setEditGalleryPhoto] = useState({ url: '', captionBn: '', captionEn: '', image: null, mediaType: 'image' });
 
   // Timings, Travel & Mantras Form States
   const [timingsForm, setTimingsForm] = useState(timings || PRELOADED_DATA.timings);
@@ -5898,34 +6196,77 @@ const AdminPanel = ({
     setIsSaving(true);
     setErrorMsg('');
     try {
-      if (editingEventId) {
-        const { error } = await supabaseClient.from('events').update(newEvent).eq('id', editingEventId);
-        if (error) throw error;
+      const primaryImage = (newEvent.images && newEvent.images.length > 0)
+        ? newEvent.images[0]
+        : (newEvent.image || null);
 
-        let updatedEvents = events.map(ev => ev.id === editingEventId ? { ...ev, ...newEvent } : ev);
-        updatedEvents.sort((a, b) => new Date(b.date) - new Date(a.date));
-        setEvents(updatedEvents);
+      const tablePayload = {
+        title: newEvent.title,
+        date: newEvent.date || new Date().toISOString().split('T')[0],
+        description: newEvent.description,
+        image: primaryImage
+      };
+
+      let targetId = editingEventId;
+      if (editingEventId) {
+        const { error } = await supabaseClient.from('events').update(tablePayload).eq('id', editingEventId);
+        if (error) throw error;
+      } else {
+        const nextId = await getNextTableId('events', events);
+        targetId = nextId;
+        const { error } = await supabaseClient.from('events').insert([{ ...tablePayload, id: nextId }]);
+        if (error) throw error;
+      }
+
+      // Read current events_media from settings
+      let eventsMedia = {};
+      try {
+        const { data: stData } = await supabaseClient.from('settings').select('value').eq('key', 'events_media').maybeSingle();
+        if (stData && stData.value) {
+          eventsMedia = JSON.parse(stData.value) || {};
+        }
+      } catch (err) {}
+
+      const allImages = (newEvent.images && newEvent.images.length > 0)
+        ? newEvent.images
+        : (primaryImage ? [primaryImage] : []);
+
+      eventsMedia[targetId] = {
+        images: allImages,
+        video: (newEvent.video || '').trim() || null
+      };
+
+      await supabaseClient.from('settings').upsert({
+        key: 'events_media',
+        value: JSON.stringify(eventsMedia)
+      }, { onConflict: 'key' });
+
+      try {
+        localStorage.setItem('temple_events_media', JSON.stringify(eventsMedia));
+      } catch (e) {}
+
+      const updatedItem = {
+        ...tablePayload,
+        id: targetId,
+        images: allImages,
+        video: eventsMedia[targetId].video
+      };
+
+      let updatedEvents;
+      if (editingEventId) {
+        updatedEvents = events.map(ev => ev.id === editingEventId ? updatedItem : ev);
         showToast('ইভেন্ট সফলভাবে আপডেট করা হয়েছে!');
         setEditingEventId(null);
       } else {
-        const nextId = await getNextTableId('events', events);
-        const eventToSave = {
-          ...newEvent,
-          id: nextId,
-          date: newEvent.date || new Date().toISOString().split('T')[0]
-        };
-        const { data, error } = await supabaseClient.from('events').insert([eventToSave]).select();
-        if (error) throw error;
-        if (data) {
-          let updatedEvents = [data[0], ...events];
-          updatedEvents.sort((a, b) => new Date(b.date) - new Date(a.date));
-          setEvents(updatedEvents);
-          showToast('নতুন ইভেন্ট সফলভাবে যোগ করা হয়েছে!');
-        }
+        updatedEvents = [updatedItem, ...events];
+        showToast('নতুন ইভেন্ট সফলভাবে যোগ করা হয়েছে!');
       }
-      setNewEvent({ title: '', date: '', description: '', image: null });
+      updatedEvents.sort((a, b) => new Date(b.date) - new Date(a.date));
+      setEvents(updatedEvents);
+      setNewEvent({ title: '', date: '', description: '', image: null, images: [], video: '' });
     } catch (err) {
-      setErrorMsg("ইভেন্ট সংরক্ষণ করতে সমস্যা হয়েছে।");
+      console.error("Save event error:", err);
+      setErrorMsg("ইভেন্ট সংরক্ষণ করতে সমস্যা হয়েছে: " + (err.message || ''));
     } finally {
       setIsSaving(false);
     }
@@ -5938,6 +6279,18 @@ const AdminPanel = ({
     try {
       const { error } = await supabaseClient.from('events').delete().eq('id', id);
       if (error) throw error;
+      try {
+        const { data: stData } = await supabaseClient.from('settings').select('value').eq('key', 'events_media').maybeSingle();
+        if (stData && stData.value) {
+          const eventsMedia = JSON.parse(stData.value) || {};
+          delete eventsMedia[id];
+          await supabaseClient.from('settings').upsert({
+            key: 'events_media',
+            value: JSON.stringify(eventsMedia)
+          }, { onConflict: 'key' });
+          localStorage.setItem('temple_events_media', JSON.stringify(eventsMedia));
+        }
+      } catch (e) {}
       setEvents(events.filter(item => item.id !== id));
       showToast('ইভেন্ট সফলভাবে মুছে ফেলা হয়েছে!');
     } catch (err) {
@@ -6414,28 +6767,133 @@ const AdminPanel = ({
     }
   };
 
+  // Event multi-images and video handlers
+  const handleEventMultiFiles = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    setIsSaving(true);
+    try {
+      const compressedList = await Promise.all(files.map(compressImageFile));
+      const valid = compressedList.filter(Boolean);
+      setNewEvent(prev => {
+        const existing = prev.images || (prev.image ? [prev.image] : []);
+        const merged = [...existing, ...valid];
+        return {
+          ...prev,
+          image: merged[0] || null,
+          images: merged
+        };
+      });
+      showToast(`${valid.length} টি ছবি সফলভাবে প্রস্তুত করা হয়েছে!`);
+    } catch (err) {
+      setErrorMsg("ছবি প্রসেস করতে সমস্যা হয়েছে।");
+    } finally {
+      setIsSaving(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleEventVideoFile = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsSaving(true);
+    try {
+      const videoData = await readVideoFile(file);
+      setNewEvent(prev => ({ ...prev, video: videoData }));
+      showToast('ভিডিও ফাইল সফলভাবে যুক্ত হয়েছে!');
+    } catch (err) {
+      setErrorMsg(err.message || 'ভিডিও আপলোড করতে সমস্যা হয়েছে।');
+    } finally {
+      setIsSaving(false);
+      e.target.value = '';
+    }
+  };
+
+  // Gallery multi-files batch upload
+  const handleGalleryMultiFiles = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    setIsSaving(true);
+    try {
+      const compressedList = await Promise.all(files.map(compressImageFile));
+      const valid = compressedList.filter(Boolean);
+      const batchEntries = valid.map((imgUrl, i) => ({
+        id: 'gal_' + Date.now() + '_' + i,
+        url: imgUrl,
+        captionBn: 'শ্রীশ্রী মা মনসা মন্দির প্রাঙ্গণ',
+        captionEn: 'Maa Manasa Temple Premises',
+        mediaType: 'image'
+      }));
+      setNewGalleryBatch(prev => [...prev, ...batchEntries]);
+      showToast(`${valid.length} টি ছবি আপলোডের জন্য ব্যাচে যুক্ত হয়েছে!`);
+    } catch (err) {
+      setErrorMsg('ছবি প্রসেসিং করতে সমস্যা হয়েছে।');
+    } finally {
+      setIsSaving(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleSaveGalleryBatch = async () => {
+    if (newGalleryBatch.length === 0) return;
+    setIsSaving(true);
+    setErrorMsg('');
+    try {
+      const updated = [...(galleryItems || DEFAULT_GALLERY_ITEMS), ...newGalleryBatch];
+      await handleSaveGalleryToCloud(updated);
+      setNewGalleryBatch([]);
+      showToast(`মোট ${newGalleryBatch.length} টি ছবি গ্যালারিতে যোগ করা হয়েছে!`);
+    } catch (err) {
+      setErrorMsg('গ্যালারি সংরক্ষণ করতে সমস্যা হয়েছে: ' + (err.message || ''));
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleGalleryVideoFile = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsSaving(true);
+    try {
+      const videoData = await readVideoFile(file);
+      setNewGalleryPhoto(prev => ({
+        ...prev,
+        image: videoData,
+        mediaType: 'video'
+      }));
+      showToast('ভিডিও ফাইল সফলভাবে প্রস্তুত হয়েছে!');
+    } catch (err) {
+      setErrorMsg(err.message || 'ভিডিও আপলোড করতে সমস্যা হয়েছে।');
+    } finally {
+      setIsSaving(false);
+      e.target.value = '';
+    }
+  };
+
   const handleAddGalleryPhoto = async (e) => {
     e.preventDefault();
-    const photoUrl = (newGalleryPhoto.image || newGalleryPhoto.url || '').trim();
-    if (!photoUrl) {
-      setErrorMsg("অনুগ্রহ করে একটি ছবি আপলোড করুন অথবা ছবির ওয়েব লিংক প্রদান করুন।");
+    const mediaUrl = (newGalleryPhoto.image || newGalleryPhoto.url || '').trim();
+    if (!mediaUrl) {
+      setErrorMsg("অনুগ্রহ করে একটি ছবি/ভিডিও আপলোড করুন অথবা অনলাইন লিংক প্রদান করুন।");
       return;
     }
+    const isVid = newGalleryPhoto.mediaType === 'video' || isVideoUrl(mediaUrl);
     setIsSaving(true);
     setErrorMsg('');
     try {
       const newEntry = {
         id: 'gal_' + Date.now(),
-        url: photoUrl,
-        captionBn: newGalleryPhoto.captionBn.trim() || 'শ্রীশ্রী মা মনসা মন্দির প্রাঙ্গণ',
-        captionEn: newGalleryPhoto.captionEn.trim() || 'Maa Manasa Temple Premises'
+        url: mediaUrl,
+        captionBn: newGalleryPhoto.captionBn.trim() || (isVid ? 'শ্রীশ্রী মা মনসা মন্দির ভিডিও' : 'শ্রীশ্রী মা মনসা মন্দির প্রাঙ্গণ'),
+        captionEn: newGalleryPhoto.captionEn.trim() || (isVid ? 'Maa Manasa Temple Video' : 'Maa Manasa Temple Premises'),
+        mediaType: isVid ? 'video' : 'image'
       };
       const updated = [...(galleryItems || DEFAULT_GALLERY_ITEMS), newEntry];
       await handleSaveGalleryToCloud(updated);
-      setNewGalleryPhoto({ url: '', captionBn: '', captionEn: '', image: null });
-      showToast('নতুন ছবি সফলভাবে গ্যালারিতে যোগ করা হয়েছে!');
+      setNewGalleryPhoto({ url: '', captionBn: '', captionEn: '', image: null, mediaType: 'image' });
+      showToast(isVid ? 'নতুন ভিডিও সফলভাবে গ্যালারিতে যোগ করা হয়েছে!' : 'নতুন ছবি সফলভাবে গ্যালারিতে যোগ করা হয়েছে!');
     } catch (err) {
-      setErrorMsg('গ্যালারির ছবি সংরক্ষণে ত্রুটি: ' + (err.message || ''));
+      setErrorMsg('গ্যালারির মিডিয়া সংরক্ষণে ত্রুটি: ' + (err.message || ''));
     } finally {
       setIsSaving(false);
     }
@@ -6447,7 +6905,8 @@ const AdminPanel = ({
       url: item.url || '',
       captionBn: item.captionBn || '',
       captionEn: item.captionEn || '',
-      image: null
+      image: null,
+      mediaType: item.mediaType || (isVideoUrl(item.url) ? 'video' : 'image')
     });
   };
 
@@ -6458,20 +6917,23 @@ const AdminPanel = ({
     try {
       const updated = (galleryItems || DEFAULT_GALLERY_ITEMS).map(item => {
         if (item.id === editingGalleryId) {
+          const finalUrl = editGalleryPhoto.image || editGalleryPhoto.url || item.url;
+          const isVid = editGalleryPhoto.mediaType === 'video' || isVideoUrl(finalUrl);
           return {
             ...item,
-            url: editGalleryPhoto.image || editGalleryPhoto.url || item.url,
+            url: finalUrl,
             captionBn: editGalleryPhoto.captionBn.trim() || item.captionBn,
-            captionEn: editGalleryPhoto.captionEn.trim() || item.captionEn
+            captionEn: editGalleryPhoto.captionEn.trim() || item.captionEn,
+            mediaType: isVid ? 'video' : 'image'
           };
         }
         return item;
       });
       await handleSaveGalleryToCloud(updated);
       setEditingGalleryId(null);
-      showToast('গ্যালারির ছবি ও ক্যাপশন হালনাগাদ করা হয়েছে!');
+      showToast('গ্যালারির তথ্য ও ক্যাপশন হালনাগাদ করা হয়েছে!');
     } catch (err) {
-      setErrorMsg('ছবি আপডেট করতে সমস্যা হয়েছে: ' + (err.message || ''));
+      setErrorMsg('মিডিয়া আপডেট করতে সমস্যা হয়েছে: ' + (err.message || ''));
     } finally {
       setIsSaving(false);
     }
@@ -7018,41 +7480,201 @@ const AdminPanel = ({
           )}
 
           {activeTab === 'events' && (
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
-              <h3 className="text-xl font-bold text-gray-800 mb-6 border-b pb-3 flex items-center gap-2"><i className="fas fa-calendar-alt text-orange-500"></i> {editingEventId ? 'ইভেন্ট আপডেট করুন' : 'নতুন ইভেন্ট যোগ করুন'}</h3>
-              <form onSubmit={handleSaveEvent} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-10 bg-gray-50 p-6 rounded-2xl border border-gray-200 items-end shadow-inner">
-                <div className="lg:col-span-1">
-                  <label className="block text-sm font-bold text-gray-700 mb-1">ইভেন্টের শিরোনাম <span className="text-red-500">*</span></label>
-                  <input type="text" value={newEvent.title} onChange={e => setNewEvent(prev => ({ ...prev, title: e.target.value }))} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500" required placeholder="উদা: বার্ষিক পূজা" />
-                </div>
-                <div className="lg:col-span-1">
-                  <label className="block text-sm font-bold text-gray-700 mb-1">তারিখ <span className="text-red-500">*</span></label>
-                  <input type="date" value={newEvent.date} onChange={e => setNewEvent(prev => ({ ...prev, date: e.target.value }))} required className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm text-gray-700 focus:ring-2 focus:ring-orange-500" />
-                </div>
-                <div className="lg:col-span-1">
-                  <label className="block text-sm font-bold text-gray-700 mb-1">ছবি (আপলোড বা লিংক)</label>
-                  <div className="flex flex-col gap-2">
-                    <label className="flex-grow cursor-pointer bg-white border border-gray-300 px-4 py-2.5 rounded-xl text-sm hover:bg-gray-50 flex items-center justify-center gap-2 overflow-hidden shadow-sm">
-                      <i className="fas fa-upload text-gray-500"></i>
-                      <span className="text-gray-600 truncate font-medium">{(newEvent.image && newEvent.image.startsWith('data:')) ? 'ছবি আপলোড করা হয়েছে' : 'ডিভাইস থেকে আপলোড'}</span>
-                      <input type="file" accept="image/*" onChange={(e) => handleImageChange(e, setNewEvent, newEvent)} className="hidden" />
-                    </label>
-                    <input type="text" value={(!newEvent.image || newEvent.image.startsWith('data:')) ? '' : newEvent.image} onChange={(e) => setNewEvent(prev => ({ ...prev, image: e.target.value }))} className="w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-orange-500" placeholder="অথবা গুগ্‌ল ড্রাইভ লিংক দিন..." />
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-200">
+              <h3 className="text-xl font-bold text-gray-800 mb-6 border-b pb-3 flex items-center gap-2">
+                <i className="fas fa-calendar-alt text-orange-500"></i> {editingEventId ? 'ইভেন্ট আপডেট করুন' : 'নতুন ইভেন্ট যোগ করুন'}
+              </h3>
+              <form onSubmit={handleSaveEvent} className="space-y-6 mb-10 bg-gray-50 p-6 rounded-2xl border border-gray-200 shadow-inner">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-1">ইভেন্টের শিরোনাম <span className="text-red-500">*</span></label>
+                    <input
+                      type="text"
+                      value={newEvent.title}
+                      onChange={e => setNewEvent(prev => ({ ...prev, title: e.target.value }))}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500"
+                      required
+                      placeholder="উদা: শ্রীশ্রী মা মনসার বাৎসরিক মহোৎসব"
+                    />
                   </div>
-                  {newEvent.image && (
-                    <img src={newEvent.image} alt="Preview" className="w-16 h-16 object-cover rounded-lg border border-gray-300 shadow-sm mt-2" />
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-1">তারিখ <span className="text-red-500">*</span></label>
+                    <input
+                      type="date"
+                      value={newEvent.date}
+                      onChange={e => setNewEvent(prev => ({ ...prev, date: e.target.value }))}
+                      required
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm text-gray-700 focus:ring-2 focus:ring-orange-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Multiple Images Upload & Management Section */}
+                <div className="p-4 sm:p-5 bg-white rounded-2xl border border-amber-200 shadow-xs space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <label className="text-sm font-bold text-amber-950 flex items-center gap-2">
+                      <i className="fas fa-images text-orange-500"></i> ইভেন্টের ছবি (এক বা একাধিক ছবি নির্বাচন করতে পারেন)
+                    </label>
+                    <span className="text-xs text-amber-700 font-semibold bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200">
+                      সংযুক্ত ছবি: {((newEvent.images && newEvent.images.length > 0) ? newEvent.images.length : (newEvent.image ? 1 : 0))} টি
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <label className="cursor-pointer bg-amber-50 hover:bg-amber-100/70 border-2 border-dashed border-amber-300 px-4 py-3 rounded-xl text-sm flex items-center justify-center gap-2 transition-colors">
+                      <i className="fas fa-file-image text-amber-600"></i>
+                      <span className="text-amber-900 font-bold">ডিভাইস থেকে এক বা একাধিক ছবি বাছাই করুন</span>
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={handleEventMultiFiles}
+                        className="hidden"
+                      />
+                    </label>
+
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="অথবা অনলাইন ছবির URL লিংক লিখুন..."
+                        id="event-single-img-url"
+                        className="flex-grow px-3 py-2 border rounded-xl text-xs focus:ring-2 focus:ring-orange-500"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            const val = e.target.value.trim();
+                            if (val) {
+                              setNewEvent(prev => {
+                                const current = prev.images || (prev.image ? [prev.image] : []);
+                                const updated = [...current, val];
+                                return { ...prev, image: updated[0], images: updated };
+                              });
+                              e.target.value = '';
+                            }
+                          }
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const input = document.getElementById('event-single-img-url');
+                          if (input && input.value.trim()) {
+                            const val = input.value.trim();
+                            setNewEvent(prev => {
+                              const current = prev.images || (prev.image ? [prev.image] : []);
+                              const updated = [...current, val];
+                              return { ...prev, image: updated[0], images: updated };
+                            });
+                            input.value = '';
+                          }
+                        }}
+                        className="bg-amber-500 hover:bg-amber-600 text-white px-3 py-2 rounded-xl text-xs font-bold shrink-0 transition-colors"
+                      >
+                        + যোগ
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Thumbnail Previews List */}
+                  {((newEvent.images && newEvent.images.length > 0) || newEvent.image) && (
+                    <div className="pt-2">
+                      <p className="text-[11px] text-gray-500 mb-2">প্রথম ছবিটি মূল কভার হিসেবে প্রদর্শিত হবে:</p>
+                      <div className="flex flex-wrap gap-2.5">
+                        {((newEvent.images && newEvent.images.length > 0) ? newEvent.images : [newEvent.image]).map((imgSrc, imgIdx) => (
+                          <div key={imgIdx} className="relative group w-20 h-20 rounded-xl overflow-hidden border-2 border-amber-300 shadow-xs">
+                            <img src={imgSrc} alt={`Event media ${imgIdx + 1}`} className="w-full h-full object-cover" />
+                            {imgIdx === 0 && (
+                              <span className="absolute bottom-0 inset-x-0 bg-orange-600 text-[9px] text-white font-bold text-center py-0.5">
+                                কভার
+                              </span>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setNewEvent(prev => {
+                                  const current = (prev.images && prev.images.length > 0) ? prev.images : (prev.image ? [prev.image] : []);
+                                  const filtered = current.filter((_, idx) => idx !== imgIdx);
+                                  return { ...prev, image: filtered[0] || null, images: filtered };
+                                });
+                              }}
+                              className="absolute top-1 right-1 w-5 h-5 rounded-full bg-red-600 text-white flex items-center justify-center text-[10px] opacity-90 hover:opacity-100 shadow transition-opacity"
+                              title="ছবি মুছুন"
+                            >
+                              <i className="fas fa-times"></i>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   )}
                 </div>
-                <div className="md:col-span-2 lg:col-span-3">
+
+                {/* Video Upload & URL Section */}
+                <div className="p-4 sm:p-5 bg-white rounded-2xl border border-red-200 shadow-xs space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <label className="text-sm font-bold text-red-950 flex items-center gap-2">
+                      <i className="fas fa-video text-red-600"></i> ইভেন্টের ভিডিও (ঐচ্ছিক - ফাইল আপলোড বা YouTube লিংক)
+                    </label>
+                    {newEvent.video && (
+                      <button
+                        type="button"
+                        onClick={() => setNewEvent(prev => ({ ...prev, video: '' }))}
+                        className="text-xs text-red-600 hover:text-red-800 font-bold"
+                      >
+                        <i className="fas fa-trash-alt mr-1"></i> ভিডিও মুছে ফেলুন
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <label className="cursor-pointer bg-red-50 hover:bg-red-100/70 border-2 border-dashed border-red-300 px-4 py-3 rounded-xl text-sm flex items-center justify-center gap-2 transition-colors">
+                      <i className="fas fa-file-video text-red-600"></i>
+                      <span className="text-red-900 font-bold">ডিভাইস থেকে ভিডিও ফাইল আপলোড (.mp4, .webm)</span>
+                      <input
+                        type="file"
+                        accept="video/*"
+                        onChange={handleEventVideoFile}
+                        className="hidden"
+                      />
+                    </label>
+
+                    <div>
+                      <input
+                        type="text"
+                        value={newEvent.video && newEvent.video.startsWith('data:video') ? '' : (newEvent.video || '')}
+                        onChange={e => setNewEvent(prev => ({ ...prev, video: e.target.value }))}
+                        placeholder="অথবা YouTube / ভিডিও লিংক দিন (e.g. https://youtu.be/...)"
+                        className="w-full px-3.5 py-3 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-red-500"
+                      />
+                    </div>
+                  </div>
+
+                  {newEvent.video && (
+                    <div className="pt-2">
+                      <div className="w-full max-w-sm aspect-video rounded-xl overflow-hidden border-2 border-red-300 bg-black shadow-sm">
+                        <MediaViewer
+                          url={newEvent.video}
+                          isVideo={true}
+                          alt="Video Preview"
+                          className="w-full h-full object-cover"
+                          controls={true}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div>
                   <label className="block text-sm font-bold text-gray-700 mb-1">ইভেন্টের বিস্তারিত <span className="text-red-500">*</span></label>
                   <QuillEditor value={newEvent.description} onChange={val => setNewEvent(prev => ({ ...prev, description: val }))} placeholder="বিস্তারিত লিখুন..." />
                 </div>
-                <div className="md:col-span-2 lg:col-span-3 mt-2 flex gap-3">
-                  <button type="submit" disabled={isSaving} className="w-full bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 flex items-center justify-center gap-2 font-bold disabled:opacity-50 shadow-md">
-                    <i className={editingEventId ? "fas fa-save" : "fas fa-plus"}></i> {isSaving ? 'সেভ হচ্ছে...' : (editingEventId ? 'আপডেট করুন' : 'ইভেন্ট যুক্ত করুন')}
+
+                <div className="flex gap-3">
+                  <button type="submit" disabled={isSaving} className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl flex items-center justify-center gap-2 font-bold disabled:opacity-50 shadow-md">
+                    <i className={editingEventId ? "fas fa-save" : "fas fa-plus"}></i> {isSaving ? 'সেভ হচ্ছে...' : (editingEventId ? 'ইভেন্ট আপডেট করুন' : 'ইভেন্ট যুক্ত করুন')}
                   </button>
                   {editingEventId && (
-                    <button type="button" onClick={() => { setEditingEventId(null); setNewEvent({ title: '', date: '', description: '', image: null }); }} className="bg-gray-500 text-white px-6 py-3 rounded-xl hover:bg-gray-600 font-bold shadow-md">বাতিল</button>
+                    <button type="button" onClick={() => { setEditingEventId(null); setNewEvent({ title: '', date: '', description: '', image: null, images: [], video: '' }); }} className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-xl font-bold shadow-md">বাতিল</button>
                   )}
                 </div>
               </form>
@@ -7062,32 +7684,76 @@ const AdminPanel = ({
                 <span className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full font-bold">Total: {events.length}</span>
               </div>
               <div className="space-y-4">
-                {events.map(ev => (
-                  <div key={ev.id} className="border border-gray-200 rounded-2xl p-5 bg-white hover:shadow-md transition-shadow flex flex-col md:flex-row justify-between items-start gap-4">
-                    {ev.image && (
-                      <div className="w-full md:w-32 h-32 md:h-24 bg-gray-100 rounded-xl overflow-hidden shrink-0">
-                        <img src={ev.image} alt={ev.title} className="w-full h-full object-cover" />
+                {events.map(ev => {
+                  const evImages = (ev.images && ev.images.length > 0) ? ev.images : (ev.image ? [ev.image] : []);
+                  return (
+                    <div key={ev.id} className="border border-gray-200 rounded-2xl p-5 bg-white hover:shadow-md transition-shadow flex flex-col md:flex-row justify-between items-start gap-4">
+                      {evImages.length > 0 ? (
+                        <div className="w-full md:w-36 h-28 bg-gray-100 rounded-xl overflow-hidden shrink-0 relative">
+                          <img src={evImages[0]} alt={ev.title} className="w-full h-full object-cover" />
+                          {evImages.length > 1 && (
+                            <span className="absolute bottom-1 right-1 bg-black/80 text-amber-300 text-[10px] px-1.5 py-0.5 rounded font-bold">
+                              📷 {evImages.length}
+                            </span>
+                          )}
+                          {ev.video && (
+                            <span className="absolute top-1 left-1 bg-red-600 text-white text-[9px] px-1.5 py-0.5 rounded font-bold">
+                              ▶ ভিডিও
+                            </span>
+                          )}
+                        </div>
+                      ) : ev.video ? (
+                        <div className="w-full md:w-36 h-28 bg-stone-900 rounded-xl flex items-center justify-center text-red-500 shrink-0">
+                          <i className="fas fa-video text-2xl"></i>
+                        </div>
+                      ) : null}
+
+                      <div className="flex-grow w-full">
+                        <div className="flex items-center gap-3 mb-2 flex-wrap">
+                          <h3 className="font-bold text-lg text-gray-800">{ev.title}</h3>
+                          <span className="text-xs font-semibold text-orange-700 bg-orange-100 border border-orange-200 px-2.5 py-1 rounded-md flex items-center gap-1">
+                            <i className="fas fa-calendar-alt"></i> {formatDateToBengali(ev.date)}
+                          </span>
+                          {evImages.length > 1 && (
+                            <span className="text-xs font-semibold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
+                              📷 {evImages.length}টি ছবি
+                            </span>
+                          )}
+                          {ev.video && (
+                            <span className="text-xs font-semibold text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded-md">
+                              🎥 ভিডিও আছে
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-gray-600 leading-relaxed bg-gray-50 p-3 rounded-lg border border-gray-100 rich-text" dangerouslySetInnerHTML={{ __html: ev.description }}></div>
                       </div>
-                    )}
-                    <div className="flex-grow w-full">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="font-bold text-lg text-gray-800">{ev.title}</h3>
-                        <span className="text-xs font-semibold text-orange-700 bg-orange-100 border border-orange-200 px-2.5 py-1 rounded-md flex items-center gap-1">
-                          <i className="fas fa-calendar-alt"></i> {formatDateToBengali(ev.date)}
-                        </span>
+                      <div className="flex gap-2 self-end md:self-start bg-gray-50 p-2 rounded-xl border border-gray-100 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setNewEvent({
+                              title: ev.title,
+                              date: ev.date,
+                              description: ev.description,
+                              image: ev.image || (ev.images && ev.images[0]) || null,
+                              images: ev.images || (ev.image ? [ev.image] : []),
+                              video: ev.video || ''
+                            });
+                            setEditingEventId(ev.id);
+                            window.scrollTo(0, 0);
+                          }}
+                          className="text-blue-600 hover:text-white hover:bg-blue-600 bg-white border border-blue-200 p-2.5 rounded-lg transition-colors shadow-sm"
+                          title="এডিট"
+                        >
+                          <i className="fas fa-edit"></i>
+                        </button>
+                        <button type="button" onClick={() => handleDeleteEvent(ev.id)} disabled={isSaving} className="text-red-600 hover:text-white hover:bg-red-600 bg-white border border-red-200 p-2.5 rounded-lg transition-colors shadow-sm disabled:opacity-50" title="ডিলিট">
+                          <i className="fas fa-trash"></i>
+                        </button>
                       </div>
-                      <div className="text-gray-600 leading-relaxed bg-gray-50 p-3 rounded-lg border border-gray-100 rich-text" dangerouslySetInnerHTML={{ __html: ev.description }}></div>
                     </div>
-                    <div className="flex gap-2 self-end md:self-start bg-gray-50 p-2 rounded-xl border border-gray-100 shrink-0">
-                      <button type="button" onClick={() => { setNewEvent(ev); setEditingEventId(ev.id); window.scrollTo(0, 0); }} className="text-blue-600 hover:text-white hover:bg-blue-600 bg-white border border-blue-200 p-2.5 rounded-lg transition-colors shadow-sm" title="এডিট">
-                        <i className="fas fa-edit"></i>
-                      </button>
-                      <button type="button" onClick={() => handleDeleteEvent(ev.id)} disabled={isSaving} className="text-red-600 hover:text-white hover:bg-red-600 bg-white border border-red-200 p-2.5 rounded-lg transition-colors shadow-sm disabled:opacity-50" title="ডিলিট">
-                        <i className="fas fa-trash"></i>
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
                 {events.length === 0 && (
                   <p className="text-center text-gray-500 p-10 bg-white rounded-xl shadow-sm border border-gray-100">এখনো কোনো ইভেন্ট যোগ করা হয়নি।</p>
                 )}
@@ -8455,92 +9121,273 @@ const AdminPanel = ({
                 </div>
               </div>
 
-              {/* Add New Gallery Photo Form */}
-              <div className="bg-pink-50/40 p-6 rounded-2xl border border-pink-100">
-                <h4 className="text-base font-bold text-pink-950 mb-3 flex items-center gap-2">
-                  <i className="fas fa-plus-circle text-pink-600"></i> নতুন ছবি যোগ করুন
-                </h4>
-                <form onSubmit={handleAddGalleryPhoto} className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold text-gray-700 mb-1">
-                        ছবির ফাইল আপলোড (কম্প্রেসড ও অপ্টিমাইজড)
-                      </label>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => handleImageChange(e, setNewGalleryPhoto, newGalleryPhoto)}
-                        className="w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-pink-100 file:text-pink-700 hover:file:bg-pink-200 cursor-pointer"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-gray-700 mb-1">
-                        অথবা ছবির অনলাইন URL / লিংক
-                      </label>
-                      <input
-                        type="text"
-                        value={newGalleryPhoto.url}
-                        onChange={(e) => setNewGalleryPhoto({ ...newGalleryPhoto, url: e.target.value })}
-                        placeholder="উদা: header image.jpg বা https://..."
-                        className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-pink-500 focus:outline-none"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Photo Preview if selected */}
-                  {(newGalleryPhoto.image || newGalleryPhoto.url) && (
-                    <div className="flex items-center gap-4 p-3 bg-white rounded-xl border border-pink-200">
-                      <img
-                        src={newGalleryPhoto.image || newGalleryPhoto.url}
-                        alt="Preview"
-                        className="w-24 h-16 object-cover rounded-lg border shadow-xs"
-                      />
-                      <div className="text-xs text-gray-600">
-                        <span className="font-bold text-pink-700">ছবি প্রাকদর্শন:</span> {newGalleryPhoto.image ? 'ডিভাইস ফাইল আপলোড' : 'ওয়েব লিংক'}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold text-gray-700 mb-1">বাংলা ক্যাপশন *</label>
-                      <input
-                        type="text"
-                        value={newGalleryPhoto.captionBn}
-                        onChange={(e) => setNewGalleryPhoto({ ...newGalleryPhoto, captionBn: e.target.value })}
-                        placeholder="উদা: শ্রীশ্রী মা মনসা মন্দির তোরণ ও মূল প্রাঙ্গণ"
-                        className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-pink-500 focus:outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-gray-700 mb-1">English Caption (ঐচ্ছিক)</label>
-                      <input
-                        type="text"
-                        value={newGalleryPhoto.captionEn}
-                        onChange={(e) => setNewGalleryPhoto({ ...newGalleryPhoto, captionEn: e.target.value })}
-                        placeholder="e.g. Temple Entrance & Main Courtyard"
-                        className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-pink-500 focus:outline-none"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end">
-                    <button
-                      type="submit"
-                      disabled={isSaving}
-                      className="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white font-bold px-6 py-2.5 rounded-xl transition-all shadow-md flex items-center gap-2 text-sm disabled:opacity-50"
-                    >
-                      {isSaving ? <><i className="fas fa-spinner fa-spin"></i> সংরক্ষণ হচ্ছে...</> : <><i className="fas fa-plus"></i> গ্যালারিতে ছবি যোগ করুন</>}
-                    </button>
-                  </div>
-                </form>
+              {/* Mode Selector: Photo (Single/Multiple) vs Video */}
+              <div className="flex border-b border-gray-200 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setGalleryTabMode('image')}
+                  className={`pb-2.5 px-4 font-bold text-sm flex items-center gap-2 border-b-2 transition-colors cursor-pointer ${
+                    galleryTabMode === 'image'
+                      ? 'border-pink-600 text-pink-700'
+                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <i className="fas fa-images"></i> ছবি আপলোড (এক বা একাধিক)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setGalleryTabMode('video')}
+                  className={`pb-2.5 px-4 font-bold text-sm flex items-center gap-2 border-b-2 transition-colors cursor-pointer ${
+                    galleryTabMode === 'video'
+                      ? 'border-red-600 text-red-700'
+                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <i className="fas fa-video"></i> ভিডিও আপলোড বা লিংক
+                </button>
               </div>
 
-              {/* Existing Gallery Photos List / Grid */}
+              {/* Photo Mode Form */}
+              {galleryTabMode === 'image' && (
+                <div className="space-y-6">
+                  {/* Single Image Form */}
+                  <div className="bg-pink-50/40 p-6 rounded-2xl border border-pink-100">
+                    <h4 className="text-base font-bold text-pink-950 mb-3 flex items-center gap-2">
+                      <i className="fas fa-plus-circle text-pink-600"></i> একক ছবি যোগ করুন
+                    </h4>
+                    <form onSubmit={handleAddGalleryPhoto} className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-bold text-gray-700 mb-1">
+                            ছবির ফাইল আপলোড (কম্প্রেসড ও অপ্টিমাইজড)
+                          </label>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleImageChange(e, setNewGalleryPhoto, newGalleryPhoto)}
+                            className="w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-pink-100 file:text-pink-700 hover:file:bg-pink-200 cursor-pointer"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-gray-700 mb-1">
+                            অথবা ছবির অনলাইন URL / লিংক
+                          </label>
+                          <input
+                            type="text"
+                            value={newGalleryPhoto.url}
+                            onChange={(e) => setNewGalleryPhoto({ ...newGalleryPhoto, url: e.target.value })}
+                            placeholder="উদা: header image.jpg বা https://..."
+                            className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-pink-500 focus:outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Photo Preview if selected */}
+                      {(newGalleryPhoto.image || newGalleryPhoto.url) && (
+                        <div className="flex items-center gap-4 p-3 bg-white rounded-xl border border-pink-200">
+                          <img
+                            src={newGalleryPhoto.image || newGalleryPhoto.url}
+                            alt="Preview"
+                            className="w-24 h-16 object-cover rounded-lg border shadow-xs"
+                          />
+                          <div className="text-xs text-gray-600">
+                            <span className="font-bold text-pink-700">ছবি প্রাকদর্শন:</span> {newGalleryPhoto.image ? 'ডিভাইস ফাইল আপলোড' : 'ওয়েব লিংক'}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-bold text-gray-700 mb-1">বাংলা ক্যাপশন *</label>
+                          <input
+                            type="text"
+                            value={newGalleryPhoto.captionBn}
+                            onChange={(e) => setNewGalleryPhoto({ ...newGalleryPhoto, captionBn: e.target.value })}
+                            placeholder="উদা: শ্রীশ্রী মা মনসা মন্দির তোরণ ও মূল প্রাঙ্গণ"
+                            className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-pink-500 focus:outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-gray-700 mb-1">English Caption (ঐচ্ছিক)</label>
+                          <input
+                            type="text"
+                            value={newGalleryPhoto.captionEn}
+                            onChange={(e) => setNewGalleryPhoto({ ...newGalleryPhoto, captionEn: e.target.value })}
+                            placeholder="e.g. Temple Entrance & Main Courtyard"
+                            className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-pink-500 focus:outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end">
+                        <button
+                          type="submit"
+                          disabled={isSaving}
+                          className="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white font-bold px-6 py-2.5 rounded-xl transition-all shadow-md flex items-center gap-2 text-sm disabled:opacity-50 cursor-pointer"
+                        >
+                          {isSaving ? <><i className="fas fa-spinner fa-spin"></i> সংরক্ষণ হচ্ছে...</> : <><i className="fas fa-plus"></i> গ্যালারিতে ছবি যোগ করুন</>}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+
+                  {/* Multiple Images Batch Upload */}
+                  <div className="bg-amber-50/50 p-6 rounded-2xl border border-amber-200 space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                      <div>
+                        <h4 className="text-base font-bold text-amber-950 flex items-center gap-2">
+                          <i className="fas fa-layer-group text-amber-600"></i> একসাথে একাধিক ছবি আপলোড (Multiple Upload)
+                        </h4>
+                        <p className="text-xs text-gray-600 mt-0.5">একসাথে ৩, ৫ বা ততোধিক ছবি নির্বাচন করুন, স্বয়ংক্রিয়ভাবে অপ্টিমাইজ হয়ে যোগ হবে</p>
+                      </div>
+                      <label className="cursor-pointer bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-5 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-all shrink-0">
+                        <i className="fas fa-folder-open"></i> একাধিক ছবি বাছুন
+                        <input
+                          type="file"
+                          multiple
+                          accept="image/*"
+                          onChange={handleGalleryMultiFiles}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+
+                    {newGalleryBatch.length > 0 && (
+                      <div className="bg-white p-4 rounded-xl border border-amber-300 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-amber-900">
+                            নির্বাচিত ছবি সমূহ ({newGalleryBatch.length} টি)
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setNewGalleryBatch([])}
+                            className="text-xs text-red-600 hover:text-red-800 font-bold"
+                          >
+                            সব বাতিল করুন
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                          {newGalleryBatch.map((batchItem, bIdx) => (
+                            <div key={bIdx} className="relative group aspect-square rounded-lg overflow-hidden border shadow-xs">
+                              <img src={batchItem.url} alt={`Batch ${bIdx + 1}`} className="w-full h-full object-cover" />
+                              <button
+                                type="button"
+                                onClick={() => setNewGalleryBatch(prev => prev.filter((_, idx) => idx !== bIdx))}
+                                className="absolute top-1 right-1 w-5 h-5 rounded-full bg-red-600 text-white flex items-center justify-center text-[10px] opacity-90 hover:opacity-100"
+                              >
+                                <i className="fas fa-times"></i>
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="flex justify-end pt-2">
+                          <button
+                            type="button"
+                            onClick={handleSaveGalleryBatch}
+                            disabled={isSaving}
+                            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 shadow-md disabled:opacity-50 cursor-pointer"
+                          >
+                            <i className="fas fa-check-double"></i> গ্যালারিতে সব ({newGalleryBatch.length} টি) ছবি সেভ করুন
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Video Mode Form */}
+              {galleryTabMode === 'video' && (
+                <div className="bg-red-50/50 p-6 rounded-2xl border border-red-200">
+                  <h4 className="text-base font-bold text-red-950 mb-3 flex items-center gap-2">
+                    <i className="fas fa-video text-red-600"></i> গ্যালারিতে ভিডিও যোগ করুন
+                  </h4>
+                  <form onSubmit={handleAddGalleryPhoto} className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 mb-1">
+                          ভিডিও ফাইল আপলোড (.mp4, .webm - ৪০MB পর্যন্ত)
+                        </label>
+                        <input
+                          type="file"
+                          accept="video/*"
+                          onChange={handleGalleryVideoFile}
+                          className="w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-red-100 file:text-red-700 hover:file:bg-red-200 cursor-pointer"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 mb-1">
+                          অথবা YouTube / অনলাইন ভিডিও লিংক
+                        </label>
+                        <input
+                          type="text"
+                          value={newGalleryPhoto.url && newGalleryPhoto.url.startsWith('data:') ? '' : newGalleryPhoto.url}
+                          onChange={(e) => setNewGalleryPhoto({ ...newGalleryPhoto, url: e.target.value, mediaType: 'video' })}
+                          placeholder="উদা: https://youtu.be/... বা https://www.youtube.com/watch?v=..."
+                          className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-red-500 focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Video Preview */}
+                    {(newGalleryPhoto.image || newGalleryPhoto.url) && (
+                      <div className="p-3 bg-white rounded-xl border border-red-200">
+                        <div className="w-full max-w-sm aspect-video rounded-lg overflow-hidden bg-black mb-2 shadow-xs">
+                          <MediaViewer
+                            url={newGalleryPhoto.image || newGalleryPhoto.url}
+                            isVideo={true}
+                            alt="Gallery Video Preview"
+                            className="w-full h-full object-cover"
+                            controls={true}
+                          />
+                        </div>
+                        <span className="text-xs text-red-700 font-bold">ভিডিও প্রাকদর্শন সক্রিয়</span>
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 mb-1">বাংলা ক্যাপশন *</label>
+                        <input
+                          type="text"
+                          value={newGalleryPhoto.captionBn}
+                          onChange={(e) => setNewGalleryPhoto({ ...newGalleryPhoto, captionBn: e.target.value })}
+                          placeholder="উদা: মন্দিরের শ্রীশ্রী মা মনসা পূজার ভিডিও দর্শন"
+                          className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-red-500 focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 mb-1">English Caption (ঐচ্ছিক)</label>
+                        <input
+                          type="text"
+                          value={newGalleryPhoto.captionEn}
+                          onChange={(e) => setNewGalleryPhoto({ ...newGalleryPhoto, captionEn: e.target.value })}
+                          placeholder="e.g. Sacred Darshan Video of Maa Manasa"
+                          className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-red-500 focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end">
+                      <button
+                        type="submit"
+                        disabled={isSaving}
+                        className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold px-6 py-2.5 rounded-xl transition-all shadow-md flex items-center gap-2 text-sm disabled:opacity-50 cursor-pointer"
+                      >
+                        {isSaving ? <><i className="fas fa-spinner fa-spin"></i> সংরক্ষণ হচ্ছে...</> : <><i className="fas fa-video"></i> গ্যালারিতে ভিডিও যোগ করুন</>}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+
+              {/* Existing Gallery Photos / Videos List */}
               <div>
                 <h4 className="text-base font-bold text-gray-800 mb-4 flex items-center justify-between">
                   <span className="flex items-center gap-2">
-                    <i className="fas fa-layer-group text-pink-600"></i> বর্তমান গ্যালারি আলোকচিত্র তালিকা
+                    <i className="fas fa-layer-group text-pink-600"></i> বর্তমান গ্যালারি আলোকচিত্র ও ভিডিও তালিকা
                   </span>
                   <span className="text-xs font-normal text-gray-500">
                     (বাম/ডান অ্যারো দিয়ে হোমপেজে প্রদর্শনের ক্রম পরিবর্তন করতে পারেন)
@@ -8551,6 +9398,7 @@ const AdminPanel = ({
                   {(galleryItems || DEFAULT_GALLERY_ITEMS).map((item, index) => {
                     const isEditing = editingGalleryId === item.id;
                     const totalCount = (galleryItems || DEFAULT_GALLERY_ITEMS).length;
+                    const isVid = item.mediaType === 'video' || isVideoUrl(item.url);
 
                     return (
                       <div
@@ -8565,7 +9413,7 @@ const AdminPanel = ({
                           /* Edit Form */
                           <form onSubmit={handleUpdateGalleryPhoto} className="space-y-3">
                             <div className="flex items-center justify-between pb-2 border-b">
-                              <span className="text-xs font-bold text-pink-700">ছবি সম্পাদনা #{index + 1}</span>
+                              <span className="text-xs font-bold text-pink-700">মিডিয়া সম্পাদনা #{index + 1} ({isVid ? 'ভিডিও' : 'ছবি'})</span>
                               <button
                                 type="button"
                                 onClick={() => setEditingGalleryId(null)}
@@ -8576,18 +9424,25 @@ const AdminPanel = ({
                             </div>
 
                             <div className="flex gap-3 items-center">
-                              <img
-                                src={editGalleryPhoto.image || editGalleryPhoto.url || item.url}
-                                alt="Current"
-                                className="w-20 h-14 object-cover rounded-lg border shadow-xs shrink-0"
-                              />
+                              {isVid ? (
+                                <div className="w-20 h-14 bg-black rounded-lg overflow-hidden flex items-center justify-center text-amber-400 shrink-0">
+                                  <i className="fas fa-play text-base"></i>
+                                </div>
+                              ) : (
+                                <img
+                                  src={editGalleryPhoto.image || editGalleryPhoto.url || item.url}
+                                  alt="Current"
+                                  className="w-20 h-14 object-cover rounded-lg border shadow-xs shrink-0"
+                                />
+                              )}
                               <div className="flex-1 min-w-0">
-                                <label className="block text-[11px] font-bold text-gray-600 mb-0.5">নতুন ছবি ফাইল (ঐচ্ছিক)</label>
+                                <label className="block text-[11px] font-bold text-gray-600 mb-0.5">নতুন ফাইল বা URL</label>
                                 <input
-                                  type="file"
-                                  accept="image/*"
-                                  onChange={(e) => handleImageChange(e, setEditGalleryPhoto, editGalleryPhoto)}
-                                  className="w-full text-[11px] text-gray-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-pink-100 file:text-pink-700 cursor-pointer"
+                                  type="text"
+                                  value={editGalleryPhoto.url || ''}
+                                  onChange={(e) => setEditGalleryPhoto({ ...editGalleryPhoto, url: e.target.value })}
+                                  placeholder="URL বা লিংক দিন..."
+                                  className="w-full px-2 py-1 border rounded text-xs"
                                 />
                               </div>
                             </div>
@@ -8623,7 +9478,7 @@ const AdminPanel = ({
                               <button
                                 type="submit"
                                 disabled={isSaving}
-                                className="px-4 py-1.5 bg-pink-600 hover:bg-pink-700 text-white rounded-lg text-xs font-bold shadow-xs transition-colors"
+                                className="px-4 py-1.5 bg-pink-600 hover:bg-pink-700 text-white rounded-lg text-xs font-bold shadow-xs transition-colors cursor-pointer"
                               >
                                 {isSaving ? 'সংরক্ষণ...' : 'আপডেট করুন'}
                               </button>
@@ -8632,14 +9487,22 @@ const AdminPanel = ({
                         ) : (
                           /* View Card */
                           <div>
-                            <div className="relative aspect-[16/10] rounded-xl overflow-hidden bg-gray-100 mb-3 border">
-                              <img
-                                src={item.url}
-                                alt={item.captionBn || `Gallery ${index + 1}`}
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute top-2 left-2 bg-black/70 backdrop-blur-xs text-white px-2 py-0.5 rounded-full text-[10px] font-mono font-bold">
-                                #{index + 1}
+                            <div className="relative aspect-[16/10] rounded-xl overflow-hidden bg-gray-900 mb-3 border">
+                              {isVid ? (
+                                <div className="w-full h-full flex flex-col items-center justify-center bg-stone-900 text-amber-400">
+                                  <i className="fas fa-play-circle text-3xl"></i>
+                                  <span className="text-[11px] font-bold text-white mt-1">ভিডিও মিডিয়া</span>
+                                </div>
+                              ) : (
+                                <img
+                                  src={item.url}
+                                  alt={item.captionBn || `Gallery ${index + 1}`}
+                                  className="w-full h-full object-cover"
+                                />
+                              )}
+                              <div className="absolute top-2 left-2 bg-black/70 backdrop-blur-xs text-white px-2 py-0.5 rounded-full text-[10px] font-mono font-bold flex items-center gap-1">
+                                <span>#{index + 1}</span>
+                                {isVid && <span className="text-amber-400 font-sans">✦ ভিডিও</span>}
                               </div>
                             </div>
 
@@ -8656,7 +9519,7 @@ const AdminPanel = ({
                                   type="button"
                                   onClick={() => handleMoveGalleryPhoto(index, -1)}
                                   disabled={index === 0}
-                                  className="w-7 h-7 rounded-lg bg-gray-100 hover:bg-pink-100 text-gray-600 hover:text-pink-700 flex items-center justify-center transition-colors disabled:opacity-30 disabled:pointer-events-none"
+                                  className="w-7 h-7 rounded-lg bg-gray-100 hover:bg-pink-100 text-gray-600 hover:text-pink-700 flex items-center justify-center transition-colors disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
                                   title="বামে / পূর্বে সরান"
                                 >
                                   <i className="fas fa-arrow-left text-[11px]"></i>
@@ -8665,7 +9528,7 @@ const AdminPanel = ({
                                   type="button"
                                   onClick={() => handleMoveGalleryPhoto(index, 1)}
                                   disabled={index === totalCount - 1}
-                                  className="w-7 h-7 rounded-lg bg-gray-100 hover:bg-pink-100 text-gray-600 hover:text-pink-700 flex items-center justify-center transition-colors disabled:opacity-30 disabled:pointer-events-none"
+                                  className="w-7 h-7 rounded-lg bg-gray-100 hover:bg-pink-100 text-gray-600 hover:text-pink-700 flex items-center justify-center transition-colors disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
                                   title="ডানে / পরে সরান"
                                 >
                                   <i className="fas fa-arrow-right text-[11px]"></i>
@@ -8676,14 +9539,14 @@ const AdminPanel = ({
                                 <button
                                   type="button"
                                   onClick={() => handleStartEditGalleryPhoto(item)}
-                                  className="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded-lg text-xs font-bold transition-colors flex items-center gap-1"
+                                  className="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded-lg text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer"
                                 >
                                   <i className="fas fa-edit text-[10px]"></i> সম্পাদনা
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => handleDeleteGalleryPhoto(item.id)}
-                                  className="w-7 h-7 rounded-lg text-red-500 hover:bg-red-50 flex items-center justify-center transition-colors"
+                                  className="w-7 h-7 rounded-lg text-red-500 hover:bg-red-50 flex items-center justify-center transition-colors cursor-pointer"
                                   title="মুছে ফেলুন"
                                 >
                                   <i className="fas fa-trash-alt text-xs"></i>
@@ -9145,6 +10008,13 @@ function App() {
             }
           } catch (e) { }
         }
+
+        const em = settingsData.find(s => s.key === 'events_media');
+        if (em && em.value) {
+          try {
+            localStorage.setItem('temple_events_media', em.value);
+          } catch (e) { }
+        }
       }
 
       const { data: committeeData } = await supabaseClient.from('committee').select('id, name, role, phone, order_idx, image').order('order_idx', { ascending: true }).order('id', { ascending: true });
@@ -9162,10 +10032,23 @@ function App() {
 
       const { data: eventsData } = await supabaseClient.from('events').select('id, title, date, description, image').order('date', { ascending: false }).order('id', { ascending: false });
       if (eventsData) {
+        let eventsMediaMap = {};
+        try {
+          const raw = localStorage.getItem('temple_events_media');
+          if (raw) eventsMediaMap = JSON.parse(raw) || {};
+        } catch (e) { }
+
         const mappedEvents = eventsData.map(ev => {
           const local = (PRELOADED_DATA.events || []).find(p => p.id === ev.id);
           const imgSrc = ev.image || (local && local.image) || `images/events/event_${ev.id}.jpg`;
-          return { ...ev, image: imgSrc };
+          const media = eventsMediaMap[ev.id] || {};
+          const images = (media.images && media.images.length > 0) ? media.images : (imgSrc ? [imgSrc] : []);
+          return {
+            ...ev,
+            image: imgSrc,
+            images: images,
+            video: media.video || null
+          };
         });
         setEvents(mappedEvents);
       }
