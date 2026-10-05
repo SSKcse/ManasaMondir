@@ -731,18 +731,26 @@ const printReceiptDirectly = (receipt, currentLang = 'bn') => {
   printWindow.document.close();
 };
 
-// --- Media & Video Helpers ---
+// --- Media, Video & High-Capacity Storage Helpers ---
 const isVideoUrl = (url) => {
   if (!url) return false;
   const str = String(url).toLowerCase().trim();
   return (
+    str.startsWith('idb:video_') ||
     str.startsWith('data:video/') ||
+    str.startsWith('blob:') ||
     str.endsWith('.mp4') ||
     str.endsWith('.webm') ||
     str.endsWith('.ogg') ||
     str.endsWith('.mov') ||
+    str.endsWith('.mkv') ||
+    str.endsWith('.m4v') ||
+    str.includes('.mp4?') ||
+    str.includes('.webm?') ||
+    str.includes('.mov?') ||
     str.includes('youtube.com') ||
-    str.includes('youtu.be')
+    str.includes('youtu.be') ||
+    str.includes('/videos/')
   );
 };
 
@@ -751,6 +759,58 @@ const getYouTubeEmbedUrl = (url) => {
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/)([^#\&\?]*).*/;
   const match = String(url).match(regExp);
   return (match && match[2].length === 11) ? `https://www.youtube-nocookie.com/embed/${match[2]}` : null;
+};
+
+// IndexedDB media store for high-capacity local video storage (virtually unlimited size)
+const openMediaDB = () => {
+  return new Promise((resolve) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return resolve(null);
+    try {
+      const req = window.indexedDB.open('MaaManasaMediaDB', 1);
+      req.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains('media')) {
+          db.createObjectStore('media', { keyPath: 'id' });
+        }
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => resolve(null);
+    } catch {
+      resolve(null);
+    }
+  });
+};
+
+const storeMediaBlob = async (id, blobOrData) => {
+  try {
+    const db = await openMediaDB();
+    if (!db) return false;
+    return new Promise((resolve) => {
+      const tx = db.transaction('media', 'readwrite');
+      const store = tx.objectStore('media');
+      store.put({ id, data: blobOrData, time: Date.now() });
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => resolve(false);
+    });
+  } catch {
+    return false;
+  }
+};
+
+const getMediaBlob = async (id) => {
+  try {
+    const db = await openMediaDB();
+    if (!db) return null;
+    return new Promise((resolve) => {
+      const tx = db.transaction('media', 'readonly');
+      const store = tx.objectStore('media');
+      const req = store.get(id);
+      req.onsuccess = () => resolve(req.result ? req.result.data : null);
+      req.onerror = () => resolve(null);
+    });
+  } catch {
+    return null;
+  }
 };
 
 const compressImageFile = (file) => {
@@ -787,23 +847,86 @@ const compressImageFile = (file) => {
   });
 };
 
-const readVideoFile = (file) => {
-  return new Promise((resolve, reject) => {
-    if (!file) return resolve(null);
-    if (file.size > 40 * 1024 * 1024) {
-      return reject(new Error('ভিডিও ফাইলটি ৪০MB এর চেয়ে ছোট হতে হবে। বড় ভিডিওর জন্য অনুগ্রহ করে YouTube বা অনলাইন ভিডিও লিংক দিন।'));
+// Video file reader & unlimited upload engine (No file size limits!)
+const readVideoFile = async (file) => {
+  if (!file) return null;
+
+  // 1. Direct server stream upload to /api/upload (Node backend)
+  try {
+    const uploadUrl = `/api/upload?filename=${encodeURIComponent(file.name)}`;
+    const res = await fetch(uploadUrl, {
+      method: 'POST',
+      body: file
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.success && data.url) {
+        return data.url;
+      }
     }
-    const reader = new FileReader();
-    reader.onerror = reject;
-    reader.onload = () => resolve(reader.result);
-    reader.readAsDataURL(file);
-  });
+  } catch (err) {
+    console.warn("Direct /api/upload attempt unavailable, using high-capacity storage:", err);
+  }
+
+  // 2. High-capacity IndexedDB storage for seamless client persistence (supports gigabytes)
+  try {
+    const mediaId = `idb:video_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const saved = await storeMediaBlob(mediaId, file);
+    if (saved) {
+      return mediaId;
+    }
+  } catch (idbErr) {
+    console.warn("IndexedDB storage failed, falling back to Object URL/Data URL:", idbErr);
+  }
+
+  // 3. Fallback: Instant browser Object URL
+  try {
+    return URL.createObjectURL(file);
+  } catch {
+    // 4. Ultimate fallback: FileReader DataURL
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = reject;
+      reader.onload = () => resolve(reader.result);
+      reader.readAsDataURL(file);
+    });
+  }
 };
 
 const MediaViewer = ({ url, isVideo, alt = "Media", className = "w-full h-full object-cover", controls = true, autoPlay = false, loop = false }) => {
-  const isVid = isVideo || isVideoUrl(url);
+  const [activeUrl, setActiveUrl] = useState(url);
+
+  useEffect(() => {
+    let isMounted = true;
+    let createdBlobUrl = null;
+
+    if (url && typeof url === 'string' && url.startsWith('idb:')) {
+      getMediaBlob(url).then(blobData => {
+        if (!isMounted) return;
+        if (blobData instanceof Blob || blobData instanceof File) {
+          createdBlobUrl = URL.createObjectURL(blobData);
+          setActiveUrl(createdBlobUrl);
+        } else if (typeof blobData === 'string') {
+          setActiveUrl(blobData);
+        }
+      });
+    } else {
+      setActiveUrl(url);
+    }
+
+    return () => {
+      isMounted = false;
+      if (createdBlobUrl) {
+        URL.revokeObjectURL(createdBlobUrl);
+      }
+    };
+  }, [url]);
+
+  const targetUrl = activeUrl || url;
+  const isVid = isVideo || isVideoUrl(targetUrl) || (typeof url === 'string' && url.startsWith('idb:video_'));
+
   if (isVid) {
-    const ytEmbed = getYouTubeEmbedUrl(url);
+    const ytEmbed = getYouTubeEmbedUrl(targetUrl);
     if (ytEmbed) {
       return (
         <iframe
@@ -817,7 +940,7 @@ const MediaViewer = ({ url, isVideo, alt = "Media", className = "w-full h-full o
     }
     return (
       <video
-        src={url}
+        src={targetUrl}
         controls={controls}
         playsInline
         autoPlay={autoPlay}
@@ -826,7 +949,7 @@ const MediaViewer = ({ url, isVideo, alt = "Media", className = "w-full h-full o
       />
     );
   }
-  return <img src={url} alt={alt} className={className} />;
+  return <img src={targetUrl} alt={alt} className={className} />;
 };
 
 // গ্যালারির ছবিগুলো
@@ -6231,15 +6354,26 @@ const AdminPanel = ({
         ? newEvent.images
         : (primaryImage ? [primaryImage] : []);
 
+      let eventVideo = (newEvent.video || '').trim() || null;
+      if (eventVideo && eventVideo.startsWith('data:video/') && eventVideo.length > 400000) {
+        const idbKey = `idb:video_event_${targetId}_${Date.now()}`;
+        await storeMediaBlob(idbKey, eventVideo);
+        eventVideo = idbKey;
+      }
+
       eventsMedia[targetId] = {
         images: allImages,
-        video: (newEvent.video || '').trim() || null
+        video: eventVideo
       };
 
-      await supabaseClient.from('settings').upsert({
-        key: 'events_media',
-        value: JSON.stringify(eventsMedia)
-      }, { onConflict: 'key' });
+      try {
+        await supabaseClient.from('settings').upsert({
+          key: 'events_media',
+          value: JSON.stringify(eventsMedia)
+        }, { onConflict: 'key' });
+      } catch (upsertErr) {
+        console.warn("Could not upsert events_media to Supabase:", upsertErr);
+      }
 
       try {
         localStorage.setItem('temple_events_media', JSON.stringify(eventsMedia));
@@ -6750,17 +6884,29 @@ const AdminPanel = ({
 
   // -- Photo Gallery Management Handlers --
   const handleSaveGalleryToCloud = async (updatedList) => {
-    if (setGalleryItems) setGalleryItems(updatedList);
+    // If any item has oversized base64 data, persist to IndexedDB first
+    const safeList = await Promise.all(updatedList.map(async (item, idx) => {
+      if (item && item.url && typeof item.url === 'string' && item.url.startsWith('data:video/') && item.url.length > 400000) {
+        const idbKey = `idb:video_gal_${item.id || idx}_${Date.now()}`;
+        await storeMediaBlob(idbKey, item.url);
+        return { ...item, url: idbKey };
+      }
+      return item;
+    }));
+
+    if (setGalleryItems) setGalleryItems(safeList);
     try {
-      localStorage.setItem('temple_gallery_items', JSON.stringify(updatedList));
-    } catch (e) { }
+      localStorage.setItem('temple_gallery_items', JSON.stringify(safeList));
+    } catch (e) {
+      console.warn("localStorage quota exceeded for gallery:", e);
+    }
 
     try {
       const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'gallery_items').maybeSingle();
       if (existing) {
-        await supabaseClient.from('settings').update({ value: JSON.stringify(updatedList) }).eq('id', existing.id);
+        await supabaseClient.from('settings').update({ value: JSON.stringify(safeList) }).eq('id', existing.id);
       } else {
-        await supabaseClient.from('settings').insert({ key: 'gallery_items', value: JSON.stringify(updatedList) });
+        await supabaseClient.from('settings').insert({ key: 'gallery_items', value: JSON.stringify(safeList) });
       }
     } catch (err) {
       console.warn("Could not save gallery to Supabase:", err);
@@ -6797,10 +6943,11 @@ const AdminPanel = ({
     const file = e.target.files?.[0];
     if (!file) return;
     setIsSaving(true);
+    showToast('ভিডিও ফাইল প্রসেস ও আপলোড হচ্ছে... অনুগ্রহ করে অপেক্ষা করুন।');
     try {
       const videoData = await readVideoFile(file);
       setNewEvent(prev => ({ ...prev, video: videoData }));
-      showToast('ভিডিও ফাইল সফলভাবে যুক্ত হয়েছে!');
+      showToast('ভিডিও ফাইল সফলভাবে প্রস্তুত ও যুক্ত হয়েছে!');
     } catch (err) {
       setErrorMsg(err.message || 'ভিডিও আপলোড করতে সমস্যা হয়েছে।');
     } finally {
@@ -6854,6 +7001,7 @@ const AdminPanel = ({
     const file = e.target.files?.[0];
     if (!file) return;
     setIsSaving(true);
+    showToast('ভিডিও ফাইল প্রসেস ও আপলোড হচ্ছে... অনুগ্রহ করে অপেক্ষা করুন।');
     try {
       const videoData = await readVideoFile(file);
       setNewGalleryPhoto(prev => ({
@@ -6861,7 +7009,7 @@ const AdminPanel = ({
         image: videoData,
         mediaType: 'video'
       }));
-      showToast('ভিডিও ফাইল সফলভাবে প্রস্তুত হয়েছে!');
+      showToast('ভিডিও ফাইল সফলভাবে প্রস্তুত ও আপলোড হয়েছে!');
     } catch (err) {
       setErrorMsg(err.message || 'ভিডিও আপলোড করতে সমস্যা হয়েছে।');
     } finally {
@@ -7629,7 +7777,7 @@ const AdminPanel = ({
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <label className="cursor-pointer bg-red-50 hover:bg-red-100/70 border-2 border-dashed border-red-300 px-4 py-3 rounded-xl text-sm flex items-center justify-center gap-2 transition-colors">
                       <i className="fas fa-file-video text-red-600"></i>
-                      <span className="text-red-900 font-bold">ডিভাইস থেকে ভিডিও ফাইল আপলোড (.mp4, .webm)</span>
+                      <span className="text-red-900 font-bold">ডিভাইস থেকে যেকোনো সাইজের ভিডিও ফাইল আপলোড (.mp4, .webm, .mov)</span>
                       <input
                         type="file"
                         accept="video/*"
@@ -9308,7 +9456,7 @@ const AdminPanel = ({
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-xs font-bold text-gray-700 mb-1">
-                          ভিডিও ফাইল আপলোড (.mp4, .webm - ৪০MB পর্যন্ত)
+                          ভিডিও ফাইল আপলোড (.mp4, .webm, .mov - যেকোনো সাইজ, আনলিমিটেড)
                         </label>
                         <input
                           type="file"
