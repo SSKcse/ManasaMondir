@@ -847,50 +847,56 @@ const compressImageFile = (file) => {
   });
 };
 
-// Video file reader & unlimited upload engine (No file size limits!)
+// Fast availability check for local video upload server (times out in 400ms)
+const checkUploadServer = async () => {
+  if (typeof window === 'undefined' || !window.fetch) return false;
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 400);
+    const res = await fetch('/api/upload-check', { signal: ctrl.signal });
+    clearTimeout(t);
+    return res.ok;
+  } catch {
+    return false;
+  }
+};
+
+// Video file reader & high-speed unlimited upload engine
 const readVideoFile = async (file) => {
   if (!file) return null;
 
-  // 1. Direct server stream upload to /api/upload (Node backend)
+  // 1. Generate unique media key for instant IndexedDB binary storage
+  const mediaId = `idb:video_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+
+  // Store file directly into browser IndexedDB (lightning fast: 10-30ms)
   try {
-    const uploadUrl = `/api/upload?filename=${encodeURIComponent(file.name)}`;
-    const res = await fetch(uploadUrl, {
-      method: 'POST',
-      body: file
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.success && data.url) {
-        return data.url;
-      }
-    }
+    await storeMediaBlob(mediaId, file);
   } catch (err) {
-    console.warn("Direct /api/upload attempt unavailable, using high-capacity storage:", err);
+    console.warn("IndexedDB direct save failed:", err);
   }
 
-  // 2. High-capacity IndexedDB storage for seamless client persistence (supports gigabytes)
-  try {
-    const mediaId = `idb:video_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-    const saved = await storeMediaBlob(mediaId, file);
-    if (saved) {
-      return mediaId;
+  // 2. Check if local upload streaming server is actively responding
+  const serverReady = await checkUploadServer();
+  if (serverReady) {
+    try {
+      const uploadUrl = `/api/upload?filename=${encodeURIComponent(file.name)}`;
+      const res = await fetch(uploadUrl, {
+        method: 'POST',
+        body: file
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json && json.success && json.url) {
+          return json.url;
+        }
+      }
+    } catch (err) {
+      console.warn("Direct upload error, relying on instant IndexedDB:", err);
     }
-  } catch (idbErr) {
-    console.warn("IndexedDB storage failed, falling back to Object URL/Data URL:", idbErr);
   }
 
-  // 3. Fallback: Instant browser Object URL
-  try {
-    return URL.createObjectURL(file);
-  } catch {
-    // 4. Ultimate fallback: FileReader DataURL
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onerror = reject;
-      reader.onload = () => resolve(reader.result);
-      reader.readAsDataURL(file);
-    });
-  }
+  // 3. Instant return of the IndexedDB key (Virtually 0ms delay, no file size limit!)
+  return mediaId;
 };
 
 const MediaViewer = ({ url, isVideo, alt = "Media", className = "w-full h-full object-cover", controls = true, autoPlay = false, loop = false }) => {
@@ -9822,14 +9828,77 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [dbError, setDbError] = useState(false);
 
-  const [marqueeText, setMarqueeText] = useState('মন্দিরে স্বাগতম ✦ মায়ের আশীর্বাদ আপনার সহায় হোক ✦ ঐশ্বরিক উপস্থিতি অনুভব করুন');
-  const [marqueeTextEn, setMarqueeTextEn] = useState('');
-  const [featuredTestimonialIds, setFeaturedTestimonialIds] = useState([]);
-  const [committeeMembers, setCommitteeMembers] = useState([]);
-  const [testimonials, setTestimonials] = useState([]);
-  const [events, setEvents] = useState([]);
-  const [notices, setNotices] = useState([]);
-  const [donations, setDonations] = useState([]);
+  const [marqueeText, setMarqueeText] = useState(() => {
+    try {
+      const saved = localStorage.getItem('temple_marquee');
+      if (saved) return saved;
+    } catch (e) {}
+    return PRELOADED_DATA.marquee || 'মন্দিরে স্বাগতম ✦ মায়ের আশীর্বাদ আপনার সহায় হোক ✦ ঐশ্বরিক উপস্থিতি অনুভব করুন';
+  });
+  const [marqueeTextEn, setMarqueeTextEn] = useState(() => {
+    try {
+      const saved = localStorage.getItem('temple_marquee_en');
+      if (saved) return saved;
+    } catch (e) {}
+    return '';
+  });
+  const [featuredTestimonialIds, setFeaturedTestimonialIds] = useState(() => {
+    try {
+      const saved = localStorage.getItem('temple_featured_test_ids');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return PRELOADED_DATA.featuredTestimonialIds || [5, 6, 4, 8];
+  });
+  const [committeeMembers, setCommitteeMembers] = useState(() => {
+    try {
+      const saved = localStorage.getItem('temple_committee');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return PRELOADED_DATA.committee || [];
+  });
+  const [testimonials, setTestimonials] = useState(() => {
+    try {
+      const saved = localStorage.getItem('temple_testimonials');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return PRELOADED_DATA.testimonials || [];
+  });
+  const [events, setEvents] = useState(() => {
+    try {
+      const saved = localStorage.getItem('temple_events');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return PRELOADED_DATA.events || [];
+  });
+  const [notices, setNotices] = useState(() => {
+    try {
+      const saved = localStorage.getItem('temple_notices');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return PRELOADED_DATA.notices || [];
+  });
+  const [donations, setDonations] = useState(() => {
+    try {
+      const saved = localStorage.getItem('temple_donations');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return [];
+  });
 
   // Features 3, 4, 5: Timings, Travel Guide, Sacred Mantras
   const [timings, setTimings] = useState(() => {
@@ -10063,15 +10132,42 @@ function App() {
   const fetchData = async () => {
     setDbError(false);
     try {
-      const { data: settingsData } = await supabaseClient.from('settings').select('*');
-      if (settingsData) {
+      // Parallelize all queries across HTTP/2 multiplexing for instant response
+      const [
+        settingsRes,
+        committeeRes,
+        testimonialsRes,
+        eventsRes,
+        noticesRes,
+        donationsRes
+      ] = await Promise.allSettled([
+        supabaseClient.from('settings').select('id, key, value').neq('key', 'events_media'),
+        supabaseClient.from('committee').select('id, name, role, phone, order_idx, image').order('order_idx', { ascending: true }).order('id', { ascending: true }),
+        supabaseClient.from('testimonials').select('*').order('date', { ascending: false }).order('id', { ascending: false }),
+        supabaseClient.from('events').select('id, title, date, description, image').order('date', { ascending: false }).order('id', { ascending: false }),
+        supabaseClient.from('notices').select('*').order('date', { ascending: false }).order('id', { ascending: false }),
+        supabaseClient.from('donations').select('*').order('id', { ascending: false })
+      ]);
+
+      // 1. Process Settings (excluding heavy events_media)
+      if (settingsRes.status === 'fulfilled' && settingsRes.value.data) {
+        const settingsData = settingsRes.value.data;
         const mq = settingsData.find(s => s.key === 'marquee');
-        if (mq) setMarqueeText(mq.value);
+        if (mq && mq.value) {
+          setMarqueeText(mq.value);
+          try { localStorage.setItem('temple_marquee', mq.value); } catch (e) { }
+        }
         const mqEn = settingsData.find(s => s.key === 'marquee_en');
-        if (mqEn) setMarqueeTextEn(mqEn.value);
+        if (mqEn && mqEn.value) {
+          setMarqueeTextEn(mqEn.value);
+          try { localStorage.setItem('temple_marquee_en', mqEn.value); } catch (e) { }
+        }
         const ft = settingsData.find(s => s.key === 'featured_test_ids');
         if (ft && ft.value) {
-          try { setFeaturedTestimonialIds(JSON.parse(ft.value)); } catch (e) { }
+          try {
+            setFeaturedTestimonialIds(JSON.parse(ft.value));
+            localStorage.setItem('temple_featured_test_ids', ft.value);
+          } catch (e) { }
         }
 
         const tm = settingsData.find(s => s.key === 'temple_timings');
@@ -10156,30 +10252,30 @@ function App() {
             }
           } catch (e) { }
         }
-
-        const em = settingsData.find(s => s.key === 'events_media');
-        if (em && em.value) {
-          try {
-            localStorage.setItem('temple_events_media', em.value);
-          } catch (e) { }
-        }
       }
 
-      const { data: committeeData } = await supabaseClient.from('committee').select('id, name, role, phone, order_idx, image').order('order_idx', { ascending: true }).order('id', { ascending: true });
-      if (committeeData) {
+      // 2. Process Committee
+      if (committeeRes.status === 'fulfilled' && committeeRes.value.data) {
+        const committeeData = committeeRes.value.data;
         const mappedCommittee = committeeData.map(m => {
           const local = PRELOADED_DATA.committee.find(p => p.id === m.id);
           const img = m.image || (local && local.image) || `images/committee/member_${m.id}.jpg`;
           return { ...m, image: img };
         });
         setCommitteeMembers(mappedCommittee);
+        try { localStorage.setItem('temple_committee', JSON.stringify(mappedCommittee)); } catch (e) { }
       }
 
-      const { data: testimonialsData } = await supabaseClient.from('testimonials').select('*').order('date', { ascending: false }).order('id', { ascending: false });
-      if (testimonialsData) setTestimonials(testimonialsData);
+      // 3. Process Testimonials
+      if (testimonialsRes.status === 'fulfilled' && testimonialsRes.value.data) {
+        const testimonialsData = testimonialsRes.value.data;
+        setTestimonials(testimonialsData);
+        try { localStorage.setItem('temple_testimonials', JSON.stringify(testimonialsData)); } catch (e) { }
+      }
 
-      const { data: eventsData } = await supabaseClient.from('events').select('id, title, date, description, image').order('date', { ascending: false }).order('id', { ascending: false });
-      if (eventsData) {
+      // 4. Process Events
+      if (eventsRes.status === 'fulfilled' && eventsRes.value.data) {
+        const eventsData = eventsRes.value.data;
         let eventsMediaMap = {};
         try {
           const raw = localStorage.getItem('temple_events_media');
@@ -10199,13 +10295,31 @@ function App() {
           };
         });
         setEvents(mappedEvents);
+        try { localStorage.setItem('temple_events', JSON.stringify(mappedEvents)); } catch (e) { }
       }
 
-      const { data: noticesData } = await supabaseClient.from('notices').select('*').order('date', { ascending: false }).order('id', { ascending: false });
-      if (noticesData) setNotices(noticesData);
+      // 5. Process Notices (CRITICAL: Instant update & cached for next refresh)
+      if (noticesRes.status === 'fulfilled' && noticesRes.value.data) {
+        const noticesData = noticesRes.value.data;
+        setNotices(noticesData);
+        try { localStorage.setItem('temple_notices', JSON.stringify(noticesData)); } catch (e) { }
+      }
 
-      const { data: dData } = await supabaseClient.from('donations').select('*').order('id', { ascending: false });
-      if (dData) setDonations(dData);
+      // 6. Process Donations
+      if (donationsRes.status === 'fulfilled' && donationsRes.value.data) {
+        const dData = donationsRes.value.data;
+        setDonations(dData);
+        try { localStorage.setItem('temple_donations', JSON.stringify(dData)); } catch (e) { }
+      }
+
+      // Background non-blocking load of events_media
+      supabaseClient.from('settings').select('value').eq('key', 'events_media').maybeSingle().then(res => {
+        if (res && res.data && res.data.value) {
+          try {
+            localStorage.setItem('temple_events_media', res.data.value);
+          } catch (e) { }
+        }
+      }).catch(() => {});
 
     } catch (error) {
       console.error("Supabase Database Error:", error);

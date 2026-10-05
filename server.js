@@ -38,6 +38,16 @@ const server = http.createServer((req, res) => {
 
   let reqPath = decodeURI(req.url.split('?')[0]);
 
+  // Fast health check for upload server availability
+  if (req.method === 'GET' && (reqPath === '/api/upload-check' || reqPath === '/api/ping')) {
+    res.writeHead(200, {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    });
+    res.end(JSON.stringify({ ok: true, uploadEnabled: true }));
+    return;
+  }
+
   // Direct unlimited video / media upload endpoint
   if (req.method === 'POST' && (reqPath === '/api/upload' || reqPath === '/upload')) {
     const urlObj = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
