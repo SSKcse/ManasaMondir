@@ -564,15 +564,18 @@ const printReceiptDirectly = (receipt, currentLang = 'bn') => {
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    body, p, span, td, th, div, label {
+      font-family: 'Noto Sans Bengali', 'Hind Siliguri', sans-serif !important;
+      font-variant-numeric: normal !important;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
     body {
-      font-family: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
       background: #faf7f2;
       color: #1c1917;
       padding: 24px 16px;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
-      text-rendering: optimizeLegibility;
-      -webkit-font-smoothing: antialiased;
     }
     .print-actions {
       max-width: 780px;
@@ -628,8 +631,7 @@ const printReceiptDirectly = (receipt, currentLang = 'bn') => {
       pointer-events: none;
       user-select: none;
       z-index: 0;
-      opacity: 0.16;
-      text-align: center;
+      opacity: 0.20; text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -704,15 +706,21 @@ const printReceiptDirectly = (receipt, currentLang = 'bn') => {
       margin-bottom: 4px;
     }
     .header .heritage-sub {
+      font-family: 'Noto Sans Bengali', 'Hind Siliguri', sans-serif !important;
       font-size: 13px;
       color: #451a03;
       font-weight: 600;
-      margin-bottom: 3px;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      letter-spacing: 0.2px;
     }
     .header .contact-sub {
+      font-family: 'Noto Sans Bengali', 'Hind Siliguri', sans-serif !important;
       font-size: 12px;
       color: #78716c;
       margin-bottom: 8px;
+      white-space: nowrap;
+      letter-spacing: 0.2px;
     }
     .sloka-pill {
       font-family: 'Noto Serif Bengali', serif;
@@ -959,8 +967,8 @@ const printReceiptDirectly = (receipt, currentLang = 'bn') => {
       <div class="header">
         <div class="temple-crest">ॐ</div>
         <h1>শ্রী শ্রী মা মনসা মন্দির, গৈলা</h1>
-        <p class="heritage-sub">মহাকবি বিজয় গুপ্ত প্রতিষ্ঠিত ঐতিহাসিক মহাপবিত্র তীর্থস্থান | স্থাপিত: ১৪৯৪ খ্রিষ্টাব্দ (১৪১৬ শকাব্দ)</p>
-        <p class="contact-sub">গৈলা, আগৈলঝাড়া, বরিশাল, বাংলাদেশ • মোবাইল: ০১৭২৭০৭৫২৫৪, ০১৭১২৯৪০৭১৬</p>
+        <p class="heritage-sub">মহাকবি বিজয় গুপ্ত প্রতিষ্ঠিত ঐতিহাসিক মহাপবিত্র তীর্থস্থান • স্থাপিত:&nbsp;১৪৯৪&nbsp;খ্রিষ্টাব্দ&nbsp;(১৪১৬&nbsp;শকাব্দ)</p>
+        <p class="contact-sub">গৈলা, আগৈলঝাড়া, বরিশাল, বাংলাদেশ • মোবাইল:&nbsp;০১৭২৭০৭৫২৫৪,&nbsp;০১৭১২৯৪০৭১৬</p>
         <div>
           <div class="sloka-pill">ওঁ হ্রীং শ্রীং ক্লীং ঐং মনসাদেব্যৈ নমঃ</div>
         </div>
@@ -1167,7 +1175,7 @@ const compressImageFile = (file) => {
       const img = new Image();
       img.onerror = () => resolve(reader.result);
       img.onload = () => {
-        const maxDim = 1280;
+        const maxDim = 880;
         let w = img.width;
         let h = img.height;
         if (w > maxDim || h > maxDim) {
@@ -1184,7 +1192,7 @@ const compressImageFile = (file) => {
         canvas.height = h;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL('image/jpeg', 0.82));
+        resolve(canvas.toDataURL('image/jpeg', 0.68));
       };
       img.src = reader.result;
     };
@@ -1210,17 +1218,7 @@ const checkUploadServer = async () => {
 const readVideoFile = async (file) => {
   if (!file) return null;
 
-  // 1. Generate unique media key for instant IndexedDB binary storage
-  const mediaId = `idb:video_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
-
-  // Store file directly into browser IndexedDB (lightning fast: 10-30ms)
-  try {
-    await storeMediaBlob(mediaId, file);
-  } catch (err) {
-    console.warn("IndexedDB direct save failed:", err);
-  }
-
-  // 2. Check if local upload streaming server is actively responding
+  // 1. Check if local upload streaming server is actively responding (e.g. localhost)
   const serverReady = await checkUploadServer();
   if (serverReady) {
     try {
@@ -1236,12 +1234,23 @@ const readVideoFile = async (file) => {
         }
       }
     } catch (err) {
-      console.warn("Direct upload error, relying on instant IndexedDB:", err);
+      console.warn("Direct upload error:", err);
     }
   }
 
-  // 3. Instant return of the IndexedDB key (Virtually 0ms delay, no file size limit!)
-  return mediaId;
+  // 2. For universal cross-device playback, convert files under 3.5MB to Base64 Data URL
+  if (file.size <= 3.5 * 1024 * 1024) {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // 3. For large video files on cloud hosting without dedicated streaming server,
+  // warn the user so they know to use a YouTube link or compress the clip
+  throw new Error('ভিডিও ফাইলটি বেশি বড় (' + (file.size / (1024 * 1024)).toFixed(1) + ' MB)। সব ডিভাইসে সঠিকভাবে চলার জন্য অনুগ্রহ করে ৩.৫ MB-এর নিচের ভিডিও দিন অথবা YouTube লিংক ব্যবহার করুন।');
 };
 
 const MediaViewer = ({ url, isVideo, alt = "Media", className = "w-full h-full object-cover", controls = true, autoPlay = false, loop = false }) => {
@@ -6784,11 +6793,7 @@ const AdminPanel = ({
         : (primaryImage ? [primaryImage] : []);
 
       let eventVideo = (newEvent.video || '').trim() || null;
-      if (eventVideo && eventVideo.startsWith('data:video/') && eventVideo.length > 400000) {
-        const idbKey = `idb:video_event_${targetId}_${Date.now()}`;
-        await storeMediaBlob(idbKey, eventVideo);
-        eventVideo = idbKey;
-      }
+      // Keep video URL intact for universal cross-device playback
 
       eventsMedia[targetId] = {
         images: allImages,
@@ -6805,7 +6810,7 @@ const AdminPanel = ({
       }
 
       try {
-        localStorage.setItem('temple_events_media', JSON.stringify(eventsMedia));
+        try { localStorage.setItem('temple_events_media', JSON.stringify(eventsMedia)); } catch (e) {}
       } catch (e) {}
 
       const updatedItem = {
@@ -10554,7 +10559,13 @@ function App() {
     }
   });
 
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(() => {
+    try {
+      return localStorage.getItem('temple_admin_logged_in') === 'true';
+    } catch (e) {
+      return false;
+    }
+  });
 
   const [adminCredentials, setAdminCredentials] = useState(() => {
     try {
@@ -10785,7 +10796,7 @@ function App() {
         noticesRes,
         donationsRes
       ] = await Promise.allSettled([
-        supabaseClient.from('settings').select('id, key, value').neq('key', 'events_media'),
+        supabaseClient.from('settings').select('id, key, value'),
         supabaseClient.from('committee').select('id, name, role, phone, order_idx, image').order('order_idx', { ascending: true }).order('id', { ascending: true }),
         supabaseClient.from('testimonials').select('*').order('date', { ascending: false }).order('id', { ascending: false }),
         supabaseClient.from('events').select('id, title, date, description, image').order('date', { ascending: false }).order('id', { ascending: false }),
@@ -10917,14 +10928,22 @@ function App() {
         try { localStorage.setItem('temple_testimonials', JSON.stringify(testimonialsData)); } catch (e) { }
       }
 
-      // 4. Process Events
+      // 4. Process Events (with universal media from cloud settings)
       if (eventsRes.status === 'fulfilled' && eventsRes.value.data) {
         const eventsData = eventsRes.value.data;
         let eventsMediaMap = {};
-        try {
-          const raw = localStorage.getItem('temple_events_media');
-          if (raw) eventsMediaMap = JSON.parse(raw) || {};
-        } catch (e) { }
+        if (settingsRes.status === 'fulfilled' && settingsRes.value.data) {
+          const emRow = settingsRes.value.data.find(s => s.key === 'events_media');
+          if (emRow && emRow.value) {
+            try { eventsMediaMap = JSON.parse(emRow.value) || {}; } catch (e) {}
+          }
+        }
+        if (Object.keys(eventsMediaMap).length === 0) {
+          try {
+            const raw = localStorage.getItem('temple_events_media');
+            if (raw) eventsMediaMap = JSON.parse(raw) || {};
+          } catch (e) {}
+        }
 
         const mappedEvents = eventsData.map(ev => {
           const local = (PRELOADED_DATA.events || []).find(p => p.id === ev.id);
@@ -10940,6 +10959,7 @@ function App() {
         });
         setEvents(mappedEvents);
         try { localStorage.setItem('temple_events', JSON.stringify(mappedEvents)); } catch (e) { }
+        try { localStorage.setItem('temple_events_media', JSON.stringify(eventsMediaMap)); } catch (e) { }
       }
 
       // 5. Process Notices (CRITICAL: Instant update & cached for next refresh)
