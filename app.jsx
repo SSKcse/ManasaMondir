@@ -1076,12 +1076,22 @@ const printReceiptDirectly = (receipt, currentLang = 'bn') => {
 
 // --- Media, Video & High-Capacity Storage Helpers ---
 
-// Universal Cross-Device / Tab Broadcast Sync
+// Universal Cross-Device & Tab Realtime Sync
 const broadcastUniversalSync = () => {
   try {
     const bc = new BroadcastChannel('mmg_universal_sync');
     bc.postMessage({ type: 'sync', timestamp: Date.now() });
     bc.close();
+  } catch (e) {}
+
+  try {
+    if (window.__supabaseSyncChannel) {
+      window.__supabaseSyncChannel.send({
+        type: 'broadcast',
+        event: 'db_sync',
+        payload: { timestamp: Date.now() }
+      });
+    }
   } catch (e) {}
 };
 
@@ -1200,9 +1210,10 @@ const compressImageFile = (file) => {
   });
 };
 
-// Fast availability check for local video upload server (times out in 400ms)
+// Fast availability check for local video upload server (only on localhost)
 const checkUploadServer = async () => {
   if (typeof window === 'undefined' || !window.fetch) return false;
+  if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') return false;
   try {
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), 400);
@@ -5652,105 +5663,114 @@ const DonationPage = ({ donations, donationReceipts, setDonationReceipts, supaba
               <div className="bg-white rounded-3xl shadow-2xl border-4 border-amber-500/70 p-6 sm:p-10 relative overflow-hidden print-sacred-card">
                 <div className="absolute top-0 left-0 right-0 h-3 bg-gradient-to-r from-amber-500 via-orange-500 to-red-600"></div>
 
-                {/* Receipt Header with Temple Seal */}
-                <div className="text-center pb-6 border-b-2 border-amber-200">
-                  <div className="w-16 h-16 mx-auto rounded-full bg-orange-100 border-2 border-amber-500 flex items-center justify-center text-amber-700 text-2xl shadow-md mb-2">
-                    <i className="fas fa-om"></i>
-                  </div>
-                  <h2 className="text-2xl sm:text-3xl font-bold font-serif text-orange-950">
-                    {lang === 'en' ? 'Shree Shree Maa Manasa Mandir, Goila' : 'শ্রী শ্রী মা মনসা মন্দির, গৈলা'}
-                  </h2>
-                  <p className="text-xs sm:text-sm text-gray-600 font-medium">
-                    {lang === 'en' ? 'Goila, Agailjhara, Barishal, Bangladesh • Established 1494 AD' : 'গৈলা, আগৈলঝাড়া, বরিশাল, বাংলাদেশ • প্রতিষ্ঠা ১৪৯৪ খ্রিষ্টাব্দ / ১৪১৬ শকাব্দ'}
-                  </p>
-                  <div className="inline-block mt-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-5 py-1 rounded-full text-xs sm:text-sm font-bold tracking-wide shadow-sm">
-                    ✦ {lang === 'en' ? 'Official Devotee Memorial Pronami Receipt' : 'পবিত্র স্মারক দান ও প্রণামী রসিদ'} ✦
+                {/* Sacred Watermark Om */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0 opacity-15">
+                  <div className="w-64 h-64 sm:w-88 sm:h-88 rounded-full border-4 border-dashed border-amber-500 flex items-center justify-center">
+                    <span className="font-serif text-[180px] sm:text-[230px] font-black text-amber-700 leading-none">ॐ</span>
                   </div>
                 </div>
 
-                {/* Receipt Details Body */}
-                <div className="py-6 space-y-4 text-gray-800 text-sm sm:text-base">
-                  <div className="flex flex-wrap justify-between items-center bg-orange-50/80 p-3.5 rounded-2xl border border-orange-200">
-                    <div>
-                      <span className="text-xs text-gray-500 block font-semibold">{lang === 'en' ? 'Receipt Serial No:' : 'রসিদ স্মারক নং:'}</span>
-                      <span className="font-mono font-bold text-amber-900 text-lg sm:text-xl tracking-wider">{generatedReceipt.receiptNo}</span>
+                <div className="relative z-10">
+                  {/* Receipt Header with Temple Seal */}
+                  <div className="text-center pb-6 border-b-2 border-amber-200">
+                    <div className="w-16 h-16 mx-auto rounded-full bg-orange-100 border-2 border-amber-500 flex items-center justify-center text-amber-700 text-2xl shadow-md mb-2">
+                      <i className="fas fa-om"></i>
                     </div>
-                    <div className="text-right mt-2 sm:mt-0">
-                      <span className="text-xs text-gray-500 block font-semibold">{lang === 'en' ? 'Date:' : 'তারিখ:'}</span>
-                      <span className="font-bold text-gray-800">{generatedReceipt.date}</span>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-100">
-                      <span className="block text-xs text-gray-500 font-semibold">{lang === 'en' ? 'Donor / Devotee Name' : 'দাতার নাম'}</span>
-                      <span className="font-bold text-gray-900 text-base">{generatedReceipt.name}</span>
-                    </div>
-                    <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-100">
-                      <span className="block text-xs text-gray-500 font-semibold">{lang === 'en' ? 'Gotra (Lineage)' : 'গোত্র'}</span>
-                      <span className="font-bold text-gray-900 text-base">{generatedReceipt.gotra || (lang === 'en' ? 'Not Mentioned' : 'অনুল্লিখিত')}</span>
-                    </div>
-                    <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-100">
-                      <span className="block text-xs text-gray-500 font-semibold">{lang === 'en' ? 'Payment Method' : 'প্রদানের মাধ্যম'}</span>
-                      <span className="font-bold text-orange-900">{generatedReceipt.method}</span>
-                    </div>
-                    <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-100">
-                      <span className="block text-xs text-gray-500 font-semibold">{lang === 'en' ? 'Transaction ID / Reference' : 'ট্রানজেকশন আইডি (TrxID) / স্লিপ নং'}</span>
-                      <span className="font-mono font-bold text-gray-800">{generatedReceipt.trxId || (lang === 'en' ? 'Cash/Direct Seva' : 'সরাসরি প্রণামী')}</span>
+                    <h2 className="text-2xl sm:text-3xl font-bold font-serif text-orange-950">
+                      {lang === 'en' ? 'Shree Shree Maa Manasa Mandir, Goila' : 'শ্রী শ্রী মা মনসা মন্দির, গৈলা'}
+                    </h2>
+                    <p className="text-xs sm:text-sm text-gray-600 font-medium">
+                      {lang === 'en' ? 'Goila, Agailjhara, Barishal, Bangladesh • Established 1494 AD' : 'গৈলা, আগৈলঝাড়া, বরিশাল, বাংলাদেশ • প্রতিষ্ঠা ১৪৯৪ খ্রিষ্টাব্দ / ১৪১৬ শকাব্দ'}
+                    </p>
+                    <div className="inline-block mt-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-5 py-1 rounded-full text-xs sm:text-sm font-bold tracking-wide shadow-sm">
+                      ✦ {lang === 'en' ? 'Official Devotee Memorial Pronami Receipt' : 'পবিত্র স্মারক দান ও প্রণামী রসিদ'} ✦
                     </div>
                   </div>
 
-                  {/* Amount Highlights */}
-                  <div className="p-5 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300">
-                    <div className="flex flex-wrap justify-between items-center mb-2">
-                      <span className="text-xs font-bold uppercase tracking-wider text-amber-800">{lang === 'en' ? 'Donated Amount' : 'গৃহীত প্রণামীর পরিমাণ'}</span>
-                      <span className="text-2xl sm:text-3xl font-extrabold text-amber-900 font-mono">৳ {formatNumber(generatedReceipt.amount, lang)} /-</span>
+                  {/* Receipt Details Body */}
+                  <div className="py-6 space-y-4 text-gray-800 text-sm sm:text-base">
+                    <div className="flex flex-wrap justify-between items-center bg-orange-50/80 p-3.5 rounded-2xl border border-orange-200">
+                      <div>
+                        <span className="text-xs text-gray-500 block font-semibold">{lang === 'en' ? 'Receipt Serial No:' : 'রসিদ স্মারক নং:'}</span>
+                        <span className="font-mono font-bold text-amber-900 text-lg sm:text-xl tracking-wider">{generatedReceipt.receiptNo}</span>
+                      </div>
+                      <div className="text-right mt-2 sm:mt-0">
+                        <span className="text-xs text-gray-500 block font-semibold">{lang === 'en' ? 'Date:' : 'তারিখ:'}</span>
+                        <span className="font-bold text-gray-800">{generatedReceipt.date}</span>
+                      </div>
                     </div>
-                    <div className="text-sm font-serif font-bold text-gray-800 border-t border-amber-200/80 pt-2">
-                      <span className="text-xs text-gray-500 font-sans font-semibold mr-1">{lang === 'en' ? 'In Words:' : 'কথায়:'}</span>
-                      {generatedReceipt.amountWords}
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-100">
+                        <span className="block text-xs text-gray-500 font-semibold">{lang === 'en' ? 'Donor / Devotee Name' : 'দাতার নাম'}</span>
+                        <span className="font-bold text-gray-900 text-base">{generatedReceipt.name}</span>
+                      </div>
+                      <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-100">
+                        <span className="block text-xs text-gray-500 font-semibold">{lang === 'en' ? 'Gotra (Lineage)' : 'গোত্র'}</span>
+                        <span className="font-bold text-gray-900 text-base">{generatedReceipt.gotra || (lang === 'en' ? 'Not Mentioned' : 'অনুল্লিখিত')}</span>
+                      </div>
+                      <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-100">
+                        <span className="block text-xs text-gray-500 font-semibold">{lang === 'en' ? 'Payment Method' : 'প্রদানের মাধ্যম'}</span>
+                        <span className="font-bold text-orange-900">{generatedReceipt.method}</span>
+                      </div>
+                      <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-100">
+                        <span className="block text-xs text-gray-500 font-semibold">{lang === 'en' ? 'Transaction ID / Reference' : 'ট্রানজেকশন আইডি (TrxID) / স্লিপ নং'}</span>
+                        <span className="font-mono font-bold text-gray-800">{generatedReceipt.trxId || (lang === 'en' ? 'Cash/Direct Seva' : 'সরাসরি প্রণামী')}</span>
+                      </div>
                     </div>
+
+                    {/* Amount Highlights */}
+                    <div className="p-5 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300">
+                      <div className="flex flex-wrap justify-between items-center mb-2">
+                        <span className="text-xs font-bold uppercase tracking-wider text-amber-800">{lang === 'en' ? 'Donated Amount' : 'গৃহীত প্রণামীর পরিমাণ'}</span>
+                        <span className="text-2xl sm:text-3xl font-extrabold text-amber-900 font-mono">৳ {formatNumber(generatedReceipt.amount, lang)} /-</span>
+                      </div>
+                      <div className="text-sm font-serif font-bold text-gray-800 border-t border-amber-200/80 pt-2">
+                        <span className="text-xs text-gray-500 font-sans font-semibold mr-1">{lang === 'en' ? 'In Words:' : 'কথায়:'}</span>
+                        {generatedReceipt.amountWords}
+                      </div>
+                    </div>
+
+                    {/* Verification & Blessing Seal */}
+                    <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-200 flex items-center justify-between flex-wrap gap-3">
+                      <div className="flex items-center gap-2.5 text-emerald-800 font-bold text-xs sm:text-sm">
+                        <i className="fas fa-check-circle text-emerald-600 text-lg"></i>
+                        <span>{lang === 'en' ? 'Verified & Acknowledged in Sacred Temple Fund' : 'শ্রী শ্রী মা মনসা মন্দির পুণ্য তহবিলে গৃহীত ও সত্যায়িত'}</span>
+                      </div>
+                      <span className="text-[11px] font-mono text-emerald-700 bg-emerald-100/70 px-2.5 py-1 rounded-md border border-emerald-300">
+                        AUTH-SEAL-VERIFIED
+                      </span>
+                    </div>
+
+                    <p className="text-center text-xs sm:text-sm text-gray-600 italic font-serif pt-2">
+                      "{lang === 'en' ? 'May Devi Manasa bless your family with eternal health, prosperity, and peace.' : 'দেবী মনসার অপার কৃপায় আপনার ও আপনার পরিবারে রোগমুক্তি, ধনধান্য ও শান্তি বর্ষিত হোক।'}"
+                    </p>
                   </div>
 
-                  {/* Verification & Blessing Seal */}
-                  <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-200 flex items-center justify-between flex-wrap gap-3">
-                    <div className="flex items-center gap-2.5 text-emerald-800 font-bold text-xs sm:text-sm">
-                      <i className="fas fa-check-circle text-emerald-600 text-lg"></i>
-                      <span>{lang === 'en' ? 'Verified & Acknowledged in Sacred Temple Fund' : 'শ্রী শ্রী মা মনসা মন্দির পুণ্য তহবিলে গৃহীত ও সত্যায়িত'}</span>
-                    </div>
-                    <span className="text-[11px] font-mono text-emerald-700 bg-emerald-100/70 px-2.5 py-1 rounded-md border border-emerald-300">
-                      AUTH-SEAL-VERIFIED
-                    </span>
+                  {/* Print & Action Buttons */}
+                  <div className="flex flex-wrap items-center justify-center gap-3 pt-6 border-t border-gray-200 no-print">
+                    <button
+                      onClick={() => printReceiptDirectly(generatedReceipt, lang)}
+                      className="btn-shine bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-bold px-6 py-2.5 rounded-full shadow-md flex items-center gap-2 active:scale-95 cursor-pointer text-sm"
+                    >
+                      <i className="fas fa-print"></i>
+                      {lang === 'en' ? 'Print / Download Official Receipt' : 'স্মারক রসিদ প্রিন্ট / PDF সংরক্ষণ'}
+                    </button>
+                    <button
+                      onClick={copyReceiptDetails}
+                      className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold px-6 py-2.5 rounded-full border border-gray-300 flex items-center gap-2 active:scale-95 cursor-pointer text-sm"
+                    >
+                      <i className="fas fa-copy"></i>
+                      {lang === 'en' ? 'Copy Details' : 'বিবরণ কপি করুন'}
+                    </button>
+                    <button
+                      onClick={() => setGeneratedReceipt(null)}
+                      className="bg-orange-50 hover:bg-orange-100 text-orange-800 font-bold px-6 py-2.5 rounded-full border border-orange-300 flex items-center gap-2 active:scale-95 cursor-pointer text-sm"
+                    >
+                      <i className="fas fa-redo"></i>
+                      {lang === 'en' ? 'New Receipt' : 'নতুন রসিদ তৈরি'}
+                    </button>
                   </div>
-
-                  <p className="text-center text-xs sm:text-sm text-gray-600 italic font-serif pt-2">
-                    "{lang === 'en' ? 'May Devi Manasa bless your family with eternal health, prosperity, and peace.' : 'দেবী মনসার অপার কৃপায় আপনার ও আপনার পরিবারে রোগমুক্তি, ধনধান্য ও শান্তি বর্ষিত হোক।'}"
-                  </p>
-                </div>
-
-                {/* Print & Action Buttons */}
-                <div className="flex flex-wrap items-center justify-center gap-3 pt-6 border-t border-gray-200 no-print">
-                  <button
-                    onClick={() => printReceiptDirectly(generatedReceipt, lang)}
-                    className="btn-shine bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-bold px-6 py-2.5 rounded-full shadow-md flex items-center gap-2 active:scale-95 cursor-pointer text-sm"
-                  >
-                    <i className="fas fa-print"></i>
-                    {lang === 'en' ? 'Print / Download Official Receipt' : 'স্মারক রসিদ প্রিন্ট / PDF সংরক্ষণ'}
-                  </button>
-                  <button
-                    onClick={copyReceiptDetails}
-                    className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold px-6 py-2.5 rounded-full border border-gray-300 flex items-center gap-2 active:scale-95 cursor-pointer text-sm"
-                  >
-                    <i className="fas fa-copy"></i>
-                    {lang === 'en' ? 'Copy Details' : 'বিবরণ কপি করুন'}
-                  </button>
-                  <button
-                    onClick={() => setGeneratedReceipt(null)}
-                    className="bg-orange-50 hover:bg-orange-100 text-orange-800 font-bold px-6 py-2.5 rounded-full border border-orange-300 flex items-center gap-2 active:scale-95 cursor-pointer text-sm"
-                  >
-                    <i className="fas fa-redo"></i>
-                    {lang === 'en' ? 'New Receipt' : 'নতুন রসিদ তৈরি'}
-                  </button>
                 </div>
               </div>
             ) : (
@@ -6442,39 +6462,17 @@ const AdminPanel = ({
     if (showToast) showToast('সফলভাবে লগআউট হয়েছে!');
   };
 
-  const handleImageChange = (e, setFunc, stateVar) => {
-    const file = e.target.files[0];
+  const handleImageChange = async (e, setFunc, stateVar) => {
+    const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const img = new Image();
-        img.onload = () => {
-          const maxDim = 1200;
-          let w = img.width;
-          let h = img.height;
-          if (w > maxDim || h > maxDim) {
-            if (w > h) {
-              h = Math.round((h * maxDim) / w);
-              w = maxDim;
-            } else {
-              w = Math.round((w * maxDim) / h);
-              h = maxDim;
-            }
-          }
-          const canvas = document.createElement('canvas');
-          canvas.width = w;
-          canvas.height = h;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, w, h);
-          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.82);
-          setFunc({ ...stateVar, image: compressedDataUrl });
-        };
-        img.onerror = () => {
-          setFunc({ ...stateVar, image: reader.result });
-        };
-        img.src = reader.result;
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressed = await compressImageFile(file);
+        if (compressed) {
+          setFunc({ ...stateVar, image: compressed });
+        }
+      } catch (err) {
+        console.warn('Image processing error:', err);
+      }
     }
   };
 
@@ -6630,8 +6628,10 @@ const AdminPanel = ({
           updatedList.sort((a, b) => new Date(b.date) - new Date(a.date));
           setTestimonials(updatedList);
           showToast('নতুন মতামত সফলভাবে যোগ করা হয়েছে!');
+          broadcastUniversalSync();
         }
       }
+      broadcastUniversalSync();
       setNewTestimonial({ name: '', designation: '', text: '', date: '' });
     } catch (err) {
       setErrorMsg("মতামত সংরক্ষণ করতে সমস্যা হয়েছে।");
@@ -6723,6 +6723,7 @@ const AdminPanel = ({
           updatedNotices.sort((a, b) => new Date(b.date) - new Date(a.date));
           setNotices(updatedNotices);
           showToast('নতুন নোটিশ সফলভাবে যোগ করা হয়েছে!');
+          broadcastUniversalSync();
         }
       }
       setNewNotice({ title: '', date: '', text: '' });
@@ -6795,10 +6796,14 @@ const AdminPanel = ({
       let eventVideo = (newEvent.video || '').trim() || null;
       // Keep video URL intact for universal cross-device playback
 
-      eventsMedia[targetId] = {
-        images: allImages,
-        video: eventVideo
-      };
+      if (allImages.length > 1 || eventVideo) {
+        eventsMedia[targetId] = {
+          images: allImages,
+          video: eventVideo
+        };
+      } else {
+        delete eventsMedia[targetId];
+      }
 
       try {
         await supabaseClient.from('settings').upsert({
@@ -6817,19 +6822,19 @@ const AdminPanel = ({
         ...tablePayload,
         id: targetId,
         images: allImages,
-        video: eventsMedia[targetId].video
+        video: eventVideo
       };
 
       let updatedEvents;
       if (editingEventId) {
         updatedEvents = events.map(ev => ev.id === editingEventId ? updatedItem : ev);
         showToast('ইভেন্ট সফলভাবে আপডেট করা হয়েছে!');
-        broadcastUniversalSync();
         setEditingEventId(null);
       } else {
         updatedEvents = [updatedItem, ...events];
         showToast('নতুন ইভেন্ট সফলভাবে যোগ করা হয়েছে!');
       }
+      broadcastUniversalSync();
       updatedEvents.sort((a, b) => new Date(b.date) - new Date(a.date));
       setEvents(updatedEvents);
       setNewEvent({ title: '', date: '', description: '', image: null, images: [], video: '' });
@@ -6862,6 +6867,7 @@ const AdminPanel = ({
       } catch (e) {}
       setEvents(events.filter(item => item.id !== id));
       showToast('ইভেন্ট সফলভাবে মুছে ফেলা হয়েছে!');
+      broadcastUniversalSync();
     } catch (err) {
       setErrorMsg("ইভেন্ট মুছে ফেলতে সমস্যা হয়েছে।");
     } finally {
@@ -6888,6 +6894,7 @@ const AdminPanel = ({
         updatedD.sort((a, b) => b.id - a.id);
         setDonations(updatedD);
         showToast('অনুদান সফলভাবে আপডেট করা হয়েছে!');
+        broadcastUniversalSync();
         setEditingDonationId(null);
       } else {
         const nextId = await getNextTableId('donations', donations);
@@ -6899,6 +6906,7 @@ const AdminPanel = ({
           updatedD.sort((a, b) => b.id - a.id);
           setDonations(updatedD);
           showToast('নতুন অনুদান সফলভাবে যোগ করা হয়েছে!');
+          broadcastUniversalSync();
         }
       }
       setNewDonation({ name: '', address: '', type: 'নগদ অর্থ', amount: '', date: '', is_hidden: false });
@@ -10708,9 +10716,12 @@ function App() {
   useEffect(() => {
     if (!supabaseClient) return;
 
-    // Supabase Realtime Postgres Changes
+    // Supabase Realtime Postgres Changes & Global Broadcast Channel
     const channel = supabaseClient
       .channel('temple_universal_db_sync')
+      .on('broadcast', { event: 'db_sync' }, () => {
+        fetchData();
+      })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'settings' }, () => {
         fetchData();
       })
@@ -10729,7 +10740,13 @@ function App() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'donations' }, () => {
         fetchData();
       })
-      .subscribe();
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          window.__supabaseSyncChannel = channel;
+        }
+      });
+
+    window.__supabaseSyncChannel = channel;
 
     // Cross-tab BroadcastChannel
     let bc;
@@ -10751,15 +10768,18 @@ function App() {
     window.addEventListener('focus', handleRevalidate);
     document.addEventListener('visibilitychange', handleRevalidate);
 
-    // Periodic heartbeat sync every 25 seconds
+    // Periodic heartbeat sync every 20 seconds (plus instant on tab focus & broadcast)
     const interval = setInterval(() => {
       if (document.visibilityState === 'visible') {
         fetchData();
       }
-    }, 4000);
+    }, 20000);
 
     return () => {
       supabaseClient.removeChannel(channel);
+      if (window.__supabaseSyncChannel === channel) {
+        window.__supabaseSyncChannel = null;
+      }
       if (bc) bc.close();
       window.removeEventListener('focus', handleRevalidate);
       document.removeEventListener('visibilitychange', handleRevalidate);
@@ -10976,14 +10996,6 @@ function App() {
         try { localStorage.setItem('temple_donations', JSON.stringify(dData)); } catch (e) { }
       }
 
-      // Background non-blocking load of events_media
-      supabaseClient.from('settings').select('value').eq('key', 'events_media').maybeSingle().then(res => {
-        if (res && res.data && res.data.value) {
-          try {
-            localStorage.setItem('temple_events_media', res.data.value);
-          } catch (e) { }
-        }
-      }).catch(() => {});
 
     } catch (error) {
       console.error("Supabase Database Error:", error);
