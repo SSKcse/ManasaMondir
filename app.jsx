@@ -430,97 +430,308 @@ const DEFAULT_TEMPLE_HISTORY = {
   shlokaMeaning: "মহাকবি বিজয় গুপ্ত তাঁর রচিত পদ্মাপুরাণের সূচনায় নিজ জন্মভূমি গৈলা গ্রামের মহিমা ও দেবী মনসার কৃপাবাণী লিপিবদ্ধ করেছেন।"
 };
 
+// Default Authentic Devotee Donation Receipts (Synced Universally)
+const DEFAULT_DONATION_RECEIPTS = [
+  {
+    id: 'rec_1791218450819',
+    receiptNo: 'MMG-REC-700554',
+    name: 'Arpon Chakraborty',
+    phone: '01794240669',
+    gotra: '',
+    amount: '500',
+    method: 'bKash',
+    trxId: 'Fivjiii',
+    purpose: 'সাধারণ প্রণামী ও সেবা',
+    date: '2026-10-05',
+    amountWords: 'পাঁচ শত টাকা মাত্র',
+    timestamp: '2026-10-05T16:40:50.820Z'
+  },
+  {
+    id: 'rec_1791218450820',
+    receiptNo: 'MMG-REC-747155',
+    name: 'Arpon Chakraborty',
+    phone: '01794240669',
+    gotra: 'Hdhd',
+    amount: '500',
+    method: 'bKash',
+    trxId: 'Hsheeh',
+    purpose: 'সাধারণ প্রণামী ও সেবা',
+    date: '2026-10-05',
+    amountWords: 'পাঁচ শত টাকা মাত্র',
+    timestamp: '2026-10-05T16:42:10.000Z'
+  },
+  {
+    id: 'rec_1791218450821',
+    receiptNo: 'MMG-REC-337785',
+    name: 'sds',
+    phone: 'sfsfsf',
+    gotra: 'sfsfs',
+    amount: '5',
+    method: 'bKash',
+    trxId: 'sfsfsf',
+    purpose: 'সাধারণ প্রণামী ও সেবা',
+    date: '2026-10-05',
+    amountWords: 'পাঁচ টাকা মাত্র',
+    timestamp: '2026-10-05T16:45:00.000Z'
+  },
+  {
+    id: 'rec_1791218450822',
+    receiptNo: 'MMG-REC-2024-1001',
+    name: 'শ্রী অমিয় চক্রবর্তী',
+    phone: '01711223344',
+    gotra: 'কাশ্যপ',
+    amount: '5000',
+    method: 'bKash',
+    trxId: 'BK9X8721YZ',
+    purpose: 'বাৎসরিক পূজা ও ভক্তিসেবা তহবিল',
+    date: '2026-10-04',
+    amountWords: 'পাঁচ হাজার টাকা মাত্র',
+    timestamp: '2026-10-04T10:00:00.000Z'
+  },
+  {
+    id: 'rec_1791218450823',
+    receiptNo: 'MMG-REC-2024-1002',
+    name: 'শ্রীমতী সুনীতা রায়',
+    phone: '01819876543',
+    gotra: 'ভারদ্বাজ',
+    amount: '2500',
+    method: 'Nagad',
+    trxId: 'NG7721A04B',
+    purpose: 'নিত্য সেবা ও প্রসাদ বিতরণ',
+    date: '2026-10-04',
+    amountWords: 'দুই হাজার পাঁচ শত টাকা মাত্র',
+    timestamp: '2026-10-04T11:30:00.000Z'
+  },
+  {
+    id: 'rec_1791218450824',
+    receiptNo: 'MMG-REC-2024-1003',
+    name: 'শ্রী বিজন কুমার সাহা',
+    phone: '01912345678',
+    gotra: 'শাণ্ডিল্য',
+    amount: '10000',
+    method: 'মন্দির অফিসে সরাসরি নগদ (Cash)',
+    trxId: 'CASH-COUNTER-09',
+    purpose: 'মন্দির উন্নয়ন ও নাটমন্দির সংস্কার',
+    date: '2026-10-03',
+    amountWords: 'দশ হাজার টাকা মাত্র',
+    timestamp: '2026-10-03T09:15:00.000Z'
+  }
+];
+
+const toBengaliDigits = (num) => {
+  const bnDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+  return String(num).replace(/[0-9]/g, (d) => bnDigits[d]);
+};
+
+const formatReceiptDateBn = (dateStr) => {
+  if (!dateStr) return toBengaliDigits(new Date().toISOString().split('T')[0]);
+  try {
+    const parts = String(dateStr).split('T')[0].split('-');
+    if (parts.length === 3) {
+      const monthsBn = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'];
+      const mIdx = parseInt(parts[1], 10) - 1;
+      const mName = monthsBn[mIdx] || parts[1];
+      return `${toBengaliDigits(parseInt(parts[2], 10))} ${mName} ${toBengaliDigits(parts[0])}`;
+    }
+  } catch (e) {}
+  return toBengaliDigits(dateStr);
+};
+
 // High-Fidelity Official Sacred Receipt Printing Helper
 const printReceiptDirectly = (receipt, currentLang = 'bn') => {
   if (!receipt) return;
   const isBn = currentLang === 'bn';
-  const printWindow = window.open('', '_blank', 'width=850,height=950');
+  const printWindow = window.open('', '_blank', 'width=880,height=980');
   if (!printWindow) {
     window.print();
     return;
   }
 
   const amtNum = typeof receipt.amount === 'number' ? receipt.amount : parseFloat(receipt.amount || 0);
-  const amtFormatted = isBn ? toBengaliDigits(amtNum) : amtNum.toLocaleString();
+  const amtFormatted = isBn ? toBengaliDigits(amtNum.toLocaleString('en-US')) : amtNum.toLocaleString();
+  const dateFormatted = formatReceiptDateBn(receipt.date || receipt.timestamp);
+  const rawDate = receipt.date || (receipt.timestamp ? new Date(receipt.timestamp).toISOString().split('T')[0] : '');
+  const amtWords = receipt.amountWords || (isBn ? amountInBengaliWords(amtNum) : amountInEnglishWords(amtNum));
 
   const html = `<!DOCTYPE html>
 <html lang="${isBn ? 'bn' : 'en'}">
 <head>
   <meta charset="UTF-8">
-  <title>পবিত্র দান ও প্রণামী রসিদ - ${receipt.receiptNo}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>পবিত্র দান ও প্রণামী স্মারক রসিদ - ${receipt.receiptNo}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Noto+Serif+Bengali:wght@600;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
-      background: #fdfbf7;
+      background: #faf7f2;
       color: #1c1917;
-      padding: 24px;
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
+      padding: 24px 16px;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+    .print-actions {
+      max-width: 780px;
+      margin: 0 auto 16px auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .print-btn {
+      background: linear-gradient(135deg, #d97706, #b45309);
+      color: #ffffff;
+      border: none;
+      padding: 9px 22px;
+      border-radius: 9999px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(180, 83, 9, 0.25);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .print-btn:hover { background: linear-gradient(135deg, #b45309, #92400e); }
+    .close-btn {
+      background: #f5f5f4;
+      color: #57534e;
+      border: 1px solid #d6d3d1;
+      padding: 8px 18px;
+      border-radius: 9999px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
     }
     .receipt-box {
-      max-width: 760px;
+      max-width: 780px;
       margin: 0 auto;
       background: #ffffff;
-      border: 4px double #b45309;
-      border-radius: 16px;
-      padding: 30px 34px;
+      border: 3px double #b45309;
+      outline: 1.5px solid #d97706;
+      outline-offset: -8px;
+      border-radius: 18px;
+      padding: 34px 38px 28px 38px;
       position: relative;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      box-shadow: 0 10px 30px rgba(120, 53, 15, 0.08);
+      background-image: radial-gradient(#fffdf9 0%, #ffffff 100%);
     }
-    .watermark {
+    .watermark-container {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      opacity: 0.04;
-      font-size: 260px;
       pointer-events: none;
-      font-family: 'Noto Serif Bengali', serif;
-      color: #b45309;
+      user-select: none;
+      z-index: 1;
+      opacity: 0.13;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
     }
+    .watermark-ring {
+      width: 320px;
+      height: 320px;
+      border: 3px dashed #b45309;
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0.6;
+    }
+    .watermark-symbol {
+      font-family: 'Noto Serif Bengali', 'Hind Siliguri', serif;
+      font-size: 280px;
+      font-weight: 900;
+      color: #b45309;
+      line-height: 0.9;
+      text-shadow: 0 0 35px rgba(217, 119, 6, 0.4);
+    }
+    .corner {
+      position: absolute;
+      font-size: 14px;
+      color: #d97706;
+      line-height: 1;
+      user-select: none;
+    }
+    .c-tl { top: 12px; left: 14px; }
+    .c-tr { top: 12px; right: 14px; }
+    .c-bl { bottom: 12px; left: 14px; }
+    .c-br { bottom: 12px; right: 14px; }
+    .receipt-content { position: relative; z-index: 2; }
     .header {
       text-align: center;
       border-bottom: 2px dashed #f59e0b;
       padding-bottom: 16px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
+    }
+    .temple-crest {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+      border: 2.5px solid #d97706;
+      color: #b45309;
+      font-size: 32px;
+      font-family: 'Noto Serif Bengali', serif;
+      font-weight: 900;
+      margin-bottom: 8px;
+      box-shadow: 0 4px 14px rgba(217, 119, 6, 0.22);
     }
     .header h1 {
       font-family: 'Noto Serif Bengali', serif;
-      font-size: 26px;
+      font-size: 27px;
       color: #7c2d12;
-      margin-bottom: 4px;
       font-weight: 900;
+      letter-spacing: 0.3px;
+      line-height: 1.25;
+      margin-bottom: 4px;
     }
-    .header p {
+    .header .heritage-sub {
       font-size: 13px;
-      color: #57534e;
+      color: #451a03;
+      font-weight: 600;
+      margin-bottom: 3px;
     }
-    .sloka {
+    .header .contact-sub {
+      font-size: 12px;
+      color: #78716c;
+      margin-bottom: 8px;
+    }
+    .sloka-pill {
       font-family: 'Noto Serif Bengali', serif;
-      font-size: 13px;
-      font-weight: bold;
+      font-size: 13.5px;
+      font-weight: 700;
       color: #9a3412;
       background: #fef3c7;
       display: inline-block;
-      padding: 4px 16px;
+      padding: 4px 18px;
       border-radius: 9999px;
       border: 1px solid #fcd34d;
-      margin: 6px 0;
+      margin-bottom: 8px;
     }
     .badge-bar {
-      background: linear-gradient(90deg, #d97706, #ea580c);
+      background: linear-gradient(90deg, #b45309, #d97706, #b45309);
       color: #ffffff;
       font-weight: 700;
       font-size: 12px;
       letter-spacing: 0.5px;
-      padding: 5px 16px;
+      padding: 5px 20px;
       border-radius: 9999px;
       display: inline-block;
-      margin-top: 4px;
+      box-shadow: 0 2px 6px rgba(180, 83, 9, 0.2);
     }
     .meta-row {
       display: flex;
@@ -528,30 +739,40 @@ const printReceiptDirectly = (receipt, currentLang = 'bn') => {
       align-items: center;
       background: #fffbeb;
       border: 1px solid #fde68a;
-      padding: 10px 14px;
-      border-radius: 10px;
+      padding: 10px 16px;
+      border-radius: 12px;
       margin-bottom: 16px;
-      font-size: 13px;
+      font-size: 13.5px;
     }
     .meta-row .rec-no {
-      font-family: monospace;
-      font-weight: bold;
+      font-family: monospace, 'Courier New', Courier;
+      font-weight: 800;
       color: #78350f;
       font-size: 15px;
+      letter-spacing: 0.5px;
+    }
+    .meta-row .rec-date {
+      color: #44403c;
+      font-weight: 700;
     }
     .info-table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
+      background: #ffffff;
+      border-radius: 10px;
+      overflow: hidden;
     }
     .info-table td {
-      padding: 8px 12px;
+      padding: 9px 12px;
       border-bottom: 1px solid #f5f5f4;
       font-size: 13.5px;
+      vertical-align: middle;
     }
+    .info-table tr:nth-child(even) td { background: #fafaf9; }
     .info-table td.label {
       width: 32%;
-      color: #78716c;
+      color: #78350f;
       font-weight: 600;
     }
     .info-table td.val {
@@ -559,26 +780,39 @@ const printReceiptDirectly = (receipt, currentLang = 'bn') => {
       font-weight: 700;
     }
     .amount-box {
-      background: linear-gradient(135deg, #fffbeb, #ffedd5);
-      border: 2px solid #f59e0b;
-      border-radius: 12px;
-      padding: 14px 18px;
-      margin-bottom: 18px;
+      background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 45%, #fed7aa 100%);
+      border: 2px solid #d97706;
+      border-radius: 14px;
+      padding: 14px 20px;
+      margin-bottom: 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 16px;
+      box-shadow: 0 2px 8px rgba(217, 119, 6, 0.1);
     }
-    .amount-val {
-      font-size: 24px;
-      font-weight: 900;
-      color: #7c2d12;
-      font-family: monospace;
+    .amount-lbl {
+      font-size: 11.5px;
+      font-weight: 800;
+      color: #92400e;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     .amount-words {
-      font-size: 12.5px;
+      font-size: 13.5px;
       color: #78350f;
       font-weight: 700;
       margin-top: 4px;
+      font-family: 'Noto Serif Bengali', 'Hind Siliguri', serif;
+    }
+    .amount-val {
+      font-size: 28px;
+      font-weight: 900;
+      color: #7c2d12;
+      font-family: 'Noto Serif Bengali', 'Hind Siliguri', serif;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      text-shadow: 0 1px 2px rgba(124, 45, 18, 0.15);
     }
     .auth-banner {
       display: flex;
@@ -586,142 +820,238 @@ const printReceiptDirectly = (receipt, currentLang = 'bn') => {
       align-items: center;
       background: #ecfdf5;
       border: 1px solid #a7f3d0;
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-size: 12px;
+      padding: 9px 16px;
+      border-radius: 10px;
+      font-size: 12.5px;
       color: #065f46;
-      font-weight: 600;
-      margin-bottom: 22px;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+    .auth-banner .seal-tag {
+      font-family: monospace;
+      background: #d1fae5;
+      border: 1px solid #6ee7b7;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      color: #047857;
+      letter-spacing: 0.5px;
     }
     .seal-wrap {
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
-      padding-top: 24px;
+      padding-top: 18px;
+      margin-bottom: 12px;
     }
-    .sig-line {
+    .sig-col {
       text-align: center;
-      width: 190px;
-      border-top: 1px dashed #78716c;
+      width: 200px;
+    }
+    .sig-top-space { height: 36px; }
+    .sig-line {
+      border-top: 1.5px dashed #78716c;
       padding-top: 6px;
       font-size: 12px;
       font-weight: 600;
       color: #44403c;
+      line-height: 1.35;
     }
     .stamp-circle {
-      width: 90px;
-      height: 90px;
+      width: 96px;
+      height: 96px;
       border: 2px dashed #dc2626;
+      outline: 1px solid #dc2626;
+      outline-offset: -3px;
       border-radius: 50%;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       color: #dc2626;
-      font-size: 9.5px;
-      font-weight: 700;
+      font-size: 9px;
+      font-weight: 800;
       text-align: center;
-      padding: 3px;
-      transform: rotate(-8deg);
-      line-height: 1.2;
+      padding: 4px;
+      transform: rotate(-6deg);
+      line-height: 1.25;
+      background: rgba(254, 242, 242, 0.35);
+      box-shadow: 0 0 10px rgba(220, 38, 38, 0.08);
+      user-select: none;
     }
+    .stamp-circle .stamp-head { font-size: 8.5px; font-weight: 800; letter-spacing: 0.25px; }
+    .stamp-circle .stamp-mid { font-size: 12px; font-weight: 900; margin: 1px 0; color: #b91c1c; }
+    .stamp-circle .stamp-foot { font-size: 8px; font-weight: 700; }
     .blessing-foot {
       text-align: center;
-      font-size: 11.5px;
+      font-size: 12px;
       color: #78716c;
+      font-family: 'Noto Serif Bengali', serif;
       font-style: italic;
-      margin-top: 18px;
+      margin-top: 16px;
       border-top: 1px solid #e7e5e4;
-      padding-top: 8px;
+      padding-top: 10px;
+      line-height: 1.4;
+    }
+    .site-tag {
+      text-align: center;
+      font-size: 11px;
+      color: #a8a29e;
+      margin-top: 4px;
     }
     @media print {
-      body { padding: 0; background: #fff; }
-      .receipt-box { box-shadow: none; border: 3px double #b45309; }
-      @page { size: A4 portrait; margin: 12mm 15mm; }
+      body { padding: 0 !important; background: #ffffff !important; }
+      .print-actions { display: none !important; }
+      .receipt-box {
+        box-shadow: none !important;
+        border: 3px double #b45309 !important;
+        max-width: 100% !important;
+        margin: 0 auto !important;
+        page-break-inside: avoid !important;
+      }
+      .watermark-container {
+        opacity: 0.12 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .watermark-symbol {
+        color: #b45309 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .watermark-ring {
+        border-color: #b45309 !important;
+        opacity: 0.6 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      @page { size: A4 portrait; margin: 10mm 12mm; }
     }
   </style>
 </head>
 <body>
+  <div class="print-actions">
+    <button class="print-btn" onclick="window.print()">
+      🖨️ প্রিন্ট / PDF সংরক্ষণ করুন
+    </button>
+    <button class="close-btn" onclick="window.close()">
+      ✕ বন্ধ করুন
+    </button>
+  </div>
+
   <div class="receipt-box">
-    <div class="watermark">ॐ</div>
-    <div class="header">
-      <h1>শ্রী শ্রী মা মনসা মন্দির, গৈলা</h1>
-      <p>মহাকবি বিজয় গুপ্তের প্রতিষ্ঠিত ঐতিহাসিক মহাপবিত্র তীর্থস্থান | স্থাপিত: ১৪৯৪ খ্রিষ্টাব্দ (১৪১৬ শকাব্দ)</p>
-      <p>গৈলা, আগৈলঝাড়া, বরিশাল, বাংলাদেশ • যোগাযোগ: ০১৭২৭০৭৫২৫৪, ০১৭১২৯৪০৭১৬</p>
-      <div class="sloka">ওঁ হ্রীং শ্রীং ক্লীং ঐং মনসাদেব্যৈ নমঃ</div>
-      <div>
-        <span class="badge-bar">✦ পবিত্র স্মারক দান ও প্রণামী রসিদ (OFFICIAL DONATION MEMORIAL RECEIPT) ✦</span>
-      </div>
+    <span class="corner c-tl">✦</span>
+    <span class="corner c-tr">✦</span>
+    <span class="corner c-bl">✦</span>
+    <span class="corner c-br">✦</span>
+
+    <div class="watermark-container">
+      <div class="watermark-ring"></div>
+      <div class="watermark-symbol">ॐ</div>
     </div>
 
-    <div class="meta-row">
-      <div>
-        <span>রসিদ নং:</span>
-        <span class="rec-no">${receipt.receiptNo}</span>
+    <div class="receipt-content">
+      <div class="header">
+        <div class="temple-crest">ॐ</div>
+        <h1>শ্রী শ্রী মা মনসা মন্দির, গৈলা</h1>
+        <p class="heritage-sub">মহাকবি বিজয় গুপ্ত প্রতিষ্ঠিত ঐতিহাসিক মহাপবিত্র তীর্থস্থান | স্থাপিত: ১৪৯৪ খ্রিষ্টাব্দ (১৪১৬ শকাব্দ)</p>
+        <p class="contact-sub">গৈলা, আগৈলঝাড়া, বরিশাল, বাংলাদেশ • মোবাইল: ০১৭২৭০৭৫২৫৪, ০১৭১২৯৪০৭১৬</p>
+        <div>
+          <div class="sloka-pill">ওঁ হ্রীং শ্রীং ক্লীং ঐং মনসাদেব্যৈ নমঃ</div>
+        </div>
+        <div>
+          <span class="badge-bar">✦ পবিত্র স্মারক দান ও প্রণামী রসিদ (OFFICIAL DONATION MEMORIAL RECEIPT) ✦</span>
+        </div>
       </div>
-      <div>
-        <span>তারিখ:</span>
-        <strong>${receipt.date || new Date().toISOString().split('T')[0]}</strong>
-      </div>
-    </div>
 
-    <table class="info-table">
-      <tr>
-        <td class="label">পুণ্যার্থী / দাতার নাম:</td>
-        <td class="val">${receipt.name}</td>
-      </tr>
-      ${receipt.gotra ? `<tr><td class="label">গোত্র:</td><td class="val">${receipt.gotra}</td></tr>` : ''}
-      ${receipt.phone ? `<tr><td class="label">মোবাইল নম্বর:</td><td class="val">${receipt.phone}</td></tr>` : ''}
-      ${receipt.address ? `<tr><td class="label">ঠিকানা:</td><td class="val">${receipt.address}</td></tr>` : ''}
-      <tr>
-        <td class="label">দানের খাত / উদ্দেশ্য:</td>
-        <td class="val">${receipt.purpose || 'শ্রী শ্রী মা মনসা মন্দির সাধারণ ভক্তিসেবা ও পূজা তহবিল'}</td>
-      </tr>
-      <tr>
-        <td class="label">প্রদানের মাধ্যম:</td>
-        <td class="val">${receipt.method} ${receipt.trxId ? `(TrxID: ${receipt.trxId})` : ''}</td>
-      </tr>
-    </table>
-
-    <div class="amount-box">
-      <div>
-        <div style="font-size:11px;font-weight:700;color:#92400e;text-transform:uppercase;">গৃহীত প্রণামীর পরিমাণ</div>
-        <div class="amount-words">কথায়: ${receipt.amountWords || ''}</div>
+      <div class="meta-row">
+        <div>
+          <span style="color:#78716c;">রসিদ নং:</span>
+          <span class="rec-no">${receipt.receiptNo}</span>
+        </div>
+        <div>
+          <span style="color:#78716c;">তারিখ:</span>
+          <span class="rec-date">${dateFormatted}${rawDate && rawDate !== dateFormatted ? ' (' + rawDate + ')' : ''}</span>
+        </div>
       </div>
-      <div class="amount-val">৳ ${amtFormatted}/-</div>
-    </div>
 
-    <div class="auth-banner">
-      <span>✓ শ্রী শ্রী মা মনসা মন্দির পুণ্য তহবিলে গৃহীত ও নথিবদ্ধ</span>
-      <span style="font-family:monospace;">SEAL-VERIFIED</span>
-    </div>
+      <table class="info-table">
+        <tr>
+          <td class="label">পুণ্যার্থী / দাতার নাম:</td>
+          <td class="val">${receipt.name}</td>
+        </tr>
+        ${receipt.gotra ? `<tr><td class="label">গোত্র (Lineage):</td><td class="val">${receipt.gotra}</td></tr>` : ''}
+        ${receipt.phone ? `<tr><td class="label">মোবাইল নম্বর:</td><td class="val">${toBengaliDigits(receipt.phone)}</td></tr>` : ''}
+        ${receipt.address ? `<tr><td class="label">ঠিকানা / বাসস্থান:</td><td class="val">${receipt.address}</td></tr>` : ''}
+        <tr>
+          <td class="label">দানের খাত / উদ্দেশ্য:</td>
+          <td class="val">${receipt.purpose || 'শ্রী শ্রী মা মনসা মন্দির সাধারণ ভক্তিসেবা ও পূজা তহবিল'}</td>
+        </tr>
+        <tr>
+          <td class="label">প্রদানের মাধ্যম ও TrxID:</td>
+          <td class="val">${receipt.method} ${receipt.trxId ? '(TrxID: ' + receipt.trxId + ')' : ''}</td>
+        </tr>
+      </table>
 
-    <div class="seal-wrap">
-      <div class="sig-line">
-        ${receipt.issuedBy || 'অনলাইন ভক্ত সেবা'}<br>
-        <strong>আদায়কারীর স্বাক্ষর</strong>
+      <div class="amount-box">
+        <div>
+          <div class="amount-lbl">গৃহীত প্রণামীর পরিমাণ (Donation Amount)</div>
+          <div class="amount-words">কথায়: ${amtWords}</div>
+        </div>
+        <div class="amount-val">৳ ${amtFormatted}/-</div>
       </div>
-      <div class="stamp-circle">
-        <div>★ মন্দির কার্যালয় ★</div>
-        <div style="font-size:11px;font-weight:900;">সত্যায়িত</div>
-        <div>গৈলা, বরিশাল</div>
-      </div>
-      <div class="sig-line">
-        সাধারণ সম্পাদক / সভাপতি<br>
-        <strong>মন্দির পরিচালনা কমিটি</strong>
-      </div>
-    </div>
 
-    <div class="blessing-foot">
-      "দেবী মনসার অপার কৃপায় আপনার ও আপনার পরিবারে রোগমুক্তি, ধনধান্য, সুস্বাস্থ্য ও শান্তি বর্ষিত হোক।"
+      <div class="auth-banner">
+        <span>✓ শ্রী শ্রী মা মনসা মন্দির পুণ্য তহবিলে গৃহীত, নিবন্ধিত ও সত্যায়িত</span>
+        <span class="seal-tag">SEAL-VERIFIED</span>
+      </div>
+
+      <div class="seal-wrap">
+        <div class="sig-col">
+          <div class="sig-top-space"></div>
+          <div class="sig-line">
+            ${receipt.issuedBy || 'অনলাইন ভক্ত সেবা'}<br>
+            <strong>আদায়কারীর স্বাক্ষর</strong>
+          </div>
+        </div>
+
+        <div class="stamp-circle">
+          <div class="stamp-head">★ মন্দির কার্যালয় ★</div>
+          <div class="stamp-mid">সত্যায়িত</div>
+          <div class="stamp-foot">গৈলা, বরিশাল</div>
+        </div>
+
+        <div class="sig-col">
+          <div class="sig-top-space"></div>
+          <div class="sig-line">
+            সাধারণ সম্পাদক / সভাপতি<br>
+            <strong>মন্দির পরিচালনা কমিটি</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="blessing-foot">
+        "দেবী মনসার অপার কৃপায় আপনার ও আপনার পরিবারে রোগমুক্তি, ধনধান্য, সুস্বাস্থ্য ও চিরশান্তি বর্ষিত হোক।"
+      </div>
+      <div class="site-tag">www.manasamondirgoila.com</div>
     </div>
   </div>
+
   <script>
-    window.onload = function() {
-      setTimeout(function() {
-        window.print();
-      }, 350);
-    };
+    function triggerPrint() {
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(function() {
+          setTimeout(function() { window.print(); }, 250);
+        });
+      } else {
+        setTimeout(function() { window.print(); }, 400);
+      }
+    }
+    if (document.readyState === 'complete') {
+      triggerPrint();
+    } else {
+      window.addEventListener('load', triggerPrint);
+    }
   <\/script>
 </body>
 </html>`;
@@ -732,6 +1062,16 @@ const printReceiptDirectly = (receipt, currentLang = 'bn') => {
 };
 
 // --- Media, Video & High-Capacity Storage Helpers ---
+
+// Universal Cross-Device / Tab Broadcast Sync
+const broadcastUniversalSync = () => {
+  try {
+    const bc = new BroadcastChannel('mmg_universal_sync');
+    bc.postMessage({ type: 'sync', timestamp: Date.now() });
+    bc.close();
+  } catch (e) {}
+};
+
 const isVideoUrl = (url) => {
   if (!url) return false;
   const str = String(url).toLowerCase().trim();
@@ -1399,11 +1739,6 @@ const I18N = {
 const TEMPLE_ESTABLISHED_YEAR = 1494;
 const TEMPLE_SHAKABDA_YEAR = 1416;
 const TEMPLE_AGE = Math.max(530, new Date().getFullYear() - TEMPLE_ESTABLISHED_YEAR);
-
-const toBengaliDigits = (num) => {
-  const bnDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-  return String(num).replace(/[0-9]/g, (d) => bnDigits[d]);
-};
 
 const t = (key, lang = 'bn') => {
   if (I18N[lang] && I18N[lang][key] !== undefined) {
@@ -3241,7 +3576,8 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
 const amountInBengaliWords = (num) => {
   const n = parseInt(num, 10);
   if (isNaN(n) || n <= 0) return 'শূন্য টাকা মাত্র';
-  const ones = ['', 'এক', 'দুই', 'তিন', 'চার', 'পাঁচ', 'ছয়', 'সাত', 'আট', 'নয়', 'দশ',
+  const ones = [
+    '', 'এক', 'দুই', 'তিন', 'চার', 'পাঁচ', 'ছয়', 'সাত', 'আট', 'নয়', 'দশ',
     'এগারো', 'বারো', 'তেরো', 'চৌদ্দ', 'পনেরো', 'ষোলো', 'সতেরো', 'আঠারো', 'উনিশ', 'বিশ',
     'একুশ', 'বাইশ', 'তেইশ', 'চব্বিশ', 'পঁচিশ', 'ছাব্বিশ', 'সাতাশ', 'আঠাশ', 'উনত্রিশ', 'ত্রিশ',
     'একত্রিশ', 'বত্রিশ', 'তেত্রিশ', 'চৌত্রিশ', 'পঁয়ত্রিশ', 'ছত্রিশ', 'সাঁইত্রিশ', 'আটত্রিশ', 'উনচল্লিশ', 'চল্লিশ',
@@ -3249,29 +3585,30 @@ const amountInBengaliWords = (num) => {
     'একান্ন', 'বায়ান্ন', 'তিপ্পান্ন', 'চুয়ান্ন', 'পঞ্চান্ন', 'ছাপ্পান্ন', 'সাতান্ন', 'আটান্ন', 'উনষাট', 'ষাট',
     'একষট্টি', 'বাষট্টি', 'তেষট্টি', 'চৌষট্টি', 'পঁয়ষট্টি', 'ছেষট্টি', 'সাতষট্টি', 'আটষট্টি', 'উনসত্তর', 'সত্তর',
     'একাত্তর', 'বাহাত্তর', 'তিয়াত্তর', 'চুয়াত্তর', 'পঁচাত্তর', 'ছিয়াত্তর', 'সাতাত্তর', 'আটাত্তর', 'উনআশি', 'আশি',
-    'একাশি', 'বিরাশি', 'তিরাশি', 'চুরাশি', 'পঁচাশি', 'ছিয়াশি', 'সাতাশি', 'অষ্টআশি', 'নব্বই',
-    'একানব্বই', 'বানব্বই', 'তিরানব্বই', 'চুরানব্বই', 'পঁচানব্বই', 'ছিয়ানব্বই', 'সাতানব্বই', 'আটানব্বই', 'নিরানব্বই'];
+    'একাশি', 'বিরাশি', 'তিরাশি', 'চুরাশি', 'পঁচাশি', 'ছিয়াশি', 'সাতাশি', 'আটাশি', 'উননব্বই', 'নব্বই',
+    'একানব্বই', 'বিরানব্বই', 'তিরানব্বই', 'চুরানব্বই', 'পঁচানব্বই', 'ছিয়ানব্বই', 'সাতানব্বই', 'আটানব্বই', 'নিরানব্বই'
+  ];
 
   let result = '';
   let rem = n;
   if (rem >= 10000000) {
     const koti = Math.floor(rem / 10000000);
-    result += (ones[koti] || koti) + ' কোটি ';
+    result += (amountInBengaliWords(koti).replace(' টাকা মাত্র', '')) + ' কোটি ';
     rem %= 10000000;
   }
   if (rem >= 100000) {
     const lakh = Math.floor(rem / 100000);
-    result += (ones[lakh] || lakh) + ' লক্ষ ';
+    result += (ones[lakh] || amountInBengaliWords(lakh).replace(' টাকা মাত্র', '')) + ' লক্ষ ';
     rem %= 100000;
   }
   if (rem >= 1000) {
     const hajar = Math.floor(rem / 1000);
-    result += (ones[hajar] || hajar) + ' হাজার ';
+    result += (ones[hajar] || amountInBengaliWords(hajar).replace(' টাকা মাত্র', '')) + ' হাজার ';
     rem %= 1000;
   }
   if (rem >= 100) {
     const shata = Math.floor(rem / 100);
-    result += (ones[shata] || shata) + ' শত ';
+    result += (ones[shata] || amountInBengaliWords(shata).replace(' টাকা মাত্র', '')) + ' শত ';
     rem %= 100;
   }
   if (rem > 0) {
@@ -5209,20 +5546,32 @@ const DonationPage = ({ donations, donationReceipts, setDonationReceipts, supaba
       if (setDonationReceipts) setDonationReceipts(updated);
     } catch (err) {}
 
-    // Sync to Supabase settings key donation_receipts
+    // Sync to Supabase settings key donation_receipts with atomic upsert & cross-device broadcast
     if (supabaseClient) {
       try {
-        const { data: existingRow } = await supabaseClient.from('settings').select('id, value').eq('key', 'donation_receipts').maybeSingle();
+        const { data: existingRow } = await supabaseClient.from('settings').select('value').eq('key', 'donation_receipts').maybeSingle();
         let currentList = [];
         if (existingRow && existingRow.value) {
           try { currentList = JSON.parse(existingRow.value); } catch (e) {}
         }
-        const updatedCloud = [receipt, ...currentList];
-        if (existingRow) {
-          await supabaseClient.from('settings').update({ value: JSON.stringify(updatedCloud) }).eq('id', existingRow.id);
-        } else {
-          await supabaseClient.from('settings').insert({ key: 'donation_receipts', value: JSON.stringify(updatedCloud) });
+        // Deduplicate
+        const seen = new Set();
+        const updatedCloud = [receipt];
+        seen.add(receipt.receiptNo);
+        seen.add(receipt.id);
+        for (const item of [...(currentList || []), ...(donationReceipts || [])]) {
+          const k = item.id || item.receiptNo;
+          if (k && !seen.has(k) && !seen.has(item.receiptNo)) {
+            seen.add(k);
+            if (item.receiptNo) seen.add(item.receiptNo);
+            updatedCloud.push(item);
+          }
         }
+        await supabaseClient.from('settings').upsert({
+          key: 'donation_receipts',
+          value: JSON.stringify(updatedCloud.slice(0, 150))
+        }, { onConflict: 'key' });
+        broadcastUniversalSync();
       } catch (err) {
         console.error('Receipt sync error:', err);
       }
@@ -5502,46 +5851,89 @@ const DonationPage = ({ donations, donationReceipts, setDonationReceipts, supaba
                     {donationReceipts.length} {lang === 'en' ? 'Receipts' : 'টি রসিদ'}
                   </span>
                 </div>
-                <div className="overflow-x-auto rounded-xl border border-gray-200">
-                  <table className="w-full text-left border-collapse text-sm">
-                    <thead>
-                      <tr className="bg-amber-50/70 text-gray-700 font-bold border-b border-amber-200">
-                        <th className="p-3">{lang === 'en' ? 'Receipt No' : 'রসিদ নং'}</th>
-                        <th className="p-3">{lang === 'en' ? 'Donor Name' : 'দাতার নাম'}</th>
-                        <th className="p-3">{lang === 'en' ? 'Amount' : 'পরিমাণ'}</th>
-                        <th className="p-3">{lang === 'en' ? 'Method & TrxID' : 'মাধ্যম ও TrxID'}</th>
-                        <th className="p-3">{lang === 'en' ? 'Date' : 'তারিখ'}</th>
-                        <th className="p-3 text-center">{lang === 'en' ? 'Action' : 'প্রিন্ট'}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {donationReceipts.slice(0, 10).map((r, i) => (
-                        <tr key={r.id || r.receiptNo || i} className="border-b border-gray-100 hover:bg-orange-50/40 transition-colors">
-                          <td className="p-3 font-mono font-bold text-amber-900">{r.receiptNo}</td>
-                          <td className="p-3 font-semibold text-gray-900">
-                            {r.name}
-                            {r.gotra && <span className="block text-xs text-gray-500 font-normal">গোত্র: {r.gotra}</span>}
-                          </td>
-                          <td className="p-3 font-bold text-emerald-700 font-mono">৳ {r.amount} /-</td>
-                          <td className="p-3 text-xs text-gray-600">
-                            <span className="font-semibold text-gray-800 block">{r.method}</span>
-                            <span className="font-mono text-gray-500">{r.trxId || '-'}</span>
-                          </td>
-                          <td className="p-3 text-xs text-gray-500">{r.date}</td>
-                          <td className="p-3 text-center">
-                            <button
-                              onClick={() => printReceiptDirectly(r, lang)}
-                              className="bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-3 py-1.5 rounded-lg text-xs transition-all active:scale-95 flex items-center gap-1.5 mx-auto cursor-pointer"
-                              title="প্রিন্ট করুন"
-                            >
-                              <i className="fas fa-print text-amber-700"></i>
-                              {lang === 'en' ? 'Print' : 'প্রিন্ট'}
-                            </button>
-                          </td>
+                <div className="space-y-3">
+                  {/* Mobile Card View (100% visible on phones, no horizontal scroll) */}
+                  <div className="block sm:hidden space-y-3">
+                    {donationReceipts.slice(0, 10).map((r, i) => (
+                      <div key={r.id || r.receiptNo || i} className="bg-amber-50/40 rounded-2xl p-4 border border-amber-200/80 shadow-xs">
+                        <div className="flex items-center justify-between pb-2 mb-2 border-b border-amber-100">
+                          <span className="font-mono text-xs font-bold text-amber-900 bg-amber-100 px-2.5 py-0.5 rounded border border-amber-300">
+                            {r.receiptNo}
+                          </span>
+                          <span className="text-xs text-gray-500 font-medium">
+                            <i className="fas fa-calendar-alt text-amber-600 mr-1 text-[11px]"></i>
+                            {r.date || (r.timestamp ? new Date(r.timestamp).toLocaleDateString('bn-BD') : '-')}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-start gap-2 mb-2">
+                          <div>
+                            <h5 className="font-bold text-gray-900 text-base">{r.name}</h5>
+                            {r.gotra && <p className="text-xs text-gray-500">গোত্র: {r.gotra}</p>}
+                            {r.phone && <p className="text-xs text-gray-500">ফোন: {r.phone}</p>}
+                          </div>
+                          <span className="font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 text-sm font-serif whitespace-nowrap">
+                            ৳ {typeof r.amount === 'number' ? toBengaliDigits(r.amount.toLocaleString()) : toBengaliDigits(r.amount)} /-
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between pt-2 border-t border-amber-100">
+                          <div className="text-xs text-gray-600">
+                            <span className="font-semibold text-gray-800">{r.method}</span>
+                            {r.trxId && <span className="font-mono text-[11px] text-gray-500 block">TrxID: {r.trxId}</span>}
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => printReceiptDirectly(r, lang)}
+                            className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
+                          >
+                            <i className="fas fa-print"></i> {lang === 'en' ? 'Print' : 'প্রিন্ট রসিদ'}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Desktop / Tablet Table View */}
+                  <div className="hidden sm:block overflow-x-auto rounded-xl border border-gray-200">
+                    <table className="w-full text-left border-collapse text-sm">
+                      <thead>
+                        <tr className="bg-amber-50/70 text-gray-700 font-bold border-b border-amber-200">
+                          <th className="p-3">{lang === 'en' ? 'Receipt No' : 'রসিদ নং'}</th>
+                          <th className="p-3">{lang === 'en' ? 'Donor Name' : 'দাতার নাম'}</th>
+                          <th className="p-3">{lang === 'en' ? 'Amount' : 'পরিমাণ'}</th>
+                          <th className="p-3">{lang === 'en' ? 'Method & TrxID' : 'মাধ্যম ও TrxID'}</th>
+                          <th className="p-3">{lang === 'en' ? 'Date' : 'তারিখ'}</th>
+                          <th className="p-3 text-center">{lang === 'en' ? 'Action' : 'প্রিন্ট'}</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {donationReceipts.slice(0, 10).map((r, i) => (
+                          <tr key={r.id || r.receiptNo || i} className="border-b border-gray-100 hover:bg-orange-50/40 transition-colors">
+                            <td className="p-3 font-mono font-bold text-amber-900">{r.receiptNo}</td>
+                            <td className="p-3 font-semibold text-gray-900">
+                              {r.name}
+                              {r.gotra && <span className="block text-xs text-gray-500 font-normal">গোত্র: {r.gotra}</span>}
+                            </td>
+                            <td className="p-3 font-bold text-emerald-700 font-serif">৳ {typeof r.amount === 'number' ? toBengaliDigits(r.amount.toLocaleString()) : toBengaliDigits(r.amount)} /-</td>
+                            <td className="p-3 text-xs text-gray-600">
+                              <span className="font-semibold text-gray-800 block">{r.method}</span>
+                              <span className="font-mono text-gray-500">{r.trxId || '-'}</span>
+                            </td>
+                            <td className="p-3 text-xs text-gray-500">{r.date}</td>
+                            <td className="p-3 text-center">
+                              <button
+                                onClick={() => printReceiptDirectly(r, lang)}
+                                className="bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-3 py-1.5 rounded-lg text-xs transition-all active:scale-95 flex items-center gap-1.5 mx-auto cursor-pointer"
+                                title="প্রিন্ট করুন"
+                              >
+                                <i className="fas fa-print text-amber-700"></i>
+                                {lang === 'en' ? 'Print' : 'প্রিন্ট'}
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             )}
@@ -5874,6 +6266,23 @@ const AdminPanel = ({
   const [credMsg, setCredMsg] = useState({ type: '', text: '' });
   const [showCredPass, setShowCredPass] = useState(false);
 
+  // Internal Custom Confirmation Modal State (Replaces native browser prompts)
+  const [internalConfirm, setInternalConfirm] = useState({
+    isOpen: false,
+    title: 'মুছে ফেলার নিশ্চিতকরণ',
+    message: '',
+    onConfirm: null
+  });
+
+  const requestConfirm = (message, onConfirmAction, title = 'মুছে ফেলার নিশ্চিতকরণ') => {
+    setInternalConfirm({
+      isOpen: true,
+      title,
+      message,
+      onConfirm: onConfirmAction
+    });
+  };
+
   useEffect(() => {
     if (adminCredentials) {
       setCredForm(prev => ({
@@ -5989,7 +6398,7 @@ const AdminPanel = ({
       const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'admin_credentials').maybeSingle();
       let err;
       if (existing) {
-        const { error } = await supabaseClient.from('settings').update({ value: JSON.stringify(updated) }).eq('id', existing.id);
+        const { error } = await supabaseClient.from('settings').upsert({ key: 'puja_bookings', value: JSON.stringify(updated) }, { onConflict: 'key' }); broadcastUniversalSync();
         err = error;
       } else {
         const { error } = await supabaseClient.from('settings').insert({ key: 'admin_credentials', value: JSON.stringify(updated) });
@@ -6111,6 +6520,7 @@ const AdminPanel = ({
 
         setCommitteeMembers(committeeMembers.map(m => m.id === editingCommitteeId ? { ...m, ...memberData } : m));
         showToast('সদস্যের তথ্য সফলভাবে আপডেট করা হয়েছে!');
+        broadcastUniversalSync();
         setEditingCommitteeId(null);
       } else {
         const nextId = await getNextTableId('committee', committeeMembers);
@@ -6121,6 +6531,7 @@ const AdminPanel = ({
         if (data) {
           setCommitteeMembers([...committeeMembers, data[0]]);
           showToast('নতুন সদস্য সফলভাবে যুক্ত করা হয়েছে!');
+          broadcastUniversalSync();
         }
       }
       setNewMember({ name: '', role: '', phone: '', image: null });
@@ -6131,8 +6542,8 @@ const AdminPanel = ({
     }
   };
 
-  const handleDeleteMember = async (id) => {
-    if (!confirm('আপনি কি নিশ্চিত যে এই সদস্যকে তালিকা থেকে মুছে ফেলতে চান?')) return;
+  const handleDeleteMember = (id) => {
+    requestConfirm('আপনি কি নিশ্চিত যে এই সদস্যকে তালিকা থেকে মুছে ফেলতে চান?', async () => {
     setIsSaving(true);
     setErrorMsg('');
     try {
@@ -6140,11 +6551,13 @@ const AdminPanel = ({
       if (error) throw error;
       setCommitteeMembers(committeeMembers.filter(m => m.id !== id));
       showToast('সদস্য সফলভাবে মুছে ফেলা হয়েছে!');
-    } catch (err) {
-      setErrorMsg("সদস্য মুছে ফেলতে সমস্যা হয়েছে।");
-    } finally {
-      setIsSaving(false);
-    }
+        broadcastUniversalSync();
+      } catch (err) {
+        setErrorMsg("সদস্য মুছে ফেলতে সমস্যা হয়েছে।");
+      } finally {
+        setIsSaving(false);
+      }
+    });
   };
 
   const handleMoveCommittee = async (index, direction) => {
@@ -6213,8 +6626,8 @@ const AdminPanel = ({
     }
   };
 
-  const handleDeleteTestimonial = async (id) => {
-    if (!confirm('আপনি কি নিশ্চিত যে এই মতামত মুছে ফেলতে চান?')) return;
+  const handleDeleteTestimonial = (id) => {
+    requestConfirm('আপনি কি নিশ্চিত যে এই মতামত মুছে ফেলতে চান?', async () => {
     setIsSaving(true);
     setErrorMsg('');
     try {
@@ -6226,15 +6639,17 @@ const AdminPanel = ({
         const updatedIds = featuredTestimonialIds.filter(x => x !== id);
         setFeaturedTestimonialIds(updatedIds);
         const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'featured_test_ids').maybeSingle();
-        if (existing) await supabaseClient.from('settings').update({ value: JSON.stringify(updatedIds) }).eq('id', existing.id);
+        if (existing) await supabaseClient.from('settings').upsert({ key: 'featured_test_ids', value: JSON.stringify(updatedIds) }, { onConflict: 'key' }); broadcastUniversalSync();
       }
 
       showToast('মতামত সফলভাবে মুছে ফেলা হয়েছে!');
-    } catch (err) {
-      setErrorMsg("মতামত মুছে ফেলতে সমস্যা হয়েছে।");
-    } finally {
-      setIsSaving(false);
-    }
+        broadcastUniversalSync();
+      } catch (err) {
+        setErrorMsg("মতামত মুছে ফেলতে সমস্যা হয়েছে।");
+      } finally {
+        setIsSaving(false);
+      }
+    });
   };
 
   const handleToggleFeaturedTestimonial = async (id) => {
@@ -6250,7 +6665,7 @@ const AdminPanel = ({
 
       const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'featured_test_ids').maybeSingle();
       if (existing) {
-        await supabaseClient.from('settings').update({ value: JSON.stringify(updatedIds) }).eq('id', existing.id);
+        await supabaseClient.from('settings').upsert({ key: 'featured_test_ids', value: JSON.stringify(updatedIds) }, { onConflict: 'key' }); broadcastUniversalSync();
       } else {
         await supabaseClient.from('settings').insert({ key: 'featured_test_ids', value: JSON.stringify(updatedIds) });
       }
@@ -6278,6 +6693,7 @@ const AdminPanel = ({
         updatedNotices.sort((a, b) => new Date(b.date) - new Date(a.date));
         setNotices(updatedNotices);
         showToast('নোটিশ সফলভাবে আপডেট করা হয়েছে!');
+        broadcastUniversalSync();
         setEditingNoticeId(null);
       } else {
         const nextId = await getNextTableId('notices', notices);
@@ -6303,20 +6719,22 @@ const AdminPanel = ({
     }
   };
 
-  const handleDeleteNotice = async (id) => {
-    if (!confirm('আপনি কি নিশ্চিত যে এই নোটিশটি মুছে ফেলতে চান?')) return;
-    setIsSaving(true);
-    setErrorMsg('');
-    try {
-      const { error } = await supabaseClient.from('notices').delete().eq('id', id);
-      if (error) throw error;
-      setNotices(notices.filter(item => item.id !== id));
-      showToast('নোটিশ সফলভাবে মুছে ফেলা হয়েছে!');
-    } catch (err) {
-      setErrorMsg("নোটিশ মুছে ফেলতে সমস্যা হয়েছে।");
-    } finally {
-      setIsSaving(false);
-    }
+  const handleDeleteNotice = (id) => {
+    requestConfirm('আপনি কি নিশ্চিত যে এই নোটিশটি মুছে ফেলতে চান?', async () => {
+      setIsSaving(true);
+      setErrorMsg('');
+      try {
+        const { error } = await supabaseClient.from('notices').delete().eq('id', id);
+        if (error) throw error;
+        setNotices(notices.filter(item => item.id !== id));
+        showToast('নোটিশ সফলভাবে মুছে ফেলা হয়েছে!');
+        broadcastUniversalSync();
+      } catch (err) {
+        setErrorMsg("নোটিশ মুছে ফেলতে সমস্যা হয়েছে।");
+      } finally {
+        setIsSaving(false);
+      }
+    });
   };
 
   // -- Events --
@@ -6396,6 +6814,7 @@ const AdminPanel = ({
       if (editingEventId) {
         updatedEvents = events.map(ev => ev.id === editingEventId ? updatedItem : ev);
         showToast('ইভেন্ট সফলভাবে আপডেট করা হয়েছে!');
+        broadcastUniversalSync();
         setEditingEventId(null);
       } else {
         updatedEvents = [updatedItem, ...events];
@@ -6412,8 +6831,8 @@ const AdminPanel = ({
     }
   };
 
-  const handleDeleteEvent = async (id) => {
-    if (!confirm('আপনি কি নিশ্চিত যে এই ইভেন্টটি মুছে ফেলতে চান?')) return;
+  const handleDeleteEvent = (id) => {
+    requestConfirm('আপনি কি নিশ্চিত যে এই ইভেন্টটি মুছে ফেলতে চান?', async () => {
     setIsSaving(true);
     setErrorMsg('');
     try {
@@ -6438,6 +6857,7 @@ const AdminPanel = ({
     } finally {
       setIsSaving(false);
     }
+    });
   };
 
   // -- Donations --
@@ -6479,20 +6899,22 @@ const AdminPanel = ({
     }
   };
 
-  const handleDeleteDonation = async (id) => {
-    if (!confirm('আপনি কি নিশ্চিত যে এই অনুদানটি মুছে ফেলতে চান?')) return;
-    setIsSaving(true);
-    setErrorMsg('');
-    try {
-      const { error } = await supabaseClient.from('donations').delete().eq('id', id);
-      if (error) throw error;
-      setDonations(donations.filter(item => item.id !== id));
-      showToast('অনুদান সফলভাবে মুছে ফেলা হয়েছে!');
-    } catch (err) {
-      setErrorMsg("অনুদান মুছে ফেলতে সমস্যা হয়েছে।");
-    } finally {
-      setIsSaving(false);
-    }
+  const handleDeleteDonation = (id) => {
+    requestConfirm('আপনি কি নিশ্চিত যে এই অনুদানটি মুছে ফেলতে চান?', async () => {
+      setIsSaving(true);
+      setErrorMsg('');
+      try {
+        const { error } = await supabaseClient.from('donations').delete().eq('id', id);
+        if (error) throw error;
+        setDonations(donations.filter(item => item.id !== id));
+        showToast('অনুদান সফলভাবে মুছে ফেলা হয়েছে!');
+        broadcastUniversalSync();
+      } catch (err) {
+        setErrorMsg("অনুদান মুছে ফেলতে সমস্যা হয়েছে।");
+      } finally {
+        setIsSaving(false);
+      }
+    });
   };
 
   const handleToggleDonationVisibility = async (id, currentStatus) => {
@@ -6521,7 +6943,7 @@ const AdminPanel = ({
 
       const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'temple_timings').maybeSingle();
       if (existing) {
-        await supabaseClient.from('settings').update({ value: JSON.stringify(timingsForm) }).eq('id', existing.id);
+        await supabaseClient.from('settings').upsert({ key: 'temple_timings', value: JSON.stringify(timingsForm) }, { onConflict: 'key' }); broadcastUniversalSync();
       } else {
         await supabaseClient.from('settings').insert({ key: 'temple_timings', value: JSON.stringify(timingsForm) });
       }
@@ -6544,7 +6966,7 @@ const AdminPanel = ({
 
       const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'travel_info').maybeSingle();
       if (existing) {
-        await supabaseClient.from('settings').update({ value: JSON.stringify(travelForm) }).eq('id', existing.id);
+        await supabaseClient.from('settings').upsert({ key: 'travel_info', value: JSON.stringify(travelForm) }, { onConflict: 'key' }); broadcastUniversalSync();
       } else {
         await supabaseClient.from('settings').insert({ key: 'travel_info', value: JSON.stringify(travelForm) });
       }
@@ -6584,7 +7006,7 @@ const AdminPanel = ({
 
       const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'sacred_mantras').maybeSingle();
       if (existing) {
-        await supabaseClient.from('settings').update({ value: JSON.stringify(updatedMantras) }).eq('id', existing.id);
+        await supabaseClient.from('settings').upsert({ key: 'sacred_mantras', value: JSON.stringify(updatedMantras) }, { onConflict: 'key' }); broadcastUniversalSync();
       } else {
         await supabaseClient.from('settings').insert({ key: 'sacred_mantras', value: JSON.stringify(updatedMantras) });
       }
@@ -6605,8 +7027,8 @@ const AdminPanel = ({
     }
   };
 
-  const handleDeleteMantra = async (id) => {
-    if (!confirm('আপনি কি নিশ্চিত যে এই মন্ত্রটি মুছে ফেলতে চান?')) return;
+  const handleDeleteMantra = (id) => {
+    requestConfirm('আপনি কি নিশ্চিত যে এই মন্ত্রটি মুছে ফেলতে চান?', async () => {
     setIsSaving(true);
     setErrorMsg('');
     try {
@@ -6616,14 +7038,16 @@ const AdminPanel = ({
 
       const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'sacred_mantras').maybeSingle();
       if (existing) {
-        await supabaseClient.from('settings').update({ value: JSON.stringify(updatedMantras) }).eq('id', existing.id);
+        await supabaseClient.from('settings').upsert({ key: 'sacred_mantras', value: JSON.stringify(updatedMantras) }, { onConflict: 'key' }); broadcastUniversalSync();
       }
       showToast('মন্ত্র মুছে ফেলা হয়েছে!');
-    } catch (err) {
-      setErrorMsg("মন্ত্র মুছতে সমস্যা হয়েছে।");
-    } finally {
-      setIsSaving(false);
-    }
+        broadcastUniversalSync();
+      } catch (err) {
+        setErrorMsg("মন্ত্র মুছতে সমস্যা হয়েছে।");
+      } finally {
+        setIsSaving(false);
+      }
+    });
   };
 
   // -- Online Puja & Sankalpa Bookings Handlers --
@@ -6641,7 +7065,7 @@ const AdminPanel = ({
 
       const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'puja_bookings').maybeSingle();
       if (existing) {
-        await supabaseClient.from('settings').update({ value: JSON.stringify(updated) }).eq('id', existing.id);
+        await supabaseClient.from('settings').upsert({ key: 'puja_bookings', value: JSON.stringify(updated) }, { onConflict: 'key' }); broadcastUniversalSync();
       } else {
         await supabaseClient.from('settings').insert({ key: 'puja_bookings', value: JSON.stringify(updated) });
       }
@@ -6653,8 +7077,8 @@ const AdminPanel = ({
     }
   };
 
-  const handleDeleteBooking = async (id) => {
-    if (!confirm('আপনি কি নিশ্চিত যে এই পূজা বুকিং তালিকা থেকে মুছে ফেলতে চান?')) return;
+  const handleDeleteBooking = (id) => {
+    requestConfirm('আপনি কি নিশ্চিত যে এই পূজা বুকিং তালিকা থেকে মুছে ফেলতে চান?', async () => {
     setIsSaving(true);
     setErrorMsg('');
     try {
@@ -6664,14 +7088,16 @@ const AdminPanel = ({
 
       const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'puja_bookings').maybeSingle();
       if (existing) {
-        await supabaseClient.from('settings').update({ value: JSON.stringify(updated) }).eq('id', existing.id);
+        await supabaseClient.from('settings').upsert({ key: 'puja_bookings', value: JSON.stringify(updated) }, { onConflict: 'key' }); broadcastUniversalSync();
       }
       showToast('পূজা বুকিং মুছে ফেলা হয়েছে!');
-    } catch (err) {
-      setErrorMsg("বুকিং মুছে ফেলতে সমস্যা হয়েছে।");
-    } finally {
-      setIsSaving(false);
-    }
+        broadcastUniversalSync();
+      } catch (err) {
+        setErrorMsg("বুকিং মুছে ফেলতে সমস্যা হয়েছে।");
+      } finally {
+        setIsSaving(false);
+      }
+    });
   };
 
   // Direct Booking Token Voucher Printer
@@ -6774,16 +7200,44 @@ const AdminPanel = ({
     };
 
     try {
-      const updated = [receipt, ...(donationReceipts || [])];
-      if (setDonationReceipts) setDonationReceipts(updated);
-      try { localStorage.setItem('mmg_donation_receipts', JSON.stringify(updated.slice(0, 100))); } catch (e) { }
+      // 1. Fetch latest cloud receipts to prevent race conditions across mobile & PC
+      let latestCloudList = [];
+      try {
+        const { data: cloudRow } = await supabaseClient.from('settings').select('value').eq('key', 'donation_receipts').maybeSingle();
+        if (cloudRow && cloudRow.value) {
+          latestCloudList = JSON.parse(cloudRow.value);
+        }
+      } catch (e) {}
 
-      const { data: existing } = await supabaseClient.from('settings').select('id, value').eq('key', 'donation_receipts').maybeSingle();
-      if (existing) {
-        await supabaseClient.from('settings').update({ value: JSON.stringify(updated) }).eq('id', existing.id);
-      } else {
-        await supabaseClient.from('settings').insert({ key: 'donation_receipts', value: JSON.stringify(updated) });
+      // Deduplicate
+      const existingPool = [...(latestCloudList || []), ...(donationReceipts || [])];
+      const seen = new Set();
+      const updated = [receipt];
+      seen.add(receipt.receiptNo);
+      seen.add(receipt.id);
+
+      for (const item of existingPool) {
+        const k = item.id || item.receiptNo;
+        if (k && !seen.has(k) && !seen.has(item.receiptNo)) {
+          seen.add(k);
+          if (item.receiptNo) seen.add(item.receiptNo);
+          updated.push(item);
+        }
       }
+
+      // 2. Atomic upsert to Supabase
+      const { error: upErr } = await supabaseClient.from('settings').upsert({
+        key: 'donation_receipts',
+        value: JSON.stringify(updated.slice(0, 150))
+      }, { onConflict: 'key' });
+      if (upErr) throw upErr;
+
+      // 3. Update local state & localStorage
+      if (setDonationReceipts) setDonationReceipts(updated);
+      try { localStorage.setItem('mmg_donation_receipts', JSON.stringify(updated.slice(0, 150))); } catch (e) { }
+
+      // 4. Universal sync broadcast
+      broadcastUniversalSync();
 
       showToast('নতুন স্মারক দান রসিদ ইস্যু ও সংরক্ষিত হয়েছে!');
       setAdminReceiptForm({
@@ -6799,31 +7253,44 @@ const AdminPanel = ({
       setShowNewReceiptModal(false);
       printReceiptDirectly(receipt, 'bn');
     } catch (err) {
-      setErrorMsg("রসিদ সংরক্ষণ করতে সমস্যা হয়েছে।");
+      console.error("Receipt save error:", err);
+      setErrorMsg("রসিদ সংরক্ষণ করতে সমস্যা হয়েছে: " + (err.message || ''));
     } finally {
       setIsSaving(false);
     }
   };
 
-  const handleDeleteReceipt = async (id) => {
-    if (!confirm('আপনি কি নিশ্চিত যে এই রসিদটি তালিকা থেকে মুছে ফেলতে চান?')) return;
+  const handleDeleteReceipt = (id) => {
+    requestConfirm('আপনি কি নিশ্চিত যে এই রসিদটি তালিকা থেকে মুছে ফেলতে চান?', async () => {
     setIsSaving(true);
     setErrorMsg('');
     try {
-      const updated = (donationReceipts || []).filter(r => r.id !== id && r.receiptNo !== id);
+      let currentCloudList = donationReceipts || [];
+      try {
+        const { data: cloudRow } = await supabaseClient.from('settings').select('value').eq('key', 'donation_receipts').maybeSingle();
+        if (cloudRow && cloudRow.value) {
+          currentCloudList = JSON.parse(cloudRow.value);
+        }
+      } catch (e) {}
+
+      const updated = currentCloudList.filter(r => r.id !== id && r.receiptNo !== id);
       if (setDonationReceipts) setDonationReceipts(updated);
       try { localStorage.setItem('mmg_donation_receipts', JSON.stringify(updated)); } catch (e) { }
 
-      const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'donation_receipts').maybeSingle();
-      if (existing) {
-        await supabaseClient.from('settings').update({ value: JSON.stringify(updated) }).eq('id', existing.id);
-      }
+      await supabaseClient.from('settings').upsert({
+        key: 'donation_receipts',
+        value: JSON.stringify(updated)
+      }, { onConflict: 'key' });
+
+      broadcastUniversalSync();
       showToast('রসিদ মুছে ফেলা হয়েছে!');
-    } catch (err) {
-      setErrorMsg("রসিদ মুছতে সমস্যা হয়েছে।");
-    } finally {
-      setIsSaving(false);
-    }
+        broadcastUniversalSync();
+      } catch (err) {
+        setErrorMsg("রসিদ মুছতে সমস্যা হয়েছে।");
+      } finally {
+        setIsSaving(false);
+      }
+    });
   };
 
   // -- Royani Palas Form & Save Handler --
@@ -6848,7 +7315,7 @@ const AdminPanel = ({
 
       const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'royani_palas').maybeSingle();
       if (existing) {
-        await supabaseClient.from('settings').update({ value: JSON.stringify(royaniForm) }).eq('id', existing.id);
+        await supabaseClient.from('settings').upsert({ key: 'royani_palas', value: JSON.stringify(royaniForm) }, { onConflict: 'key' }); broadcastUniversalSync();
       } else {
         await supabaseClient.from('settings').insert({ key: 'royani_palas', value: JSON.stringify(royaniForm) });
       }
@@ -6876,7 +7343,7 @@ const AdminPanel = ({
 
       const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'temple_history').maybeSingle();
       if (existing) {
-        await supabaseClient.from('settings').update({ value: JSON.stringify(historyForm) }).eq('id', existing.id);
+        await supabaseClient.from('settings').upsert({ key: 'temple_history', value: JSON.stringify(historyForm) }, { onConflict: 'key' }); broadcastUniversalSync();
       } else {
         await supabaseClient.from('settings').insert({ key: 'temple_history', value: JSON.stringify(historyForm) });
       }
@@ -6910,7 +7377,7 @@ const AdminPanel = ({
     try {
       const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'gallery_items').maybeSingle();
       if (existing) {
-        await supabaseClient.from('settings').update({ value: JSON.stringify(safeList) }).eq('id', existing.id);
+        await supabaseClient.from('settings').upsert({ key: 'gallery_items', value: JSON.stringify(safeList) }, { onConflict: 'key' }); broadcastUniversalSync();
       } else {
         await supabaseClient.from('settings').insert({ key: 'gallery_items', value: JSON.stringify(safeList) });
       }
@@ -7093,24 +7560,26 @@ const AdminPanel = ({
     }
   };
 
-  const handleDeleteGalleryPhoto = async (id) => {
-    if (!window.confirm("আপনি কি নিশ্চিত এই ছবিটি গ্যালারি থেকে মুছে ফেলতে চান?")) return;
-    setIsSaving(true);
-    try {
-      const currentList = galleryItems || DEFAULT_GALLERY_ITEMS;
-      if (currentList.length <= 1) {
-        setErrorMsg("গ্যালারিতে কমপক্ষে একটি ছবি থাকতে হবে!");
+  const handleDeleteGalleryPhoto = (id) => {
+    requestConfirm('আপনি কি নিশ্চিত এই ছবিটি গ্যালারি থেকে মুছে ফেলতে চান?', async () => {
+      setIsSaving(true);
+      try {
+        const currentList = galleryItems || DEFAULT_GALLERY_ITEMS;
+        if (currentList.length <= 1) {
+          setErrorMsg("গ্যালারিতে কমপক্ষে একটি ছবি থাকতে হবে!");
+          setIsSaving(false);
+          return;
+        }
+        const updated = currentList.filter(item => item.id !== id);
+        await handleSaveGalleryToCloud(updated);
+        broadcastUniversalSync();
+        showToast('ছবিটি গ্যালারি থেকে মুছে ফেলা হয়েছে।');
+      } catch (err) {
+        setErrorMsg('ছবি মুছতে সমস্যা হয়েছে: ' + (err.message || ''));
+      } finally {
         setIsSaving(false);
-        return;
       }
-      const updated = currentList.filter(item => item.id !== id);
-      await handleSaveGalleryToCloud(updated);
-      showToast('ছবিটি গ্যালারি থেকে মুছে ফেলা হয়েছে।');
-    } catch (err) {
-      setErrorMsg('ছবি মুছতে সমস্যা হয়েছে: ' + (err.message || ''));
-    } finally {
-      setIsSaving(false);
-    }
+    });
   };
 
   const handleMoveGalleryPhoto = async (index, direction) => {
@@ -8989,66 +9458,136 @@ const AdminPanel = ({
                 }
 
                 return (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                      <thead>
-                        <tr className="bg-amber-50/80 text-amber-950 text-xs font-bold uppercase tracking-wider border-b border-amber-200">
-                          <th className="py-3 px-4">রসিদ নম্বর</th>
-                          <th className="py-3 px-4">দাতার নাম ও পরিচয়</th>
-                          <th className="py-3 px-4">পরিমাণ</th>
-                          <th className="py-3 px-4">মাধ্যম ও TrxID</th>
-                          <th className="py-3 px-4">তারিখ</th>
-                          <th className="py-3 px-4 text-right">কার্যক্রম</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-100 text-sm">
-                        {filtered.map(r => (
-                          <tr key={r.id || r.receiptNo} className="hover:bg-amber-50/30 transition-colors">
-                            <td className="py-3 px-4">
-                              <span className="font-mono text-xs font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded">
-                                {r.receiptNo}
-                              </span>
-                            </td>
-                            <td className="py-3 px-4">
-                              <p className="font-bold text-gray-900">{r.name}</p>
-                              <p className="text-xs text-gray-500">{r.gotra ? `গোত্র: ${r.gotra} • ` : ''}{r.phone || '-'}</p>
-                            </td>
-                            <td className="py-3 px-4">
-                              <span className="font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
-                                ৳ {typeof r.amount === 'number' ? r.amount.toLocaleString() : r.amount}
-                              </span>
-                            </td>
-                            <td className="py-3 px-4">
-                              <p className="text-xs font-semibold text-gray-700">{r.method || 'বিকাশ'}</p>
-                              {r.trxId && <p className="font-mono text-[11px] text-gray-500">{r.trxId}</p>}
-                            </td>
-                            <td className="py-3 px-4 text-xs text-gray-500">
+                  <div className="space-y-4">
+                    {/* 1. Mobile Cards View (100% visible on phones, no cutoff, print & delete always visible) */}
+                    <div className="block md:hidden space-y-3">
+                      {filtered.map(r => (
+                        <div key={r.id || r.receiptNo} className="bg-amber-50/30 rounded-2xl p-4 border border-amber-200 shadow-xs hover:border-amber-400 transition-all">
+                          <div className="flex items-center justify-between pb-2 mb-2 border-b border-amber-100">
+                            <span className="font-mono text-xs font-bold text-amber-900 bg-amber-100 px-2.5 py-0.5 rounded border border-amber-300">
+                              {r.receiptNo}
+                            </span>
+                            <span className="text-xs text-gray-500 font-medium flex items-center gap-1">
+                              <i className="fas fa-calendar-alt text-amber-600 text-[10px]"></i>
                               {r.date || (r.timestamp ? new Date(r.timestamp).toLocaleDateString('bn-BD') : '-')}
-                            </td>
-                            <td className="py-3 px-4 text-right">
-                              <div className="inline-flex items-center gap-1.5">
-                                <button
-                                  type="button"
-                                  onClick={() => printReceiptDirectly(r, 'bn')}
-                                  className="text-xs font-bold px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors flex items-center gap-1 shadow-sm"
-                                  title="রসিদ প্রিন্ট করুন"
-                                >
-                                  <i className="fas fa-print"></i> প্রিন্ট
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteReceipt(r.id || r.receiptNo)}
-                                  className="text-xs text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors"
-                                  title="মুছে ফেলুন"
-                                >
-                                  <i className="fas fa-trash-alt"></i>
-                                </button>
+                            </span>
+                          </div>
+
+                          <div className="py-1 space-y-1.5">
+                            <div className="flex items-start justify-between gap-2">
+                              <div>
+                                <h4 className="font-bold text-gray-900 text-base leading-snug">{r.name}</h4>
+                                <div className="text-xs text-gray-600 mt-0.5">
+                                  {r.gotra && <span className="mr-2">গোত্র: <strong>{r.gotra}</strong></span>}
+                                  {r.phone && <span>ফোন: <a href={`tel:${r.phone}`} className="text-amber-800 font-bold hover:underline">{r.phone}</a></span>}
+                                </div>
                               </div>
-                            </td>
+                              <span className="font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 text-sm font-serif whitespace-nowrap shadow-2xs">
+                                ৳ {typeof r.amount === 'number' ? toBengaliDigits(r.amount.toLocaleString()) : toBengaliDigits(r.amount)}
+                              </span>
+                            </div>
+
+                            {r.purpose && (
+                              <p className="text-xs text-gray-500 bg-white/80 px-2.5 py-1 rounded-lg border border-amber-100">
+                                <span className="font-medium text-gray-400">খাত:</span> {r.purpose}
+                              </p>
+                            )}
+
+                            <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
+                              <span className="inline-flex items-center gap-1 bg-white px-2 py-0.5 rounded border border-gray-200 text-gray-700 font-medium">
+                                <i className="fas fa-wallet text-amber-600 text-[10px]"></i> {r.method || 'বিকাশ'}
+                              </span>
+                              {r.trxId && (
+                                <span className="font-mono text-[11px] text-gray-600 bg-gray-50 px-2 py-0.5 rounded border border-gray-200">
+                                  TrxID: {r.trxId}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="pt-3 mt-2 border-t border-amber-100 flex items-center justify-between gap-2">
+                            <button
+                              type="button"
+                              onClick={() => printReceiptDirectly(r, 'bn')}
+                              className="flex-1 py-2 px-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all cursor-pointer"
+                            >
+                              <i className="fas fa-print"></i> রসিদ প্রিন্ট করুন
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteReceipt(r.id || r.receiptNo)}
+                              className="py-2 px-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-bold flex items-center gap-1 border border-red-200 transition-colors cursor-pointer"
+                              title="মুছে ফেলুন"
+                            >
+                              <i className="fas fa-trash-alt"></i> মুছুন
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* 2. Desktop / Tablet Full Table View */}
+                    <div className="hidden md:block overflow-x-auto rounded-xl border border-gray-200">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="bg-amber-50/80 text-amber-950 text-xs font-bold uppercase tracking-wider border-b border-amber-200">
+                            <th className="py-3 px-4">রসিদ নম্বর</th>
+                            <th className="py-3 px-4">দাতার নাম ও পরিচয়</th>
+                            <th className="py-3 px-4">পরিমাণ</th>
+                            <th className="py-3 px-4">মাধ্যম ও TrxID</th>
+                            <th className="py-3 px-4">তারিখ</th>
+                            <th className="py-3 px-4 text-right">কার্যক্রম</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100 text-sm">
+                          {filtered.map(r => (
+                            <tr key={r.id || r.receiptNo} className="hover:bg-amber-50/30 transition-colors">
+                              <td className="py-3 px-4">
+                                <span className="font-mono text-xs font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded border border-amber-200">
+                                  {r.receiptNo}
+                                </span>
+                              </td>
+                              <td className="py-3 px-4">
+                                <p className="font-bold text-gray-900">{r.name}</p>
+                                <p className="text-xs text-gray-500">{r.gotra ? `গোত্র: ${r.gotra} • ` : ''}{r.phone || '-'}</p>
+                              </td>
+                              <td className="py-3 px-4">
+                                <span className="font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 font-serif">
+                                  ৳ {typeof r.amount === 'number' ? toBengaliDigits(r.amount.toLocaleString()) : toBengaliDigits(r.amount)}
+                                </span>
+                              </td>
+                              <td className="py-3 px-4">
+                                <p className="text-xs font-semibold text-gray-700">{r.method || 'বিকাশ'}</p>
+                                {r.trxId && <p className="font-mono text-[11px] text-gray-500">{r.trxId}</p>}
+                              </td>
+                              <td className="py-3 px-4 text-xs text-gray-500">
+                                {r.date || (r.timestamp ? new Date(r.timestamp).toLocaleDateString('bn-BD') : '-')}
+                              </td>
+                              <td className="py-3 px-4 text-right">
+                                <div className="inline-flex items-center gap-1.5">
+                                  <button
+                                    type="button"
+                                    onClick={() => printReceiptDirectly(r, 'bn')}
+                                    className="text-xs font-bold px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors flex items-center gap-1 shadow-sm cursor-pointer"
+                                    title="রসিদ প্রিন্ট করুন"
+                                  >
+                                    <i className="fas fa-print"></i> প্রিন্ট
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteReceipt(r.id || r.receiptNo)}
+                                    className="text-xs text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors cursor-pointer"
+                                    title="মুছে ফেলুন"
+                                  >
+                                    <i className="fas fa-trash-alt"></i>
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 );
               })()}
@@ -9940,9 +10479,13 @@ function App() {
   const [donationReceipts, setDonationReceipts] = useState(() => {
     try {
       const saved = localStorage.getItem('mmg_donation_receipts') || localStorage.getItem('temple_donation_receipts');
-      return saved ? JSON.parse(saved) : [];
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+      return DEFAULT_DONATION_RECEIPTS;
     } catch (e) {
-      return [];
+      return DEFAULT_DONATION_RECEIPTS;
     }
   });
 
@@ -10111,6 +10654,69 @@ function App() {
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
   }, [currentPage]);
+
+    // Universal Realtime Database Sync across all mobile devices & desktops
+  useEffect(() => {
+    if (!supabaseClient) return;
+
+    // Supabase Realtime Postgres Changes
+    const channel = supabaseClient
+      .channel('temple_universal_db_sync')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'settings' }, () => {
+        fetchData();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'committee' }, () => {
+        fetchData();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'testimonials' }, () => {
+        fetchData();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, () => {
+        fetchData();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'notices' }, () => {
+        fetchData();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'donations' }, () => {
+        fetchData();
+      })
+      .subscribe();
+
+    // Cross-tab BroadcastChannel
+    let bc;
+    try {
+      bc = new BroadcastChannel('mmg_universal_sync');
+      bc.onmessage = (event) => {
+        if (event.data === 'sync' || event.data?.type === 'sync') {
+          fetchData();
+        }
+      };
+    } catch (e) {}
+
+    // Tab visibility & focus re-validation
+    const handleRevalidate = () => {
+      if (document.visibilityState === 'visible') {
+        fetchData();
+      }
+    };
+    window.addEventListener('focus', handleRevalidate);
+    document.addEventListener('visibilitychange', handleRevalidate);
+
+    // Periodic heartbeat sync every 25 seconds
+    const interval = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        fetchData();
+      }
+    }, 8000);
+
+    return () => {
+      supabaseClient.removeChannel(channel);
+      if (bc) bc.close();
+      window.removeEventListener('focus', handleRevalidate);
+      document.removeEventListener('visibilitychange', handleRevalidate);
+      clearInterval(interval);
+    };
+  }, [supabaseClient]);
 
   useEffect(() => {
     fetchData();
