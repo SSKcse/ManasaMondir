@@ -622,13 +622,13 @@ const printReceiptDirectly = (receipt, currentLang = 'bn') => {
     }
     .watermark-container {
       position: absolute;
-      top: 50%;
+      top: 52%;
       left: 50%;
       transform: translate(-50%, -50%);
       pointer-events: none;
       user-select: none;
-      z-index: 1;
-      opacity: 0.13;
+      z-index: 0;
+      opacity: 0.16;
       text-align: center;
       display: flex;
       flex-direction: column;
@@ -638,23 +638,27 @@ const printReceiptDirectly = (receipt, currentLang = 'bn') => {
       print-color-adjust: exact !important;
     }
     .watermark-ring {
-      width: 320px;
-      height: 320px;
-      border: 3px dashed #b45309;
+      width: 360px;
+      height: 360px;
+      border: 4px dashed #b45309;
       border-radius: 50%;
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      opacity: 0.6;
+      opacity: 0.75;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
     }
     .watermark-symbol {
       font-family: 'Noto Serif Bengali', 'Hind Siliguri', serif;
-      font-size: 280px;
+      font-size: 320px;
       font-weight: 900;
       color: #b45309;
-      line-height: 0.9;
-      text-shadow: 0 0 35px rgba(217, 119, 6, 0.4);
+      line-height: 0.85;
+      text-shadow: 0 0 45px rgba(217, 119, 6, 0.5);
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
     }
     .corner {
       position: absolute;
@@ -737,8 +741,8 @@ const printReceiptDirectly = (receipt, currentLang = 'bn') => {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #fffbeb;
-      border: 1px solid #fde68a;
+      background: rgba(254, 243, 199, 0.65) !important;
+      border: 1px solid rgba(217, 119, 6, 0.35);
       padding: 10px 16px;
       border-radius: 12px;
       margin-bottom: 16px;
@@ -759,17 +763,18 @@ const printReceiptDirectly = (receipt, currentLang = 'bn') => {
       width: 100%;
       border-collapse: collapse;
       margin-bottom: 16px;
-      background: #ffffff;
+      background: transparent !important;
       border-radius: 10px;
       overflow: hidden;
     }
     .info-table td {
       padding: 9px 12px;
-      border-bottom: 1px solid #f5f5f4;
+      border-bottom: 1px solid rgba(217, 119, 6, 0.15) !important;
       font-size: 13.5px;
       vertical-align: middle;
+      background: transparent !important;
     }
-    .info-table tr:nth-child(even) td { background: #fafaf9; }
+    .info-table tr:nth-child(even) td { background: rgba(254, 243, 199, 0.28) !important; }
     .info-table td.label {
       width: 32%;
       color: #78350f;
@@ -780,7 +785,7 @@ const printReceiptDirectly = (receipt, currentLang = 'bn') => {
       font-weight: 700;
     }
     .amount-box {
-      background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 45%, #fed7aa 100%);
+      background: linear-gradient(135deg, rgba(255, 251, 235, 0.82) 0%, rgba(254, 243, 199, 0.82) 45%, rgba(254, 215, 170, 0.82) 100%) !important;
       border: 2px solid #d97706;
       border-radius: 14px;
       padding: 14px 20px;
@@ -10345,6 +10350,39 @@ const AdminPanel = ({
           )}
         </div>
       </div>
+
+      {/* Internal Custom Confirmation Modal (Completely replaces native browser confirm) */}
+      {internalConfirm && internalConfirm.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl max-w-sm sm:max-w-md w-full p-6 shadow-2xl border border-gray-100 text-center transform transition-all scale-100">
+            <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner">
+              <i className="fas fa-trash-alt"></i>
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">{internalConfirm.title}</h3>
+            <p className="text-gray-600 text-sm mb-6 leading-relaxed px-2">{internalConfirm.message}</p>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setInternalConfirm(prev => ({ ...prev, isOpen: false }))}
+                className="flex-1 py-3 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-sm transition-colors cursor-pointer"
+              >
+                বাতিল
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  const action = internalConfirm.onConfirm;
+                  setInternalConfirm(prev => ({ ...prev, isOpen: false }));
+                  if (action) await action();
+                }}
+                className="flex-1 py-3 px-4 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white font-bold rounded-xl text-sm shadow-md hover:shadow-lg transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2"
+              >
+                <i className="fas fa-check"></i> হ্যাঁ, মুছে ফেলুন
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -10707,7 +10745,7 @@ function App() {
       if (document.visibilityState === 'visible') {
         fetchData();
       }
-    }, 8000);
+    }, 4000);
 
     return () => {
       supabaseClient.removeChannel(channel);
@@ -10735,7 +10773,7 @@ function App() {
     checkSession();
   }, []);
 
-  const fetchData = async () => {
+  async function fetchData() {
     setDbError(false);
     try {
       // Parallelize all queries across HTTP/2 multiplexing for instant response
