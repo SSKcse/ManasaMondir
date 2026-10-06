@@ -1229,7 +1229,31 @@ const checkUploadServer = async () => {
 const readVideoFile = async (file) => {
   if (!file) return null;
 
-  // 1. Check if local upload streaming server is actively responding (e.g. localhost)
+  // 1. Try direct cloud upload to Supabase Storage ('videos' bucket)
+  try {
+    if (typeof supabaseClient !== 'undefined' && supabaseClient?.storage) {
+      const ext = (file.name || 'video.mp4').split('.').pop().toLowerCase();
+      const cleanName = (file.name || 'clip').replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 30);
+      const safeName = `event_${Date.now()}_${cleanName}.${ext}`;
+      const { data: upData, error: upErr } = await supabaseClient.storage
+        .from('videos')
+        .upload(safeName, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (!upErr && upData) {
+        const { data: pubData } = supabaseClient.storage.from('videos').getPublicUrl(safeName);
+        if (pubData && pubData.publicUrl) {
+          return pubData.publicUrl;
+        }
+      }
+    }
+  } catch (supaErr) {
+    console.warn("Supabase storage upload attempt:", supaErr);
+  }
+
+  // 2. Check if local upload streaming server is actively responding (e.g. localhost)
   const serverReady = await checkUploadServer();
   if (serverReady) {
     try {
@@ -1249,8 +1273,8 @@ const readVideoFile = async (file) => {
     }
   }
 
-  // 2. For universal cross-device playback, convert files under 3.5MB to Base64 Data URL
-  if (file.size <= 3.5 * 1024 * 1024) {
+  // 3. For small videos under 4MB, convert to Base64 Data URL for instant cross-device playback
+  if (file.size <= 4.0 * 1024 * 1024) {
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result);
@@ -1259,9 +1283,9 @@ const readVideoFile = async (file) => {
     });
   }
 
-  // 3. For large video files on cloud hosting without dedicated streaming server,
-  // warn the user so they know to use a YouTube link or compress the clip
-  throw new Error('ভিডিও ফাইলটি বেশি বড় (' + (file.size / (1024 * 1024)).toFixed(1) + ' MB)। সব ডিভাইসে সঠিকভাবে চলার জন্য অনুগ্রহ করে ৩.৫ MB-এর নিচের ভিডিও দিন অথবা YouTube লিংক ব্যবহার করুন।');
+  // 4. For large files when Supabase Storage bucket 'videos' is not yet configured,
+  // guide the user to paste a YouTube link or enable the bucket
+  throw new Error(`ভিডিও ফাইলটির সাইজ (${(file.size / (1024 * 1024)).toFixed(1)} MB)। ক্লাউডে সরাসরি বড় ফাইল আপলোডের জন্য Supabase-এ 'videos' পাবলিক বাকেট অন করুন, অথবা যেকোনো YouTube/ভিডিও লিংক পেস্ট করুন (অনলিমিটেড ও দ্রুত)।`);
 };
 
 const MediaViewer = ({ url, isVideo, alt = "Media", className = "w-full h-full object-cover", controls = true, autoPlay = false, loop = false }) => {
@@ -8268,25 +8292,41 @@ const AdminPanel = ({
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <label className="cursor-pointer bg-red-50 hover:bg-red-100/70 border-2 border-dashed border-red-300 px-4 py-3 rounded-xl text-sm flex items-center justify-center gap-2 transition-colors">
-                      <i className="fas fa-file-video text-red-600"></i>
-                      <span className="text-red-900 font-bold">ডিভাইস থেকে যেকোনো সাইজের ভিডিও ফাইল আপলোড (.mp4, .webm, .mov)</span>
-                      <input
-                        type="file"
-                        accept="video/*"
-                        onChange={handleEventVideoFile}
-                        className="hidden"
-                      />
-                    </label>
-
                     <div>
+                      <span className="block text-xs font-bold text-gray-700 mb-1.5 flex items-center gap-1.5">
+                        <i className="fab fa-youtube text-red-600 text-sm"></i>
+                        ইউটিউব / অনলাইন ভিডিও লিংক (সুপারিশকৃত)
+                      </span>
                       <input
                         type="text"
                         value={newEvent.video && newEvent.video.startsWith('data:video') ? '' : (newEvent.video || '')}
                         onChange={e => setNewEvent(prev => ({ ...prev, video: e.target.value }))}
-                        placeholder="অথবা YouTube / ভিডিও লিংক দিন (e.g. https://youtu.be/...)"
-                        className="w-full px-3.5 py-3 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-red-500"
+                        placeholder="YouTube / Shorts লিংক দিন (e.g. https://youtu.be/...)"
+                        className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-red-500"
                       />
+                      <span className="block text-[11px] text-gray-500 mt-1">
+                        💡 ফেসবুক, ইউটিউব বা যেকোনো অনলাইন ভিডিওর লিংক পেস্ট করলে তৎক্ষণাৎ চলবে।
+                      </span>
+                    </div>
+
+                    <div>
+                      <span className="block text-xs font-bold text-gray-700 mb-1.5 flex items-center gap-1.5">
+                        <i className="fas fa-file-video text-orange-600 text-sm"></i>
+                        ডিভাইস থেকে ভিডিও ফাইল
+                      </span>
+                      <label className="cursor-pointer bg-red-50 hover:bg-red-100/70 border-2 border-dashed border-red-300 px-4 py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition-colors">
+                        <i className="fas fa-cloud-upload-alt text-red-600"></i>
+                        <span className="text-red-900 font-bold">ভিডিও ফাইল নির্বাচন করুন (.mp4, .webm)</span>
+                        <input
+                          type="file"
+                          accept="video/*"
+                          onChange={handleEventVideoFile}
+                          className="hidden"
+                        />
+                      </label>
+                      <span className="block text-[11px] text-gray-500 mt-1">
+                        ছোট ক্লিপ সরাসরি আপলোড হবে; ক্লাউড বাকেট যুক্ত থাকলে যেকোনো সাইজের ফাইল চলবে।
+                      </span>
                     </div>
                   </div>
 
