@@ -2627,10 +2627,13 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
       )}
 
       {/* CSS Marquee */}
-      <div className="bg-orange-800 text-yellow-200 py-2 border-b-2 border-yellow-500 marquee-wrapper shadow-inner">
-        <div className="marquee-text font-medium text-sm md:text-base flex items-center gap-2">
-          <i className="fas fa-bell text-yellow-300 animate-bounce inline-block text-xs mr-2"></i>
-          {displayMarquee}
+      <div 
+        className="bg-orange-800 text-yellow-200 py-2.5 sm:py-2 border-b-2 border-yellow-500 marquee-wrapper shadow-inner cursor-pointer"
+        title={lang === 'en' ? "Touch or hover to pause" : "ট্যাপ বা মাউস ধরে রাখলে থামবে"}
+      >
+        <div className="marquee-text font-medium text-sm md:text-base inline-flex items-center gap-2 leading-relaxed">
+          <i className="fas fa-bell text-yellow-300 animate-bounce inline-block text-xs mr-2 flex-shrink-0"></i>
+          <span className="whitespace-nowrap flex-shrink-0">{displayMarquee}</span>
         </div>
       </div>
 

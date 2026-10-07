@@ -133,38 +133,51 @@
             -webkit-user-select: none;
         }
 
-        /* Optimized smooth marquee with 3D transform */
-        .marquee-text {
-            transform: translate3d(0, 0, 0);
-            will-change: transform;
-        }
-
-
-        /* Modern CSS Marquee Animation */
+        /* Modern High-Performance Marquee Animation (Fully visible on all mobile & desktop screens) */
         .marquee-wrapper {
             width: 100%;
             overflow: hidden;
             white-space: nowrap;
             box-sizing: border-box;
+            position: relative;
+            display: flex;
+            align-items: center;
+            user-select: none;
+            -webkit-user-select: none;
+            contain: content;
         }
 
         .marquee-text {
-            display: inline-block;
+            display: inline-flex !important;
+            align-items: center;
+            white-space: nowrap !important;
+            flex-shrink: 0 !important;
+            width: max-content !important;
+            min-width: max-content !important;
             padding-left: 100%;
-            animation: marquee 25s linear infinite;
+            animation: marquee 18s linear infinite;
+            transform: translate3d(0, 0, 0);
+            will-change: transform;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            line-height: normal;
         }
 
-        .marquee-text:hover {
-            animation-play-state: paused;
+        /* Pause on hover (desktop) or touch/press (mobile) */
+        .marquee-wrapper:hover .marquee-text,
+        .marquee-wrapper:active .marquee-text,
+        .marquee-text:hover,
+        .marquee-text:active {
+            animation-play-state: paused !important;
         }
 
         @keyframes marquee {
             0% {
-                transform: translateX(0);
+                transform: translate3d(0, 0, 0);
             }
 
             100% {
-                transform: translateX(-100%);
+                transform: translate3d(-100%, 0, 0);
             }
         }
 
@@ -660,7 +673,7 @@
     <div id="root"></div>
 
     <!-- Pre-compiled Ultra-Fast Production JS (Zero Babel Delay, 120 FPS) -->
-    <script src="app.min.js?v=41" defer></script>
+    <script src="app.min.js?v=43" defer></script>
 </body>
 
 </html>
