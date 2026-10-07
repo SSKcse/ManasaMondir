@@ -558,7 +558,7 @@ const printReceiptDirectly = (receipt, currentLang = 'bn') => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>পবিত্র দান ও প্রণামী স্মারক রসিদ - ${receipt.receiptNo}</title>
+  <title>পবিত্র প্রণামী স্মারক রশিদ - ${receipt.receiptNo}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@500;600;700;800;900&display=swap" rel="stylesheet">
@@ -973,13 +973,13 @@ const printReceiptDirectly = (receipt, currentLang = 'bn') => {
           <div class="sloka-pill">ওঁ হ্রীং শ্রীং ক্লীং ঐং মনসাদেব্যৈ নমঃ</div>
         </div>
         <div>
-          <span class="badge-bar">✦ পবিত্র স্মারক দান ও প্রণামী রসিদ (OFFICIAL DONATION MEMORIAL RECEIPT) ✦</span>
+          <span class="badge-bar">✦ পবিত্র স্মারক প্রণামী রশিদ (OFFICIAL DONATION RECEIPT) ✦</span>
         </div>
       </div>
 
       <div class="meta-row">
         <div>
-          <span style="color:#78716c;">রসিদ নং:</span>
+          <span style="color:#78716c;">রশিদ নং:</span>
           <span class="rec-no">${receipt.receiptNo}</span>
         </div>
         <div>
@@ -1590,9 +1590,9 @@ const I18N = {
     royaniSubtitle: "মধ্যযুগের মহাকবি বিজয় গুপ্তের অমর সৃষ্টি ও গৈলা মনসা মন্দিরের ৫০০+ বছরের ঐতিহ্যবাহী সংগীতধারা",
     panjika: "পঞ্জিকা ও তিথি",
     panjikaTitle: "শুভ পঞ্জিকা ও মহোৎসব সময়সূচী",
-    receipt: "দান রসিদ",
-    receiptTitle: "স্বয়ংক্রিয় পবিত্র দান রসিদ",
-    receiptSubtitle: "শ্রী শ্রী মা মনসা মন্দির তহবিলে প্রদত্ত প্রণামীর স্মারক রসিদ সংগ্রহ ও প্রিন্ট",
+    receipt: "প্রণামী রশিদ",
+    receiptTitle: "স্বয়ংক্রিয় পবিত্র প্রণামী রশিদ",
+    receiptSubtitle: "শ্রী শ্রী মা মনসা মন্দির তহবিলে প্রদত্ত প্রণামীর স্মারক রশিদ সংগ্রহ ও প্রিন্ট",
     annualFestivalTarget: "বাৎসরিক মহোৎসব ও মনসা পূজা ২০২৬",
     festivalCountdown: "মহোৎসব ও রয়ানী গানের বাকি",
     daysUnit: "দিন",
@@ -1773,6 +1773,9 @@ const I18N = {
     historyChap6Text: "While the ancient shrine endured numerous natural calamities over the centuries, the devotion of local and global devotees, organized under the 'Poet Bijoy Gupta Memorial, Shree Shree Maa Manasa Mandir Preservation & Development Committee', has restored and elevated the sanctum to majestic splendor. In 2005, a magnificent one-ton (1,000 kg) solid brass deity of Shree Shree Maa Manasa was consecrated in the inner sanctum. In 2013, a modern three-storey marble temple structure, expansive Natmandir (prayer hall), and pilgrim lodge were inaugurated beside the ancient Dighi. Today, it stands both as a living divine shrine and an eternal cultural monument to Bengali heritage.",
 
     // Footer
+    receipt: "Donation Receipt",
+    receiptTitle: "Automated Donation Receipt",
+    receiptSubtitle: "Download and print your official sacred devotee donation receipt",
     footerAbout: "The historic temple founded by medieval poet Bijoy Gupta. May Maa Manasa bestow peace, health, and prosperity upon all.",
     quickLinks: "Quick Links",
     adminLogin: "Admin Login",
@@ -2319,11 +2322,22 @@ const Header = ({ navigateTo, isMenuOpen, setIsMenuOpen, lang, setLang, isMusicP
 
         {/* 100% Solid Opaque Mobile Navigation Menu */}
         <div className="lg:hidden bg-stone-950 text-white fixed w-full left-0 top-[60px] sm:top-[68px] shadow-2xl flex flex-col font-medium border-t-2 border-orange-500 border-b-4 border-amber-500 z-50 max-h-[85vh] overflow-y-auto">
-          <div className="p-3 bg-stone-900 border-b border-stone-800 flex justify-between items-center">
+          <div className="p-3 bg-stone-900 border-b border-stone-800 flex justify-between items-center gap-2 sticky top-0 z-10 backdrop-blur-md">
             <span className="text-xs text-yellow-300 uppercase tracking-wider font-bold flex items-center gap-1.5">
               <i className="fas fa-sliders-h text-xs"></i> Controls / নিয়ন্ত্রণ
             </span>
-            <HeaderControls isMusicPlaying={isMusicPlaying} toggleMusic={toggleMusic} lang={lang} setLang={setLang} />
+            <div className="flex items-center gap-2.5">
+              <HeaderControls isMusicPlaying={isMusicPlaying} toggleMusic={toggleMusic} lang={lang} setLang={setLang} isCompact={true} />
+              <button
+                type="button"
+                onClick={() => setIsMenuOpen(false)}
+                title={lang === 'en' ? "Close Menu" : "মেনু বন্ধ করুন"}
+                aria-label="Close Navigation Menu"
+                className="w-8 h-8 rounded-full bg-red-600/90 hover:bg-red-500 active:scale-90 text-white flex items-center justify-center transition-all shadow-md border border-red-400 cursor-pointer text-sm font-bold shrink-0"
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
           </div>
           <button onClick={() => navigateTo('home')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3"><i className="fas fa-home text-yellow-400 w-5"></i> {t('home', lang)}</button>
           <button onClick={() => navigateTo('booking')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3 text-amber-300 font-bold"><i className="fas fa-hands-praying text-amber-400 w-5"></i> {t('booking', lang)}</button>
@@ -3150,7 +3164,7 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
               </div>
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-yellow-800 bg-yellow-100 px-2.5 py-0.5 rounded-full">
-                  {lang === 'en' ? 'Instant Memorial Slip' : 'স্বয়ংক্রিয় দান রসিদ'}
+                  {lang === 'en' ? 'Donation Receipt' : 'স্বয়ংক্রিয় প্রণামী রশিদ'}
                 </span>
                 <h3 className="text-xl font-bold font-serif text-gray-900 mt-0.5 group-hover:text-yellow-700 transition-colors">
                   {t('receipt', lang)}
@@ -3158,10 +3172,10 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
               </div>
             </div>
             <p className="text-gray-600 text-xs sm:text-sm leading-relaxed mb-4">
-              {lang === 'en' ? 'Download and print your official sacred devotee memorial donation receipt with seal & serial number.' : 'মন্দির তহবিলে প্রদত্ত প্রণামীর অফিসিয়াল সিল ও স্মারক নম্বরযুক্ত রসিদ ডাউনলোড ও প্রিন্ট করুন।'}
+              {lang === 'en' ? 'Download and print your official sacred devotee donation receipt with seal & serial number.' : 'মন্দির তহবিলে প্রদত্ত প্রণামীর অফিসিয়াল সিল ও স্মারক নম্বরযুক্ত রশিদ ডাউনলোড ও প্রিন্ট করুন।'}
             </p>
             <div className="flex items-center justify-between text-xs font-bold text-yellow-800 pt-3 border-t border-gray-100">
-              <span>{lang === 'en' ? 'Generate Official Receipt' : 'স্মারক রসিদ সংগ্রহ করুন'}</span>
+              <span>{lang === 'en' ? 'Get Donation Receipt' : 'প্রণামী রশিদ সংগ্রহ করুন'}</span>
               <i className="fas fa-arrow-right group-hover:translate-x-1.5 transition-transform"></i>
             </div>
           </div>
@@ -3386,8 +3400,8 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
           </div>
 
           {/* Right Column: Sacred Mantra & Interactive Ghonta / Shonkho Sound Sanctuary */}
-          <div className="relative w-full h-full rounded-[2.5rem] p-1 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 shadow-[0_20px_50px_-15px_rgba(217,119,6,0.35)] flex flex-col">
-            <div className="bg-gradient-to-br from-[#240606] via-[#331102] to-[#1a0404] text-white rounded-[2.35rem] p-4 sm:p-6 md:p-7 relative overflow-hidden border border-amber-300/30 flex-1 flex flex-col justify-between text-center card-hover-glow">
+          <div className="relative w-full h-full rounded-[2.2rem] p-[2px] bg-gradient-to-b from-amber-500/50 via-amber-600/30 to-amber-700/50 shadow-[0_15px_35px_-10px_rgba(180,83,9,0.22)] border border-amber-400/30 flex flex-col">
+            <div className="bg-gradient-to-b from-[#1f140e] via-[#241710] to-[#1a100a] text-white rounded-[2.1rem] p-5 sm:p-6 md:p-7 relative overflow-hidden border border-amber-400/20 flex-1 flex flex-col justify-between text-center card-hover-glow">
 
               {/* Sacred Om Watermark & Background Glow */}
               <div className="absolute -right-6 -bottom-8 opacity-10 text-9xl text-amber-300 pointer-events-none select-none">
@@ -3396,33 +3410,33 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
               <div className="absolute -left-10 -top-10 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
               {/* Corner Flourish Motifs */}
-              <span className="absolute top-4 left-5 text-amber-400/40 text-sm pointer-events-none select-none">❖</span>
-              <span className="absolute top-4 right-5 text-amber-400/40 text-sm pointer-events-none select-none">❖</span>
-              <span className="absolute bottom-4 left-5 text-amber-400/40 text-sm pointer-events-none select-none">❖</span>
-              <span className="absolute bottom-4 right-5 text-amber-400/40 text-sm pointer-events-none select-none">❖</span>
+              <span className="absolute top-4 left-5 text-amber-400/30 text-sm pointer-events-none select-none">❖</span>
+              <span className="absolute top-4 right-5 text-amber-400/30 text-sm pointer-events-none select-none">❖</span>
+              <span className="absolute bottom-4 left-5 text-amber-400/30 text-sm pointer-events-none select-none">❖</span>
+              <span className="absolute bottom-4 right-5 text-amber-400/30 text-sm pointer-events-none select-none">❖</span>
 
               <div className="relative z-10 flex-1 flex flex-col justify-between">
                 <div>
                   {/* Devotional Top Badge */}
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-widest text-amber-200 bg-amber-400/15 border border-amber-400/40 backdrop-blur-md mb-2.5 shadow-xs">
-                    <i className="fas fa-om text-amber-400"></i>
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-semibold uppercase tracking-widest text-amber-200/95 bg-amber-500/10 border border-amber-400/30 backdrop-blur-md mb-2.5 shadow-xs">
+                    <i className="fas fa-om text-amber-400 text-xs"></i>
                     <span>{lang === 'en' ? 'Sacred Devotion of the Day' : 'আজকের পবিত্র স্তোত্র'}</span>
-                    <i className="fas fa-om text-amber-400"></i>
+                    <i className="fas fa-om text-amber-400 text-xs"></i>
                   </div>
 
-                  {/* Title with Divine Glowing Gold Text */}
-                  <h3 className="text-xl sm:text-2xl md:text-3xl font-extrabold font-serif text-yellow-300 drop-shadow-[0_2px_8px_rgba(245,158,11,0.5)] mb-3.5 tracking-normal leading-normal py-1">
+                  {/* Title with Soft Divine Sacred Gold */}
+                  <h3 className="text-xl sm:text-2xl md:text-3xl font-bold font-serif text-amber-50 drop-shadow-sm mb-3.5 tracking-normal leading-normal py-1">
                     {lang === 'en' ? 'Shree Shree Maa Manasa Pranam Mantra' : 'মা মনসার পবিত্র প্রণাম মন্ত্র'}
                   </h3>
 
                   {/* Shloka Altar Sanctuary Box */}
-                  <div className="bg-black/45 backdrop-blur-md rounded-2xl p-5 sm:p-6 border border-amber-400/35 max-w-xl mx-auto mb-4 shadow-inner relative">
-                    <p className="text-base sm:text-lg md:text-xl font-serif text-amber-100 font-bold leading-relaxed tracking-wide mb-2.5 drop-shadow">
+                  <div className="bg-stone-900/70 backdrop-blur-md rounded-2xl p-5 sm:p-6 border border-amber-500/25 max-w-xl mx-auto mb-4 shadow-sm relative">
+                    <p className="text-base sm:text-lg md:text-xl font-serif text-amber-50 font-bold leading-relaxed tracking-wide mb-2.5 drop-shadow-sm">
                       ওঁ আস্তীকস্য মুনের্মাতা ভগিনী বাসুকেস্তথা ।<br />
                       জরৎকারুমুনেঃ পত্নী মনসাদেবী নমোহস্তুতে ॥
                     </p>
-                    <div className="h-[1px] w-24 bg-gradient-to-r from-transparent via-amber-400/60 to-transparent mx-auto my-2.5"></div>
-                    <p className="text-xs sm:text-sm text-amber-200/90 italic font-medium leading-relaxed max-w-lg mx-auto">
+                    <div className="h-[1px] w-24 bg-gradient-to-r from-transparent via-amber-400/50 to-transparent mx-auto my-2.5"></div>
+                    <p className="text-xs sm:text-sm text-amber-100/90 font-normal leading-relaxed max-w-lg mx-auto">
                       {lang === 'en'
                         ? '"Salutations unto Goddess Manasa, Mother of sage Astika, sister of serpent king Vasuki, and devoted consort of sage Jaratkaru."'
                         : '"হে মুনি আস্তীকের জননী, নাগরাজ বাসুকির ভগিনী এবং তপস্বী জরৎকারু মুনির ধর্মপত্নী দেবি মনসা, আপনাকে ভক্তিপূর্ণ প্রণাম জানাই।"'}
@@ -3438,9 +3452,9 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
                       playSacredBellSound();
                       if (showToast) showToast(t('bellRungToast', lang));
                     }}
-                    className="btn-shine bg-gradient-to-b from-amber-300 via-yellow-400 to-amber-500 hover:from-amber-200 hover:to-yellow-300 text-amber-950 font-extrabold px-4 sm:px-5 py-2.5 rounded-full shadow-lg shadow-amber-500/30 hover:shadow-amber-400/50 hover:scale-105 active:scale-95 border-2 border-yellow-200 inline-flex items-center gap-2 transition-all cursor-pointer text-xs sm:text-sm group"
+                    className="btn-shine bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-stone-950 font-bold px-4 sm:px-5 py-2.5 rounded-full shadow-md hover:shadow-lg active:scale-95 border border-yellow-200/80 inline-flex items-center gap-2 transition-all cursor-pointer text-xs sm:text-sm group"
                   >
-                    <i className="fas fa-bell text-amber-950 text-sm group-hover:rotate-12 transition-transform"></i>
+                    <i className="fas fa-bell text-stone-950 text-sm group-hover:rotate-12 transition-transform"></i>
                     <span>{t('playChime', lang)}</span>
                     <span className="text-sm">🔔</span>
                   </button>
@@ -3451,7 +3465,7 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
                       playSacredShankhSound();
                       if (showToast) showToast(t('shankhBlownToast', lang));
                     }}
-                    className="btn-shine bg-gradient-to-b from-white via-amber-50 to-orange-100 hover:from-white hover:to-amber-100 text-amber-950 font-extrabold px-4 sm:px-5 py-2.5 rounded-full shadow-lg shadow-amber-300/30 hover:shadow-amber-200/50 hover:scale-105 active:scale-95 border-2 border-amber-300/80 inline-flex items-center gap-2 transition-all cursor-pointer text-xs sm:text-sm group"
+                    className="btn-shine bg-gradient-to-r from-stone-50 via-amber-50 to-orange-100 hover:from-white hover:to-amber-100 text-amber-950 font-bold px-4 sm:px-5 py-2.5 rounded-full shadow-md hover:shadow-lg active:scale-95 border border-amber-300/80 inline-flex items-center gap-2 transition-all cursor-pointer text-xs sm:text-sm group"
                   >
                     <span className="text-lg leading-none group-hover:scale-110 transition-transform">🐚</span>
                     <span>{t('playShankh', lang)}</span>
@@ -3461,7 +3475,7 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
                   {/* Sacred Mantras Page Link */}
                   <button
                     onClick={() => navigateTo('mantras')}
-                    className="bg-white/10 hover:bg-white/20 text-amber-100 hover:text-white border border-amber-400/40 hover:border-amber-300 px-4 sm:px-5 py-2.5 rounded-full font-bold transition-all hover:scale-105 active:scale-95 inline-flex items-center gap-2 shadow-md cursor-pointer text-xs sm:text-sm"
+                    className="bg-amber-950/70 hover:bg-amber-900 text-amber-200 hover:text-white border border-amber-500/40 px-4 sm:px-5 py-2.5 rounded-full font-bold transition-all hover:scale-105 active:scale-95 inline-flex items-center gap-2 shadow-sm cursor-pointer text-xs sm:text-sm"
                   >
                     <i className="fas fa-book-open text-amber-300 text-xs"></i>
                     <span>{t('viewMantrasBtn', lang)}</span>
@@ -3881,8 +3895,8 @@ const PanjikaWidget = ({ navigateTo, lang = 'bn' }) => {
   const weekDaysEn = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
-    <div className="relative w-full h-full rounded-[2.5rem] p-1 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 shadow-[0_20px_50px_-15px_rgba(217,119,6,0.35)] flex flex-col">
-      <div className="bg-gradient-to-br from-[#240606] via-[#331102] to-[#1a0404] text-white rounded-[2.35rem] p-4 sm:p-6 md:p-7 relative overflow-hidden border border-amber-300/30 flex-1 flex flex-col justify-between card-hover-glow">
+    <div className="relative w-full h-full rounded-[2.2rem] p-[2px] bg-gradient-to-b from-amber-500/50 via-amber-600/30 to-amber-700/50 shadow-[0_15px_35px_-10px_rgba(180,83,9,0.22)] border border-amber-400/30 flex flex-col">
+      <div className="bg-gradient-to-b from-[#1f140e] via-[#241710] to-[#1a100a] text-white rounded-[2.1rem] p-4 sm:p-6 md:p-7 relative overflow-hidden border border-amber-400/20 flex-1 flex flex-col justify-between card-hover-glow">
 
         {/* Sacred Om Watermark & Background Glow */}
         <div className="absolute -right-6 -bottom-8 opacity-10 text-9xl text-amber-300 pointer-events-none select-none">
@@ -3891,40 +3905,40 @@ const PanjikaWidget = ({ navigateTo, lang = 'bn' }) => {
         <div className="absolute -left-10 -top-10 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
         {/* Corner Flourish Motifs */}
-        <span className="absolute top-4 left-5 text-amber-400/40 text-sm pointer-events-none select-none">❖</span>
-        <span className="absolute top-4 right-5 text-amber-400/40 text-sm pointer-events-none select-none">❖</span>
-        <span className="absolute bottom-4 left-5 text-amber-400/40 text-sm pointer-events-none select-none">❖</span>
-        <span className="absolute bottom-4 right-5 text-amber-400/40 text-sm pointer-events-none select-none">❖</span>
+        <span className="absolute top-4 left-5 text-amber-400/30 text-sm pointer-events-none select-none">❖</span>
+        <span className="absolute top-4 right-5 text-amber-400/30 text-sm pointer-events-none select-none">❖</span>
+        <span className="absolute bottom-4 left-5 text-amber-400/30 text-sm pointer-events-none select-none">❖</span>
+        <span className="absolute bottom-4 right-5 text-amber-400/30 text-sm pointer-events-none select-none">❖</span>
 
         <div className="relative z-10 flex-1 flex flex-col justify-between">
           <div>
             {/* Devotional Top Badge */}
             <div className="text-center mb-2.5">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-widest text-amber-200 bg-amber-400/15 border border-amber-400/40 backdrop-blur-md shadow-xs">
-                <i className="fas fa-calendar-alt text-amber-400"></i>
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-semibold uppercase tracking-widest text-amber-200/95 bg-amber-500/10 border border-amber-400/30 backdrop-blur-md shadow-xs">
+                <i className="fas fa-calendar-alt text-amber-400 text-xs"></i>
                 <span>{lang === 'en' ? 'Sacred Temple Panjika' : 'পবিত্র দিনপঞ্জি ও তিথি'}</span>
-                <i className="fas fa-om text-amber-400"></i>
+                <i className="fas fa-om text-amber-400 text-xs"></i>
               </div>
             </div>
 
-            {/* Title with Divine Glowing Gold Text */}
-            <h3 className="text-xl sm:text-2xl font-extrabold font-serif text-yellow-300 drop-shadow-[0_2px_8px_rgba(245,158,11,0.5)] mb-3.5 text-center tracking-normal leading-normal py-1">
+            {/* Title with Soft Divine Sacred Gold */}
+            <h3 className="text-xl sm:text-2xl font-bold font-serif text-amber-50 drop-shadow-sm mb-3.5 text-center tracking-normal leading-normal py-1">
               {lang === 'en' ? 'Shree Shree Maa Manasa Daily Panjika' : 'শ্রীশ্রী মা মনসা নিত্য শুভ পঞ্জিকা'}
             </h3>
 
             {/* Streamlined Header & Navigation Controls */}
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-500/30 pb-2 mb-2.5">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-500/20 pb-2 mb-2.5">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-400/50 flex items-center justify-center text-amber-300 text-sm shadow-inner shrink-0">
+                <div className="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-400/40 flex items-center justify-center text-amber-300 text-sm shadow-inner shrink-0">
                   <i className="fas fa-calendar-check"></i>
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] text-amber-200/90 font-medium">
+                    <span className="text-[10px] text-amber-200/80 font-medium">
                       {lang === 'en' ? `${monthNamesEn[curMonth]} ${curYear}` : `${monthNamesBn[curMonth]} ${formatNumber(curYear, lang)}`}
                     </span>
                   </div>
-                  <h4 className="text-sm sm:text-base font-bold font-serif text-yellow-300">
+                  <h4 className="text-sm sm:text-base font-bold font-serif text-amber-100">
                     {bnMonthInfo.monthStr} • {bnMonthInfo.yearStr}
                   </h4>
                 </div>
@@ -3934,7 +3948,7 @@ const PanjikaWidget = ({ navigateTo, lang = 'bn' }) => {
               <div className="flex items-center gap-1 no-print">
                 <button
                   onClick={prevMonth}
-                  className="bg-white/10 hover:bg-white/20 text-amber-300 hover:text-white px-2 py-0.5 rounded border border-amber-500/40 text-[10px] font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1"
+                  className="bg-stone-800/80 hover:bg-stone-700 text-amber-200 hover:text-white px-2 py-0.5 rounded border border-amber-500/30 text-[10px] font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1"
                   title="Previous Month"
                 >
                   <i className="fas fa-chevron-left text-[9px]"></i>
@@ -3942,7 +3956,7 @@ const PanjikaWidget = ({ navigateTo, lang = 'bn' }) => {
                 </button>
                 <button
                   onClick={goToToday}
-                  className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-stone-950 px-2 py-0.5 rounded text-[10px] font-black shadow-xs transition-all active:scale-95 cursor-pointer flex items-center gap-1"
+                  className="bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-stone-950 px-2 py-0.5 rounded text-[10px] font-bold shadow-xs transition-all active:scale-95 cursor-pointer flex items-center gap-1"
                   title="Today"
                 >
                   <i className="fas fa-dot-circle text-[8px] text-red-700"></i>
@@ -3950,7 +3964,7 @@ const PanjikaWidget = ({ navigateTo, lang = 'bn' }) => {
                 </button>
                 <button
                   onClick={nextMonth}
-                  className="bg-white/10 hover:bg-white/20 text-amber-300 hover:text-white px-2 py-0.5 rounded border border-amber-500/40 text-[10px] font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1"
+                  className="bg-stone-800/80 hover:bg-stone-700 text-amber-200 hover:text-white px-2 py-0.5 rounded border border-amber-500/30 text-[10px] font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1"
                   title="Next Month"
                 >
                   <span className="hidden sm:inline">{lang === 'en' ? 'Next' : 'পরবর্তী'}</span>
@@ -3960,35 +3974,35 @@ const PanjikaWidget = ({ navigateTo, lang = 'bn' }) => {
             </div>
 
             {/* Slender Live Countdown Bar */}
-            <div className="mb-2.5 px-2.5 py-1 rounded-lg bg-black/60 border border-amber-500/30 flex flex-wrap items-center justify-between gap-1.5">
+            <div className="mb-2.5 px-2.5 py-1.5 rounded-xl bg-stone-900/80 border border-amber-500/20 flex flex-wrap items-center justify-between gap-1.5">
               <div className="flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span>
-                <span className="text-[11px] sm:text-xs font-serif font-bold text-amber-200">
+                <span className="text-[11px] sm:text-xs font-serif font-bold text-amber-100/90">
                   {t('annualFestivalTarget', lang)} • ১৮ আগস্ট ২০২৬
                 </span>
               </div>
-              <div className="flex items-center gap-1 font-mono text-[10px] sm:text-[11px] font-bold text-amber-200">
-                <span className="bg-amber-500/25 text-yellow-300 px-1 py-0.2 rounded border border-amber-500/40">{formatNumber(timeLeft.days, lang)} {t('daysUnit', lang)}</span>
-                <span className="text-amber-400/80">:</span>
-                <span className="bg-amber-500/25 text-yellow-300 px-1 py-0.2 rounded border border-amber-500/40">{formatNumber(timeLeft.hours, lang)} {t('hoursUnit', lang)}</span>
-                <span className="text-amber-400/80">:</span>
-                <span className="bg-amber-500/25 text-yellow-300 px-1 py-0.2 rounded border border-amber-500/40">{formatNumber(timeLeft.minutes, lang)} {t('minsUnit', lang)}</span>
-                <span className="text-amber-400/80">:</span>
-                <span className="bg-amber-500/25 text-yellow-300 px-1 py-0.2 rounded border border-amber-500/40">{formatNumber(timeLeft.seconds, lang)} {t('secsUnit', lang)}</span>
+              <div className="flex items-center gap-1 font-mono text-[10px] sm:text-[11px] font-semibold text-amber-200">
+                <span className="bg-amber-500/15 text-amber-200 px-1 py-0.2 rounded border border-amber-500/30">{formatNumber(timeLeft.days, lang)} {t('daysUnit', lang)}</span>
+                <span className="text-amber-400/60">:</span>
+                <span className="bg-amber-500/15 text-amber-200 px-1 py-0.2 rounded border border-amber-500/30">{formatNumber(timeLeft.hours, lang)} {t('hoursUnit', lang)}</span>
+                <span className="text-amber-400/60">:</span>
+                <span className="bg-amber-500/15 text-amber-200 px-1 py-0.2 rounded border border-amber-500/30">{formatNumber(timeLeft.minutes, lang)} {t('minsUnit', lang)}</span>
+                <span className="text-amber-400/60">:</span>
+                <span className="bg-amber-500/15 text-amber-200 px-1 py-0.2 rounded border border-amber-500/30">{formatNumber(timeLeft.seconds, lang)} {t('secsUnit', lang)}</span>
               </div>
             </div>
 
             {/* Compact Panjika Grid */}
-            <div className="bg-black/50 backdrop-blur-md rounded-xl p-1.5 sm:p-2 border border-amber-500/30 mb-2">
-              {/* Days of Week Header with high contrast readable colors */}
+            <div className="bg-stone-900/60 backdrop-blur-md rounded-xl p-1.5 sm:p-2 border border-amber-500/25 mb-2">
+              {/* Days of Week Header with eye-soothing harmonious colors */}
               <div className="grid grid-cols-7 gap-1 text-center mb-1">
                 {(lang === 'en' ? weekDaysEn : weekDaysBn).map((wd, i) => (
                   <div
                     key={i}
-                    className={`py-0.5 rounded text-[10px] sm:text-[11px] font-black uppercase tracking-wider border shadow-2xs ${
+                    className={`py-0.5 rounded text-[10px] sm:text-[11px] font-bold uppercase tracking-wider border shadow-2xs ${
                       i === 0
-                        ? 'text-rose-100 bg-rose-700 border-rose-500'
-                        : (i === 6 ? 'text-amber-100 bg-amber-600 border-amber-500' : 'text-amber-100 bg-stone-800 border-stone-700')
+                        ? 'text-rose-200 bg-rose-950/60 border-rose-800/40'
+                        : (i === 6 ? 'text-amber-200 bg-amber-950/60 border-amber-800/40' : 'text-amber-100/80 bg-stone-900/80 border-stone-800/70')
                     }`}
                   >
                     {wd}
@@ -3999,7 +4013,7 @@ const PanjikaWidget = ({ navigateTo, lang = 'bn' }) => {
               {/* Days Grid Cells */}
               <div className="grid grid-cols-7 gap-1">
                 {Array.from({ length: firstDayIndex }).map((_, i) => (
-                  <div key={`empty-${i}`} className="min-h-[26px] sm:min-h-[30px] rounded-lg bg-transparent"></div>
+                  <div key={`empty-${i}`} className="min-h-[28px] sm:min-h-[32px] rounded-lg bg-transparent"></div>
                 ))}
 
                 {Array.from({ length: daysInMonth }).map((_, i) => {
@@ -4012,36 +4026,36 @@ const PanjikaWidget = ({ navigateTo, lang = 'bn' }) => {
                     <div
                       key={dayNum}
                       onClick={() => setSelectedDay(dayNum)}
-                      className={`min-h-[26px] sm:min-h-[30px] p-0.5 sm:p-1 rounded-lg border transition-all cursor-pointer flex flex-col justify-between relative group select-none ${
+                      className={`min-h-[28px] sm:min-h-[32px] p-0.5 sm:p-1 rounded-lg border transition-all cursor-pointer flex flex-col justify-between relative group select-none ${
                         isSelected
-                          ? 'border-yellow-300 bg-amber-600/60 ring-2 ring-yellow-400 shadow-md scale-[1.02]'
+                          ? 'border-amber-300 bg-amber-600/40 ring-1 ring-amber-400/70 shadow-md scale-[1.02]'
                           : isToday
-                          ? 'border-2 border-amber-400 bg-amber-500/40 shadow-sm shadow-amber-500/30'
+                          ? 'border-amber-400/90 bg-amber-500/25 ring-1 ring-amber-400/60 shadow-sm text-yellow-100'
                           : special
-                          ? (special.isGrand ? 'border-amber-400 bg-amber-950/80 hover:bg-amber-900/90' : 'border-amber-500/50 bg-stone-900 hover:bg-amber-950/60')
-                          : 'border-stone-800 bg-stone-900/90 hover:border-amber-400/80 hover:bg-amber-950/40'
+                          ? (special.isGrand ? 'border-amber-400/70 bg-amber-950/60 hover:bg-amber-900/70' : 'border-amber-500/40 bg-stone-900/80 hover:bg-amber-950/40')
+                          : 'border-stone-800/70 bg-stone-900/60 hover:border-amber-400/40 hover:bg-amber-950/30'
                       }`}
                     >
                       <div className="flex justify-between items-center text-[10px] sm:text-[11px] leading-none">
-                        <span className={`font-mono font-black ${isToday ? 'text-yellow-200' : 'text-white'}`}>
+                        <span className={`font-mono font-bold ${isToday ? 'text-amber-200' : 'text-stone-200'}`}>
                           {dayNum}
                         </span>
-                        <span className="text-[9px] sm:text-[10px] text-amber-300 font-extrabold">
+                        <span className="text-[9px] sm:text-[10px] text-amber-300/90 font-bold">
                           {formatNumber(dayNum, lang)}
                         </span>
                       </div>
 
                       {isToday && (
-                        <div className="absolute top-0.5 right-1/2 translate-x-1/2 w-1.5 h-1.5 rounded-full bg-yellow-400 animate-ping"></div>
+                        <div className="absolute top-0.5 right-1/2 translate-x-1/2 w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></div>
                       )}
 
                       {special ? (
                         <div className="mt-auto pt-0.5">
                           <span
-                            className={`block text-[7.5px] sm:text-[8.5px] font-black px-0.5 py-0.2 rounded text-center truncate ${
+                            className={`block text-[7.5px] sm:text-[8.5px] font-bold px-0.5 py-0.2 rounded text-center truncate ${
                               special.isGrand
-                                ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-stone-950 font-black shadow-xs'
-                                : 'bg-amber-400 text-stone-950 font-black shadow-2xs'
+                                ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-stone-950 shadow-xs'
+                                : 'bg-amber-400 text-stone-950 shadow-2xs'
                             }`}
                           >
                             {lang === 'en' ? special.badgeEn : special.badge}
@@ -4062,10 +4076,10 @@ const PanjikaWidget = ({ navigateTo, lang = 'bn' }) => {
             const dayStr = dayDate.toLocaleDateString(lang === 'bn' ? 'bn-BD' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
             return (
-              <div className="mt-2 p-3 sm:p-3.5 rounded-2xl bg-amber-500/15 border border-amber-400/40 anim-fade-up">
+              <div className="mt-2 p-3 sm:p-3.5 rounded-2xl bg-stone-900/90 border border-amber-500/30 anim-fade-up">
                 <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-400/20 pb-1.5 mb-1.5">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs uppercase font-extrabold text-yellow-300">
+                    <span className="text-xs uppercase font-extrabold text-amber-200">
                       <i className="fas fa-om text-xs mr-1"></i> {dayStr}
                     </span>
                     {special && (
@@ -4083,7 +4097,7 @@ const PanjikaWidget = ({ navigateTo, lang = 'bn' }) => {
                   </button>
                 </div>
 
-                <p className="text-xs text-yellow-100/90 leading-relaxed mb-2.5">
+                <p className="text-xs text-amber-100/90 leading-relaxed mb-2.5">
                   {special
                     ? (lang === 'en' ? special.descEn : special.descBn)
                     : (lang === 'en'
@@ -4104,7 +4118,7 @@ const PanjikaWidget = ({ navigateTo, lang = 'bn' }) => {
                   </button>
                   <button
                     onClick={() => navigateTo('timings')}
-                    className="bg-black/50 hover:bg-black/70 text-yellow-200 font-semibold px-2.5 py-1 rounded-full border border-amber-400/30 text-xs transition-colors cursor-pointer"
+                    className="bg-black/50 hover:bg-black/70 text-amber-200 font-semibold px-2.5 py-1 rounded-full border border-amber-400/30 text-xs transition-colors cursor-pointer"
                   >
                     <i className="fas fa-clock text-[10px] mr-1"></i>
                     {lang === 'en' ? 'Timings' : 'সময়সূচী'}
@@ -5629,14 +5643,14 @@ const DonationPage = ({ donations, donationReceipts, setDonationReceipts, supaba
       }
     }
 
-    if (showToast) showToast(lang === 'en' ? 'Official Memorial Receipt Generated!' : 'পবিত্র স্মারক দান রসিদ তৈরি হয়েছে!');
+    if (showToast) showToast(lang === 'en' ? 'Official Donation Receipt Generated!' : 'পবিত্র প্রণামী রশিদ তৈরি হয়েছে!');
   };
 
   const copyReceiptDetails = () => {
     if (!generatedReceipt) return;
-    const txt = `শ্রী শ্রী মা মনসা মন্দির, গৈলা - স্মারক দান রসিদ\nরসিদ নং: ${generatedReceipt.receiptNo}\nদাতার নাম: ${generatedReceipt.name}\nগোত্র: ${generatedReceipt.gotra || 'অনুল্লিখিত'}\nমোবাইল: ${generatedReceipt.phone || '-'}\nপরিমাণ: ৳ ${generatedReceipt.amount} /- (${generatedReceipt.amountWords})\nমাধ্যম: ${generatedReceipt.method}\nTrxID: ${generatedReceipt.trxId || '-'}\nউদ্দেশ্য: ${generatedReceipt.purpose}\nতারিখ: ${generatedReceipt.date}\nসত্যায়িত: শ্রী শ্রী মা মনসা মন্দির তহবিল`;
+    const txt = `শ্রী শ্রী মা মনসা মন্দির, গৈলা - স্মারক প্রণামী রশিদ\nরশিদ নং: ${generatedReceipt.receiptNo}\nদাতার নাম: ${generatedReceipt.name}\nগোত্র: ${generatedReceipt.gotra || 'অনুল্লিখিত'}\nমোবাইল: ${generatedReceipt.phone || '-'}\nপরিমাণ: ৳ ${generatedReceipt.amount} /- (${generatedReceipt.amountWords})\nমাধ্যম: ${generatedReceipt.method}\nTrxID: ${generatedReceipt.trxId || '-'}\nউদ্দেশ্য: ${generatedReceipt.purpose}\nতারিখ: ${generatedReceipt.date}\nসত্যায়িত: শ্রী শ্রী মা মনসা মন্দির তহবিল`;
     if (navigator.clipboard) navigator.clipboard.writeText(txt);
-    if (showToast) showToast(lang === 'en' ? 'Receipt details copied!' : 'রসিদ বিবরণ কপি হয়েছে!');
+    if (showToast) showToast(lang === 'en' ? 'Receipt details copied!' : 'রশিদ বিবরণ কপি হয়েছে!');
   };
 
   const publicDonations = donations ? donations.filter(d => !d.is_hidden) : [];
@@ -5679,7 +5693,7 @@ const DonationPage = ({ donations, donationReceipts, setDonationReceipts, supaba
             }`}
           >
             <i className="fas fa-file-invoice text-xs"></i>
-            {lang === 'en' ? 'Official Receipt Generator' : 'স্বয়ংক্রিয় দান রসিদ সংগ্রহ'}
+            {lang === 'en' ? 'Donation Receipt' : 'স্বয়ংক্রিয় প্রণামী রশিদ সংগ্রহ'}
           </button>
         </div>
 
@@ -5710,7 +5724,7 @@ const DonationPage = ({ donations, donationReceipts, setDonationReceipts, supaba
                       {lang === 'en' ? 'Goila, Agailjhara, Barishal, Bangladesh • Established 1494 AD' : 'গৈলা, আগৈলঝাড়া, বরিশাল, বাংলাদেশ • প্রতিষ্ঠা ১৪৯৪ খ্রিষ্টাব্দ / ১৪১৬ শকাব্দ'}
                     </p>
                     <div className="inline-block mt-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-5 py-1 rounded-full text-xs sm:text-sm font-bold tracking-wide shadow-sm">
-                      ✦ {lang === 'en' ? 'Official Devotee Memorial Pronami Receipt' : 'পবিত্র স্মারক দান ও প্রণামী রসিদ'} ✦
+                      ✦ {lang === 'en' ? 'Official Devotee Donation Receipt' : 'পবিত্র স্মারক প্রণামী রশিদ'} ✦
                     </div>
                   </div>
 
@@ -5718,7 +5732,7 @@ const DonationPage = ({ donations, donationReceipts, setDonationReceipts, supaba
                   <div className="py-6 space-y-4 text-gray-800 text-sm sm:text-base">
                     <div className="flex flex-wrap justify-between items-center bg-orange-50/80 p-3.5 rounded-2xl border border-orange-200">
                       <div>
-                        <span className="text-xs text-gray-500 block font-semibold">{lang === 'en' ? 'Receipt Serial No:' : 'রসিদ স্মারক নং:'}</span>
+                        <span className="text-xs text-gray-500 block font-semibold">{lang === 'en' ? 'Receipt Serial No:' : 'রশিদ স্মারক নং:'}</span>
                         <span className="font-mono font-bold text-amber-900 text-lg sm:text-xl tracking-wider">{generatedReceipt.receiptNo}</span>
                       </div>
                       <div className="text-right mt-2 sm:mt-0">
@@ -5781,7 +5795,7 @@ const DonationPage = ({ donations, donationReceipts, setDonationReceipts, supaba
                       className="btn-shine bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-bold px-6 py-2.5 rounded-full shadow-md flex items-center gap-2 active:scale-95 cursor-pointer text-sm"
                     >
                       <i className="fas fa-print"></i>
-                      {lang === 'en' ? 'Print / Download Official Receipt' : 'স্মারক রসিদ প্রিন্ট / PDF সংরক্ষণ'}
+                      {lang === 'en' ? 'Print / Download Donation Receipt' : 'প্রণামী রশিদ প্রিন্ট / PDF সংরক্ষণ'}
                     </button>
                     <button
                       onClick={copyReceiptDetails}
@@ -5795,7 +5809,7 @@ const DonationPage = ({ donations, donationReceipts, setDonationReceipts, supaba
                       className="bg-orange-50 hover:bg-orange-100 text-orange-800 font-bold px-6 py-2.5 rounded-full border border-orange-300 flex items-center gap-2 active:scale-95 cursor-pointer text-sm"
                     >
                       <i className="fas fa-redo"></i>
-                      {lang === 'en' ? 'New Receipt' : 'নতুন রসিদ তৈরি'}
+                      {lang === 'en' ? 'New Receipt' : 'নতুন রশিদ তৈরি'}
                     </button>
                   </div>
                 </div>
@@ -5805,10 +5819,10 @@ const DonationPage = ({ donations, donationReceipts, setDonationReceipts, supaba
               <div className="bg-white rounded-3xl p-6 sm:p-10 shadow-xl border-2 border-orange-100">
                 <div className="text-center mb-6">
                   <h3 className="text-xl sm:text-2xl font-bold font-serif text-gray-900">
-                    {lang === 'en' ? 'Official Donation Receipt Form' : 'অনলাইন দান রসিদ তৈরি করুন'}
+                    {lang === 'en' ? 'Official Donation Receipt Form' : 'অনলাইন প্রণামী রশিদ তৈরি করুন'}
                   </h3>
                   <p className="text-xs sm:text-sm text-gray-500 mt-1">
-                    {lang === 'en' ? 'Enter your contribution details to generate and download an official memorial receipt.' : 'আপনার প্রেরিত প্রণামীর তথ্য প্রদান করে তৎক্ষণাৎ মন্দিরের সিলযুক্ত স্মারক রসিদ সংগ্রহ করুন।'}
+                    {lang === 'en' ? 'Enter your contribution details to generate and download an official donation receipt.' : 'আপনার প্রেরিত প্রণামীর তথ্য প্রদান করে তৎক্ষণাৎ মন্দিরের সিলযুক্ত স্মারক রশিদ সংগ্রহ করুন।'}
                   </p>
                 </div>
                 <form onSubmit={handleGenerateReceipt} className="space-y-5">
@@ -5893,7 +5907,7 @@ const DonationPage = ({ donations, donationReceipts, setDonationReceipts, supaba
                       className="btn-shine bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-400 text-white font-extrabold px-10 py-3.5 rounded-full text-base sm:text-lg shadow-xl shadow-orange-500/30 transition-all hover:scale-[1.02] active:scale-95 border-2 border-yellow-200 cursor-pointer"
                     >
                       <i className="fas fa-file-invoice mr-2"></i>
-                      {lang === 'en' ? 'Generate & View Official Receipt' : 'পবিত্র স্মারক রসিদ তৈরি করুন'}
+                      {lang === 'en' ? 'Generate & View Donation Receipt' : 'পবিত্র প্রণামী রশিদ তৈরি করুন'}
                     </button>
                   </div>
                 </form>
@@ -5906,10 +5920,10 @@ const DonationPage = ({ donations, donationReceipts, setDonationReceipts, supaba
                 <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-amber-100">
                   <h4 className="text-lg font-bold font-serif text-gray-900 flex items-center gap-2">
                     <i className="fas fa-receipt text-amber-600"></i>
-                    {lang === 'en' ? 'Previously Issued Memorial Receipts' : 'সম্প্রতি সংগৃহীত স্মারক দান রসিদসমূহ'}
+                    {lang === 'en' ? 'Previously Issued Donation Receipts' : 'সম্প্রতি সংগৃহীত স্মারক প্রণামী রশিদসমূহ'}
                   </h4>
                   <span className="text-xs font-bold text-amber-800 bg-amber-100 px-3 py-1 rounded-full">
-                    {donationReceipts.length} {lang === 'en' ? 'Receipts' : 'টি রসিদ'}
+                    {donationReceipts.length} {lang === 'en' ? 'Receipts' : 'টি রশিদ'}
                   </span>
                 </div>
                 <div className="space-y-3">
@@ -5946,7 +5960,7 @@ const DonationPage = ({ donations, donationReceipts, setDonationReceipts, supaba
                             onClick={() => printReceiptDirectly(r, lang)}
                             className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
                           >
-                            <i className="fas fa-print"></i> {lang === 'en' ? 'Print' : 'প্রিন্ট রসিদ'}
+                            <i className="fas fa-print"></i> {lang === 'en' ? 'Print' : 'প্রিন্ট রশিদ'}
                           </button>
                         </div>
                       </div>
@@ -5958,7 +5972,7 @@ const DonationPage = ({ donations, donationReceipts, setDonationReceipts, supaba
                     <table className="w-full text-left border-collapse text-sm">
                       <thead>
                         <tr className="bg-amber-50/70 text-gray-700 font-bold border-b border-amber-200">
-                          <th className="p-3">{lang === 'en' ? 'Receipt No' : 'রসিদ নং'}</th>
+                          <th className="p-3">{lang === 'en' ? 'Receipt No' : 'রশিদ নং'}</th>
                           <th className="p-3">{lang === 'en' ? 'Donor Name' : 'দাতার নাম'}</th>
                           <th className="p-3">{lang === 'en' ? 'Amount' : 'পরিমাণ'}</th>
                           <th className="p-3">{lang === 'en' ? 'Method & TrxID' : 'মাধ্যম ও TrxID'}</th>
@@ -7284,7 +7298,7 @@ const AdminPanel = ({
       // 4. Universal sync broadcast
       broadcastUniversalSync();
 
-      showToast('নতুন স্মারক দান রসিদ ইস্যু ও সংরক্ষিত হয়েছে!');
+      showToast('নতুন স্মারক প্রণামী রশিদ ইস্যু ও সংরক্ষিত হয়েছে!');
       setAdminReceiptForm({
         name: '',
         phone: '',
@@ -7299,14 +7313,14 @@ const AdminPanel = ({
       printReceiptDirectly(receipt, 'bn');
     } catch (err) {
       console.error("Receipt save error:", err);
-      setErrorMsg("রসিদ সংরক্ষণ করতে সমস্যা হয়েছে: " + (err.message || ''));
+      setErrorMsg("রশিদ সংরক্ষণ করতে সমস্যা হয়েছে: " + (err.message || ''));
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleDeleteReceipt = (id) => {
-    requestConfirm('আপনি কি নিশ্চিত যে এই রসিদটি তালিকা থেকে মুছে ফেলতে চান?', async () => {
+    requestConfirm('আপনি কি নিশ্চিত যে এই রশিদটি তালিকা থেকে মুছে ফেলতে চান?', async () => {
     setIsSaving(true);
     setErrorMsg('');
     try {
@@ -7328,10 +7342,10 @@ const AdminPanel = ({
       }, { onConflict: 'key' });
 
       broadcastUniversalSync();
-      showToast('রসিদ মুছে ফেলা হয়েছে!');
+      showToast('রশিদ মুছে ফেলা হয়েছে!');
         broadcastUniversalSync();
       } catch (err) {
-        setErrorMsg("রসিদ মুছতে সমস্যা হয়েছে।");
+        setErrorMsg("রশিদ মুছতে সমস্যা হয়েছে।");
       } finally {
         setIsSaving(false);
       }
@@ -7778,7 +7792,7 @@ const AdminPanel = ({
           </div>
           <div onClick={() => handleTabSwitch('receipts')} className="cursor-pointer bg-white p-3 rounded-2xl border border-gray-200 shadow-xs hover:border-emerald-500 hover:shadow-sm transition-all text-center">
             <i className="fas fa-file-invoice text-emerald-500 text-base mb-1"></i>
-            <div className="text-[10px] text-gray-500 font-bold">ইস্যুকৃত রসিদ</div>
+            <div className="text-[10px] text-gray-500 font-bold">প্রণামী রশিদ</div>
             <div className="text-xs font-extrabold text-emerald-700">{(donationReceipts || []).length} টি</div>
           </div>
           <div onClick={() => handleTabSwitch('royani')} className="cursor-pointer bg-white p-3 rounded-2xl border border-gray-200 shadow-xs hover:border-yellow-500 hover:shadow-sm transition-all text-center">
@@ -7833,7 +7847,7 @@ const AdminPanel = ({
               <i className="fas fa-hands-praying w-5 text-amber-500"></i> পূজা ও সংকল্প বুকিং
             </button>
             <button onClick={() => handleTabSwitch('receipts')} className={`px-5 py-3 text-left font-bold text-sm border-b ${activeTab === 'receipts' ? 'bg-orange-50 text-orange-700 border-l-[5px] border-l-orange-600' : 'text-gray-600 hover:bg-gray-50 border-l-[5px] border-transparent'}`}>
-              <i className="fas fa-file-invoice w-5 text-emerald-500"></i> দান ও প্রণামী রসিদসমূহ
+              <i className="fas fa-file-invoice w-5 text-emerald-500"></i> প্রণামী রশিদসমূহ
             </button>
             <button onClick={() => handleTabSwitch('royani')} className={`px-5 py-3 text-left font-bold text-sm border-b ${activeTab === 'royani' ? 'bg-orange-50 text-orange-700 border-l-[5px] border-l-orange-600' : 'text-gray-600 hover:bg-gray-50 border-l-[5px] border-transparent'}`}>
               <i className="fas fa-music w-5 text-yellow-500"></i> ঐতিহ্যবাহী রয়ানী গান
@@ -9357,13 +9371,13 @@ const AdminPanel = ({
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 pb-4 border-b">
                 <div>
                   <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                    <i className="fas fa-receipt text-orange-600"></i> স্মারক দান ও প্রণামী রসিদসমূহ
+                    <i className="fas fa-receipt text-orange-600"></i> স্মারক প্রণামী রশিদসমূহ
                   </h3>
-                  <p className="text-xs text-gray-500 mt-1">ভক্তদের ইস্যুকৃত ডিজিটাল দান রসিদ ও হিসাব ভাউচার</p>
+                  <p className="text-xs text-gray-500 mt-1">ভক্তদের ইস্যুকৃত ডিজিটাল প্রণামী রশিদ ও হিসাব ভাউচার</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="bg-emerald-100 text-emerald-800 text-xs px-3 py-1.5 rounded-full font-bold">
-                    মোট রসিদ: {(donationReceipts || []).length} টি
+                    মোট প্রণামী রশিদ: {(donationReceipts || []).length} টি
                   </span>
                   <button
                     type="button"
@@ -9371,7 +9385,7 @@ const AdminPanel = ({
                     className="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition-all shadow-sm flex items-center gap-1.5"
                   >
                     <i className={`fas ${showNewReceiptModal ? 'fa-times' : 'fa-plus'}`}></i>
-                    {showNewReceiptModal ? 'ফর্ম বন্ধ করুন' : 'নতুন রসিদ ইস্যু করুন'}
+                    {showNewReceiptModal ? 'ফর্ম বন্ধ করুন' : 'নতুন প্রণামী রশিদ ইস্যু করুন'}
                   </button>
                 </div>
               </div>
@@ -9380,7 +9394,7 @@ const AdminPanel = ({
               {showNewReceiptModal && (
                 <form onSubmit={handleAdminIssueReceipt} className="mb-8 p-6 bg-gradient-to-br from-amber-50/70 to-orange-50/50 rounded-2xl border-2 border-amber-200">
                   <h4 className="font-bold text-amber-950 mb-4 flex items-center gap-2 text-sm">
-                    <i className="fas fa-file-invoice text-amber-600"></i> ভক্তের জন্য নতুন অফিসিয়াল রসিদ প্রস্তুত করুন
+                    <i className="fas fa-file-invoice text-amber-600"></i> ভক্তের জন্য নতুন অফিসিয়াল প্রণামী রশিদ প্রস্তুত করুন
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                     <div>
@@ -9477,7 +9491,7 @@ const AdminPanel = ({
                       className="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-6 py-2 rounded-xl transition-all shadow-md flex items-center gap-1.5"
                     >
                       {isSaving ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-check-circle"></i>}
-                      রসিদ ইস্যু ও স্বয়ংক্রিয় প্রিন্ট করুন
+                      প্রণামী রশিদ ইস্যু ও প্রিন্ট করুন
                     </button>
                   </div>
                 </form>
@@ -9489,7 +9503,7 @@ const AdminPanel = ({
                   <i className="fas fa-search absolute left-3.5 top-3.5 text-gray-400 text-sm"></i>
                   <input
                     type="text"
-                    placeholder="রসিদ নম্বর, দাতার নাম, ফোন বা ট্রানজেকশন আইডি লিখে খুঁজুন..."
+                    placeholder="রশিদ নম্বর, দাতার নাম, ফোন বা ট্রানজেকশন আইডি লিখে খুঁজুন..."
                     value={receiptSearch}
                     onChange={(e) => setReceiptSearch(e.target.value)}
                     className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"
@@ -9513,7 +9527,7 @@ const AdminPanel = ({
                   return (
                     <div className="text-center py-12 bg-orange-50/50 rounded-2xl border border-dashed border-orange-200">
                       <i className="fas fa-receipt text-4xl text-orange-300 mb-2"></i>
-                      <p className="text-gray-500 font-medium">কোনো দান রসিদ পাওয়া যায়নি</p>
+                      <p className="text-gray-500 font-medium">কোনো প্রণামী রশিদ পাওয়া যায়নি</p>
                     </div>
                   );
                 }
@@ -9572,7 +9586,7 @@ const AdminPanel = ({
                               onClick={() => printReceiptDirectly(r, 'bn')}
                               className="flex-1 py-2 px-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all cursor-pointer"
                             >
-                              <i className="fas fa-print"></i> রসিদ প্রিন্ট করুন
+                              <i className="fas fa-print"></i> রশিদ প্রিন্ট করুন
                             </button>
                             <button
                               type="button"
@@ -9592,7 +9606,7 @@ const AdminPanel = ({
                       <table className="w-full text-left border-collapse">
                         <thead>
                           <tr className="bg-amber-50/80 text-amber-950 text-xs font-bold uppercase tracking-wider border-b border-amber-200">
-                            <th className="py-3 px-4">রসিদ নম্বর</th>
+                            <th className="py-3 px-4">রশিদ নম্বর</th>
                             <th className="py-3 px-4">দাতার নাম ও পরিচয়</th>
                             <th className="py-3 px-4">পরিমাণ</th>
                             <th className="py-3 px-4">মাধ্যম ও TrxID</th>
@@ -9630,7 +9644,7 @@ const AdminPanel = ({
                                     type="button"
                                     onClick={() => printReceiptDirectly(r, 'bn')}
                                     className="text-xs font-bold px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors flex items-center gap-1 shadow-sm cursor-pointer"
-                                    title="রসিদ প্রিন্ট করুন"
+                                    title="রশিদ প্রিন্ট করুন"
                                   >
                                     <i className="fas fa-print"></i> প্রিন্ট
                                   </button>
