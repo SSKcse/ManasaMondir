@@ -527,6 +527,58 @@ const DEFAULT_DONATION_RECEIPTS = [
   }
 ];
 
+// Default Revered Personalities & Scholars of Goila & Manasa Mondir
+const DEFAULT_SCHOLARS = [
+  {
+    id: 'sch_1',
+    name: 'স্বর্গীয় শুকদেব হালদার',
+    title: 'বিশিষ্ট সমাজসেবক ও শ্রদ্ধেয় ব্যক্তিত্ব',
+    date: 'মৃত্যুঃ ২৫ সেপ্টেম্বর ২০০৯ ইং',
+    image: 'images/Scholars/10r 1ps (1).jpg.jpeg',
+    order_idx: 1
+  },
+  {
+    id: 'sch_2',
+    name: 'স্বর্গীয় মিহির দাশগুপ্ত',
+    title: 'বিশিষ্ট গুণীজন ও সমাজ হিতৈষী',
+    date: 'মৃত্যুঃ ০৬ নভেম্বর ২০১২ ইং',
+    image: 'images/Scholars/10r 1ps (2).jpg.jpeg',
+    order_idx: 2
+  },
+  {
+    id: 'sch_3',
+    name: 'স্বর্গীয় শ্যামাপদ দাশগুপ্ত',
+    title: 'শ্রদ্ধেয় শিক্ষানুরাগী ও বিশিষ্ট ব্যক্তিত্ব',
+    date: 'মৃত্যুঃ ০৬ আগস্ট ২০১৩ ইং',
+    image: 'images/Scholars/10r 1ps (3).jpg.jpeg',
+    order_idx: 3
+  },
+  {
+    id: 'sch_4',
+    name: 'স্বর্গীয় দুলাল রায় দুলু',
+    title: 'বিশিষ্ট সমাজসেবক ও নিবেদিতপ্রাণ ভক্ত',
+    date: 'মৃত্যুঃ ২৩ সেপ্টেম্বর ২০২৫ ইং',
+    image: 'images/Scholars/10r 1ps (4).jpg.jpeg',
+    order_idx: 4
+  },
+  {
+    id: 'sch_5',
+    name: 'স্বর্গীয় সুনীল গুপ্ত',
+    title: 'শ্রদ্ধেয় ব্যক্তিত্ব ও মন্দির পৃষ্ঠপোষক',
+    date: 'মৃত্যুঃ ৩০ এপ্রিল ২০০৯ ইং',
+    image: 'images/Scholars/10r 1pss.jpg.jpeg',
+    order_idx: 5
+  },
+  {
+    id: 'sch_6',
+    name: 'স্বর্গীয় দুলাল দাশ গুপ্ত',
+    title: 'বিশিষ্ট গুণীজন ও প্রবীণ সমাজসেবক',
+    date: 'মৃত্যুঃ ১৫ মে ২০২৬ ইং',
+    image: 'images/Scholars/10r1psss.jpg.jpeg',
+    order_idx: 6
+  }
+];
+
 const toBengaliDigits = (num) => {
   const bnDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
   return String(num).replace(/[0-9]/g, (d) => bnDigits[d]);
@@ -3054,8 +3106,142 @@ const getLiveStatus = (timings, lang = 'bn') => {
   }
 };
 
+// --- Revered Scholars & Personalities Memorial Section (চিরস্মরণীয় গুণীজন) ---
+const ScholarsSection = ({ scholars, lang = 'bn' }) => {
+  const [selectedScholarModal, setSelectedScholarModal] = useState(null);
+  const activeScholars = (scholars && scholars.length > 0) ? scholars : DEFAULT_SCHOLARS;
+
+  return (
+    <section className="py-20 bg-gradient-to-b from-stone-50 via-amber-50/50 to-orange-50/60 border-t-2 border-amber-200/80 relative overflow-hidden">
+      <div className="container mx-auto px-4 max-w-6xl relative z-10">
+        <SectionHeader
+          tag={lang === 'en' ? 'Revered Scholars & Legends' : 'স্মরণীয় ও বরেণ্য ব্যক্তিত্ব'}
+          title={lang === 'en' ? 'Late Renowned Scholars & Personalities' : 'চিরস্মরণীয় ও প্রখ্যাত মনীষী ব্যক্তিত্ব'}
+          subtitle={lang === 'en' ? 'Honoring the late great scholars, benefactors, and noble guardians of historical Goila and Manasa Mondir.' : 'ঐতিহাসিক গৈলা ও শ্রী শ্রী মা মনসা মন্দিরের পুণ্যস্মৃতিতে চিরভাস্বর পরলোকগত শ্রদ্ধেয় সুধীজন ও সমাজ হিতৈষীবৃন্দ।'}
+          icon="fa-graduation-cap"
+          className="text-center mb-12"
+        />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          {activeScholars.map((sch, idx) => (
+            <div
+              key={sch.id || idx}
+              onClick={() => setSelectedScholarModal(sch)}
+              className="bg-white rounded-3xl p-5 shadow-lg hover:shadow-2xl border-2 border-amber-200/90 hover:border-amber-400 transition-all duration-300 hover:-translate-y-2 flex flex-col justify-between group relative overflow-hidden card-hover-glow cursor-pointer"
+            >
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-400 via-yellow-400 to-orange-500"></div>
+
+              {/* Photo Frame */}
+              <div className="relative w-full aspect-[4/5] rounded-2xl overflow-hidden bg-stone-900 border-2 border-amber-300 shadow-md group-hover:border-amber-500 transition-all">
+                <img
+                  src={sch.image}
+                  alt={sch.name}
+                  className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'manasaprofile.jpg';
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white gap-2 font-bold text-xs">
+                  <span className="bg-black/60 px-3 py-1.5 rounded-full border border-white/30 backdrop-blur-xs flex items-center gap-1.5">
+                    <i className="fas fa-search-plus text-sm text-yellow-300"></i> পূর্ণ ছবি ও বিবরণ
+                  </span>
+                </div>
+                <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between pointer-events-none">
+                  <span className="bg-black/75 backdrop-blur-xs text-amber-300 text-[11px] px-2.5 py-1 rounded-full font-bold flex items-center gap-1 border border-amber-400/50 shadow-xs">
+                    🌸 বিনম্র শ্রদ্ধাঞ্জলি
+                  </span>
+                  <span className="bg-white/90 text-stone-900 text-[10px] px-2 py-0.5 rounded-md font-mono font-bold shadow-xs">
+                    #{idx + 1}
+                  </span>
+                </div>
+              </div>
+
+              {/* Scholar Details */}
+              <div className="pt-4 text-center flex-grow flex flex-col justify-between">
+                <div>
+                  <h4 className="font-bold text-gray-900 font-serif text-lg leading-tight group-hover:text-amber-700 transition-colors">
+                    {sch.name}
+                  </h4>
+                  {sch.date && (
+                    <div className="mt-2">
+                      <span className="inline-block text-xs font-bold text-amber-950 bg-amber-50 border border-amber-200/90 px-3 py-1 rounded-full shadow-2xs">
+                        <i className="fas fa-calendar-times text-amber-600 mr-1 text-[11px]"></i> {sch.date}
+                      </span>
+                    </div>
+                  )}
+                  {sch.title && (
+                    <p className="text-xs text-gray-600 mt-2.5 leading-relaxed font-medium">
+                      {sch.title}
+                    </p>
+                  )}
+                </div>
+                <div className="pt-3 mt-3 border-t border-gray-100 flex items-center justify-center text-xs text-amber-700 font-bold gap-1 group-hover:text-orange-600">
+                  <span>স্মৃতিফলক ও আলোকচিত্র দেখুন</span>
+                  <i className="fas fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Lightbox / High-Resolution Photo Modal */}
+      {selectedScholarModal && (
+        <div
+          className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 anim-fade-in"
+          onClick={() => setSelectedScholarModal(null)}
+        >
+          <div
+            className="bg-white rounded-3xl max-w-xl w-full max-h-[92vh] overflow-y-auto border-2 border-amber-300 shadow-2xl p-6 sm:p-7 relative anim-scale-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setSelectedScholarModal(null)}
+              className="absolute top-4 right-4 w-9 h-9 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center shadow-md transition-all active:scale-90 cursor-pointer z-10"
+              title="বন্ধ করুন"
+            >
+              <i className="fas fa-times"></i>
+            </button>
+
+            <div className="text-center mb-4">
+              <span className="text-xs uppercase font-bold tracking-wider text-amber-800 bg-amber-100 px-3 py-1 rounded-full">
+                🌸 শ্রদ্ধার্ঘ্য ও স্মৃতিচারণ
+              </span>
+              <h3 className="text-2xl font-bold font-serif text-stone-900 mt-2">
+                {selectedScholarModal.name}
+              </h3>
+              {selectedScholarModal.date && (
+                <p className="text-xs font-bold text-amber-700 mt-1">
+                  {selectedScholarModal.date}
+                </p>
+              )}
+            </div>
+
+            <div className="rounded-2xl overflow-hidden border-2 border-amber-200 bg-stone-900 mb-4 shadow-lg flex items-center justify-center max-h-[60vh]">
+              <img
+                src={selectedScholarModal.image}
+                alt={selectedScholarModal.name}
+                className="w-full h-auto max-h-[60vh] object-contain"
+              />
+            </div>
+
+            {selectedScholarModal.title && (
+              <div className="bg-amber-50 p-4 rounded-xl border border-amber-200 text-center">
+                <p className="text-sm text-stone-800 font-medium">
+                  {selectedScholarModal.title}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </section>
+  );
+};
+
 // --- Home Component ---
-const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTestimonialIds, committeeMembers, events, notices, timings, travelInfo, mantras, galleryItems, navigateTo, showToast, lang, openComplainModal }) => {
+const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTestimonialIds, committeeMembers, events, notices, timings, travelInfo, mantras, galleryItems, scholars, navigateTo, showToast, lang, openComplainModal }) => {
   const [currentImg, setCurrentImg] = useState(0);
   const [lightboxImg, setLightboxImg] = useState(null);
   const [testIdx, setTestIdx] = useState(0);
@@ -3218,8 +3404,8 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
         </div>
       </section>
 
-      {/* Quick Spiritual Gateway Cards (Premium & Minimalist Heritage Design) */}
-      <section className="container mx-auto px-4 -mt-8 relative z-30">
+      {/* Quick Spiritual Gateway Cards (Moved down from border with elegant spacing) */}
+      <section className="container mx-auto px-4 mt-6 sm:mt-8 relative z-20">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
           {/* Card 1: Timings */}
           <div
@@ -4123,6 +4309,9 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
           </div>
         </section>
       )}
+
+      {/* Revered Scholars & Personalities Memorial Section (চিরস্মরণীয় গুণীজন) */}
+      <ScholarsSection scholars={scholars} lang={lang} />
     </div>
   );
 };
@@ -7100,6 +7289,147 @@ const DonationPage = ({ donations, setDonations, donationReceipts, setDonationRe
               </div>
             </div>
 
+            {/* Temple Development & Historical Contribution Notice (মহৎ কর্মযজ্ঞ ও ভক্তদের অবদান) */}
+            <div className="mb-10 bg-gradient-to-br from-amber-50/90 via-orange-50/80 to-yellow-50/90 rounded-3xl shadow-xl border-2 border-amber-300/80 p-6 sm:p-8 md:p-10 relative overflow-hidden card-hover-glow">
+              <div className="absolute -top-16 -right-16 w-48 h-48 bg-amber-300/20 rounded-full blur-3xl pointer-events-none"></div>
+              <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-orange-300/20 rounded-full blur-3xl pointer-events-none"></div>
+
+              <div className="relative z-10">
+                {/* Header Badge & Title */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-amber-200/80 mb-6">
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center text-2xl shadow-md shrink-0 border border-yellow-300">
+                      <i className="fas fa-landmark"></i>
+                    </div>
+                    <div>
+                      <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-900 bg-amber-200/70 px-3 py-0.5 rounded-full mb-1">
+                        <i className="fas fa-om text-amber-800 text-[10px]"></i>
+                        <span>{lang === 'en' ? 'Temple Development & Heritage' : 'মনসা মন্দির উন্নয়ন ও কর্মযজ্ঞ'}</span>
+                      </div>
+                      <h3 className="text-2xl sm:text-3xl font-bold font-serif text-stone-900 leading-tight">
+                        {lang === 'en' ? 'Temple Development & Devotees Contribution' : 'মনসা মন্দির উন্নয়ন ও মূল্যবান অর্থ দান'}
+                      </h3>
+                    </div>
+                  </div>
+                  <span className="self-start sm:self-center px-4 py-1.5 bg-gradient-to-r from-amber-600 to-orange-600 text-white text-xs font-bold rounded-full shadow-sm flex items-center gap-1.5">
+                    <i className="fas fa-hammer text-[11px]"></i> {lang === 'en' ? 'Ongoing Works & Vision' : 'উন্নয়ন কর্মকাণ্ড ও পরিকল্পনা'}
+                  </span>
+                </div>
+
+                {/* Primary Narrative Text (Exact User History of Data) */}
+                <div className="bg-white/85 backdrop-blur-sm p-6 sm:p-7 rounded-2xl border border-amber-200/90 shadow-sm mb-6">
+                  <p className="text-base sm:text-lg text-stone-800 leading-relaxed font-serif text-justify indent-4 sm:indent-6">
+                    মনসা মন্দির উন্নয়ন ও মূল্যবান অর্থ দান করে যারা অবদান রেখেছেন, ২০২৪ সালের পর থেকে প্রধান একটি অফিসকক্ষ নির্মাণ করা হয়েছে, ও জাগ্রত শনিদেবের মন্দির নির্মিত হয়েছে, মন্দির চত্বর সম্প্রসারণ এবং সৌন্দর্য বর্ধনের কাজ চলমান রয়েছে মন্দিরের প্রবেশ পথে একটি গেট নির্মাণের কাজ চলমান রয়েছে। এছাড়াও মন্দির এর রাস্তার সম্মুখভাগে একটি সুদৃশ্য গেট নির্মাণের পরিকল্পনা রয়েছে ও তদ্রূপ ওষুধি নিবান্ন, প্রসাদ আলয় নির্মাণ, মন্দির সংলগ্ন ঐতিহাসিক পুকুর সেখান থেকে 'মনসা ঘট' তুলে মহাকবি বিজয় গুপ্ত সম্মানিত হয়ে উদ্বোধণ করেছিলেন যে পুকুর সংস্কার এবং পবিত্র পুকুর পাড় এর চারদিকে ওয়াক ওয়ে নির্মাণ সহ বহু কর্মসূচী পরিকল্পনা রয়েছে। এ বিপুল কর্মযজ্ঞে প্রচুর অর্থের প্রয়োজন। এ পর্যন্ত অনেকেই অর্থ সাহায্য দিয়ে অবদান রেখেছেন।
+                  </p>
+                </div>
+
+                {/* Structured Key Milestones & Ongoing Projects Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 mb-6">
+                  {/* Item 1 */}
+                  <div className="bg-white/90 p-4 rounded-xl border border-amber-200 shadow-xs flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center text-lg shrink-0">
+                      <i className="fas fa-building"></i>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-bold text-gray-900 text-sm">প্রধান অফিসকক্ষ</span>
+                        <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold">সম্পন্ন</span>
+                      </div>
+                      <p className="text-xs text-gray-600 mt-0.5">২০২৪ সালের পর থেকে প্রধান একটি আধুনিক অফিসকক্ষ নির্মাণ করা হয়েছে।</p>
+                    </div>
+                  </div>
+
+                  {/* Item 2 */}
+                  <div className="bg-white/90 p-4 rounded-xl border border-amber-200 shadow-xs flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center text-lg shrink-0">
+                      <i className="fas fa-place-of-worship"></i>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-bold text-gray-900 text-sm">জাগ্রত শনিদেবের মন্দির</span>
+                        <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold">নির্মিত</span>
+                      </div>
+                      <p className="text-xs text-gray-600 mt-0.5">মন্দির প্রাঙ্গণে পরম জাগ্রত শ্রী শ্রী শনিদেবের নতুন মন্দির নির্মিত হয়েছে।</p>
+                    </div>
+                  </div>
+
+                  {/* Item 3 */}
+                  <div className="bg-white/90 p-4 rounded-xl border border-amber-200 shadow-xs flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center text-lg shrink-0">
+                      <i className="fas fa-seedling"></i>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-bold text-gray-900 text-sm">চত্বর ও সৌন্দর্য বর্ধন</span>
+                        <span className="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-bold">চলমান</span>
+                      </div>
+                      <p className="text-xs text-gray-600 mt-0.5">মন্দির চত্বর সম্প্রসারণ ও সার্বিক নান্দনিক সৌন্দর্য বর্ধনের কাজ চলছে।</p>
+                    </div>
+                  </div>
+
+                  {/* Item 4 */}
+                  <div className="bg-white/90 p-4 rounded-xl border border-amber-200 shadow-xs flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-orange-50 text-orange-700 border border-orange-200 flex items-center justify-center text-lg shrink-0">
+                      <i className="fas fa-archway"></i>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-bold text-gray-900 text-sm">প্রবেশ তোরণ ও গেট</span>
+                        <span className="text-[10px] bg-orange-100 text-orange-800 px-2 py-0.5 rounded font-bold">চলমান ও পরিকল্পিত</span>
+                      </div>
+                      <p className="text-xs text-gray-600 mt-0.5">প্রবেশ পথে গেট নির্মাণ চলছে ও রাস্তার সম্মুখে সুদৃশ্য গেটের পরিকল্পনা রয়েছে।</p>
+                    </div>
+                  </div>
+
+                  {/* Item 5 */}
+                  <div className="bg-white/90 p-4 rounded-xl border border-amber-200 shadow-xs flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 flex items-center justify-center text-lg shrink-0">
+                      <i className="fas fa-utensils"></i>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-bold text-gray-900 text-sm">প্রসাদ আলয় ও ওষুধি নিবান্ন</span>
+                        <span className="text-[10px] bg-purple-100 text-purple-800 px-2 py-0.5 rounded font-bold">পরিকল্পিত</span>
+                      </div>
+                      <p className="text-xs text-gray-600 mt-0.5">ভক্তবৃন্দের সুবিধার্থে প্রসাদ বিতরণ আলয় ও ওষুধি নিবান্ন নির্মাণের উদ্যোগ।</p>
+                    </div>
+                  </div>
+
+                  {/* Item 6 */}
+                  <div className="bg-white/90 p-4 rounded-xl border border-amber-200 shadow-xs flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-700 border border-teal-200 flex items-center justify-center text-lg shrink-0">
+                      <i className="fas fa-water"></i>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-bold text-gray-900 text-sm">ঐতিহাসিক ঘট পুকুর ও ওয়াকওয়ে</span>
+                        <span className="text-[10px] bg-teal-100 text-teal-800 px-2 py-0.5 rounded font-bold">মহাপরিকল্পনা</span>
+                      </div>
+                      <p className="text-xs text-gray-600 mt-0.5">কবি বিজয় গুপ্তের স্মৃতিধন্য ঐতিহাসিক 'মনসা ঘট' পুকুর সংস্কার ও ওয়াকওয়ে নির্মাণ।</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Gratitude & Devotee Appeal Banner */}
+                <div className="bg-gradient-to-r from-orange-600 to-amber-600 text-white p-4 sm:p-5 rounded-2xl shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-xl shrink-0">
+                      🌸
+                    </div>
+                    <p className="text-xs sm:text-sm font-medium leading-relaxed">
+                      <span className="font-bold text-yellow-200">শ্রদ্ধেয় ভক্তবৃন্দের প্রতি বিনীত নিবেদন:</span> এই বিপুল পবিত্র কর্মযজ্ঞে দেবীর কৃপায় ভক্তদের সাহায্যেই মন্দির পূর্ণতা পাচ্ছে। নিচে আমাদের শ্রদ্ধেয় দাতাগণের তালিকা প্রদর্শিত হলো।
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setActiveTab('online')}
+                    className="shrink-0 bg-white text-orange-700 hover:bg-yellow-100 font-bold px-5 py-2 rounded-xl text-xs sm:text-sm shadow-sm transition-all cursor-pointer whitespace-nowrap"
+                  >
+                    <i className="fas fa-hand-holding-heart mr-1.5 text-orange-600"></i> অনুদান প্রদান করুন
+                  </button>
+                </div>
+              </div>
+            </div>
+
             {/* Public Donor List */}
             <div className="bg-white rounded-3xl shadow-xl border-2 border-orange-100 overflow-hidden card-hover-glow">
               <div className="bg-gradient-to-r from-orange-100 via-amber-100 to-orange-100 p-6 border-b border-orange-200">
@@ -7408,6 +7738,7 @@ const AdminPanel = ({
   galleryItems, setGalleryItems,
   complaintsSuggestions, setComplaintsSuggestions,
   paymentGatewayConfig, setPaymentGatewayConfig,
+  scholars, setScholars,
   showToast
 }) => {
   const [loginEmail, setLoginEmail] = useState('');
@@ -7424,6 +7755,7 @@ const AdminPanel = ({
   const [editingDonationId, setEditingDonationId] = useState(null);
   const [editingMantraId, setEditingMantraId] = useState(null);
   const [editingGalleryId, setEditingGalleryId] = useState(null);
+  const [editingScholarId, setEditingScholarId] = useState(null);
 
   // Form States
   const [newMember, setNewMember] = useState({ name: '', role: '', phone: '', image: null });
@@ -7431,6 +7763,7 @@ const AdminPanel = ({
   const [newNotice, setNewNotice] = useState({ title: '', date: '', text: '' });
   const [newEvent, setNewEvent] = useState({ title: '', date: '', description: '', image: null, images: [], video: '' });
   const [newDonation, setNewDonation] = useState({ name: '', address: '', type: 'নগদ অর্থ', amount: '', date: '', is_hidden: false });
+  const [newScholar, setNewScholar] = useState({ name: '', title: '', date: '', image: '', order_idx: 0 });
   const [newGalleryPhoto, setNewGalleryPhoto] = useState({ url: '', captionBn: '', captionEn: '', image: null, mediaType: 'image' });
   const [newGalleryBatch, setNewGalleryBatch] = useState([]);
   const [galleryTabMode, setGalleryTabMode] = useState('image');
@@ -8220,6 +8553,70 @@ const AdminPanel = ({
     }
   };
 
+  // -- Donors Drag & Drop and Serial Reordering --
+  const [draggedDonationIndex, setDraggedDonationIndex] = useState(null);
+
+  const saveDonationsOrder = async (reorderedList) => {
+    if (!reorderedList) return;
+    setDonations(reorderedList);
+    try {
+      localStorage.setItem('temple_donations', JSON.stringify(reorderedList));
+      const orderIds = reorderedList.map(d => d.id);
+      localStorage.setItem('temple_donations_order', JSON.stringify(orderIds));
+      if (supabaseClient) {
+        await supabaseClient.from('settings').upsert({
+          key: 'donations_order',
+          value: JSON.stringify(orderIds)
+        }, { onConflict: 'key' });
+        broadcastUniversalSync();
+      }
+      showToast('দাতাদের ক্রমিক ও অবস্থান সফলভাবে সংরক্ষিত হয়েছে!');
+    } catch (e) {
+      console.error('Error saving donations order:', e);
+    }
+  };
+
+  const handleMoveDonation = async (index, direction) => {
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= (donations || []).length) return;
+    const reordered = [...(donations || [])];
+    const [item] = reordered.splice(index, 1);
+    reordered.splice(targetIndex, 0, item);
+    await saveDonationsOrder(reordered);
+  };
+
+  const handleSetDonationSerial = async (fromIndex, targetPosStr) => {
+    const targetPos = parseInt(targetPosStr, 10);
+    if (isNaN(targetPos) || targetPos < 1 || targetPos > (donations || []).length) return;
+    const targetIndex = targetPos - 1;
+    if (targetIndex === fromIndex) return;
+    const reordered = [...(donations || [])];
+    const [item] = reordered.splice(fromIndex, 1);
+    reordered.splice(targetIndex, 0, item);
+    await saveDonationsOrder(reordered);
+  };
+
+  const handleDonationDragStart = (e, index) => {
+    setDraggedDonationIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    try { e.dataTransfer.setData('text/plain', String(index)); } catch (err) {}
+  };
+
+  const handleDonationDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDonationDrop = async (e, targetIndex) => {
+    e.preventDefault();
+    if (draggedDonationIndex === null || draggedDonationIndex === targetIndex) return;
+    const reordered = [...(donations || [])];
+    const [item] = reordered.splice(draggedDonationIndex, 1);
+    reordered.splice(targetIndex, 0, item);
+    setDraggedDonationIndex(null);
+    await saveDonationsOrder(reordered);
+  };
+
   // -- Timings Save Handler --
   const handleSaveTimings = async (e) => {
     e.preventDefault();
@@ -8341,6 +8738,70 @@ const AdminPanel = ({
   // -- Online Puja & Sankalpa Bookings Handlers --
   const [bookingSearch, setBookingSearch] = useState('');
   const [bookingFilter, setBookingFilter] = useState('all'); // all, pending, completed
+  const [bookingDatePreset, setBookingDatePreset] = useState('all'); // all, today, 7days, 30days, custom
+  const [bookingStartDate, setBookingStartDate] = useState('');
+  const [bookingEndDate, setBookingEndDate] = useState('');
+
+  const handleExportPujaBookingsExcel = (listToExport) => {
+    if (!listToExport || listToExport.length === 0) {
+      if (showToast) showToast('ডাউনলোড করার জন্য কোনো বুকিং ডাটা পাওয়া যায়নি!');
+      return;
+    }
+    // UTF-8 BOM so Bengali text opens flawlessly in Microsoft Excel
+    let csv = '\uFEFF';
+    const headers = [
+      'ক্রমিক নং',
+      'টোকেন নং',
+      'ভক্তের নাম',
+      'মোবাইল নম্বর',
+      'গোত্র',
+      'পূজার ধরন',
+      'পূজার তারিখ',
+      'আবেদনের তারিখ',
+      'ঠিকানা',
+      'সংকল্প ও প্রার্থনা',
+      'প্রণামী পরিমাণ (টাকা)',
+      'স্ট্যাটাস'
+    ];
+    csv += headers.map(h => `"${h.replace(/"/g, '""')}"`).join(',') + '\r\n';
+
+    listToExport.forEach((b, idx) => {
+      let bDate = '';
+      if (b.timestamp) {
+        try { bDate = new Date(b.timestamp).toISOString().split('T')[0]; } catch(e) {}
+      } else if (b.date) {
+        bDate = b.date;
+      }
+      const row = [
+        idx + 1,
+        b.token || '',
+        b.devoteeName || '',
+        b.phone || '',
+        b.gotra || 'অনুল্লিখিত',
+        b.pujaType || '',
+        b.pujaDate || 'নিকটতম তিথি',
+        bDate,
+        b.address || '',
+        b.sankalpa || '',
+        b.amount || '০',
+        b.status === 'completed' ? 'সম্পন্ন' : 'পেন্ডিং'
+      ];
+      csv += row.map(val => `"${String(val || '').replace(/"/g, '""')}"`).join(',') + '\r\n';
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    const nowTag = new Date().toISOString().split('T')[0];
+    const rangeTag = bookingDatePreset === '7days' ? '1_Week' : (bookingDatePreset === '30days' ? '1_Month' : (bookingDatePreset === 'today' ? 'Today' : (bookingDatePreset === 'custom' ? `${bookingStartDate || 'from'}_to_${bookingEndDate || 'to'}` : 'All')));
+    link.setAttribute('download', `Puja_Bookings_Manasa_Mondir_${rangeTag}_${nowTag}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    if (showToast) showToast('এক্সেল চার্ট সফলভাবে ডাউনলোড হয়েছে!');
+  };
 
   const handleToggleBookingStatus = async (id, currentStatus) => {
     setIsSaving(true);
@@ -8455,6 +8916,166 @@ const AdminPanel = ({
     printWindow.document.write(html);
     printWindow.document.close();
   };
+
+  // -- Revered Scholars & Personalities Handlers --
+  const [draggedScholarIndex, setDraggedScholarIndex] = useState(null);
+
+  const saveScholarsOrder = async (reorderedList) => {
+    if (!reorderedList) return;
+    if (setScholars) setScholars(reorderedList);
+    try {
+      localStorage.setItem('temple_scholars', JSON.stringify(reorderedList));
+      if (supabaseClient) {
+        await supabaseClient.from('settings').upsert({
+          key: 'temple_scholars',
+          value: JSON.stringify(reorderedList)
+        }, { onConflict: 'key' });
+        broadcastUniversalSync();
+      }
+      showToast('মনীষীদের তালিকা ও ক্রমিক সফলভাবে সংরক্ষিত হয়েছে!');
+    } catch (e) {
+      console.error('Error saving scholars:', e);
+    }
+  };
+
+  const handleSaveScholarsToCloud = saveScholarsOrder;
+
+  const handleSaveScholar = async (e) => {
+    if (e) e.preventDefault();
+    if (!newScholar.name || !newScholar.name.trim()) {
+      setErrorMsg('অনুগ্রহ করে গুণীজনের নাম লিখুন।');
+      return;
+    }
+    setIsSaving(true);
+    setErrorMsg('');
+    try {
+      const currentList = scholars && scholars.length > 0 ? scholars : DEFAULT_SCHOLARS;
+      let updatedScholars;
+      if (editingScholarId) {
+        updatedScholars = currentList.map(s => s.id === editingScholarId ? {
+          ...s,
+          name: newScholar.name.trim(),
+          title: newScholar.title.trim(),
+          date: newScholar.date.trim(),
+          image: newScholar.image || s.image || 'images/Scholars/10r 1ps (1).jpg.jpeg'
+        } : s);
+        setEditingScholarId(null);
+        showToast('মনীষীর তথ্য সফলভাবে আপডেট হয়েছে!');
+      } else {
+        const nextId = 'sch_' + Date.now();
+        const nextOrder = currentList.length + 1;
+        const scholarItem = {
+          id: nextId,
+          name: newScholar.name.trim(),
+          title: newScholar.title.trim(),
+          date: newScholar.date.trim(),
+          image: newScholar.image || 'images/Scholars/10r 1ps (1).jpg.jpeg',
+          order_idx: newScholar.order_idx || nextOrder
+        };
+        updatedScholars = [...currentList, scholarItem];
+        showToast('নতুন গুণীজনের তথ্য যুক্ত হয়েছে!');
+      }
+      await saveScholarsOrder(updatedScholars);
+      setNewScholar({ name: '', title: '', date: '', image: '', order_idx: 0 });
+    } catch (err) {
+      setErrorMsg('গুণীজনের তথ্য সংরক্ষণে সমস্যা হয়েছে।');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleStartEditScholar = (item) => {
+    setEditingScholarId(item.id);
+    setNewScholar({
+      name: item.name || '',
+      title: item.title || '',
+      date: item.date || '',
+      image: item.image || '',
+      order_idx: item.order_idx || 0
+    });
+    const formElem = document.getElementById('scholar-form-top');
+    if (formElem) formElem.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleDeleteScholar = (id) => {
+    requestConfirm('আপনি কি নিশ্চিত যে এই গুণীজনের তথ্য মুছে ফেলতে চান?', async () => {
+      setIsSaving(true);
+      setErrorMsg('');
+      try {
+        const currentList = scholars && scholars.length > 0 ? scholars : DEFAULT_SCHOLARS;
+        const updated = currentList.filter(s => s.id !== id);
+        await saveScholarsOrder(updated);
+        showToast('গুণীজনের তথ্য মুছে ফেলা হয়েছে!');
+      } catch (err) {
+        setErrorMsg('মুছে ফেলতে সমস্যা হয়েছে।');
+      } finally {
+        setIsSaving(false);
+      }
+    });
+  };
+
+  const handleMoveScholar = async (index, direction) => {
+    const currentList = [...(scholars && scholars.length > 0 ? scholars : DEFAULT_SCHOLARS)];
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= currentList.length) return;
+    const [item] = currentList.splice(index, 1);
+    currentList.splice(targetIndex, 0, item);
+    const reordered = currentList.map((s, idx) => ({ ...s, order_idx: idx + 1 }));
+    await saveScholarsOrder(reordered);
+  };
+
+  const handleSetScholarSerial = async (fromIndex, targetPosStr) => {
+    const currentList = [...(scholars && scholars.length > 0 ? scholars : DEFAULT_SCHOLARS)];
+    const targetPos = parseInt(targetPosStr, 10);
+    if (isNaN(targetPos) || targetPos < 1 || targetPos > currentList.length) return;
+    const targetIndex = targetPos - 1;
+    if (targetIndex === fromIndex) return;
+    const [item] = currentList.splice(fromIndex, 1);
+    currentList.splice(targetIndex, 0, item);
+    const reordered = currentList.map((s, idx) => ({ ...s, order_idx: idx + 1 }));
+    await saveScholarsOrder(reordered);
+  };
+
+  const handleScholarDragStart = (e, index) => {
+    setDraggedScholarIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    try { e.dataTransfer.setData('text/plain', String(index)); } catch (err) {}
+  };
+
+  const handleScholarDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleScholarDrop = async (e, targetIndex) => {
+    e.preventDefault();
+    if (draggedScholarIndex === null || draggedScholarIndex === targetIndex) return;
+    const currentList = [...(scholars && scholars.length > 0 ? scholars : DEFAULT_SCHOLARS)];
+    const [item] = currentList.splice(draggedScholarIndex, 1);
+    currentList.splice(targetIndex, 0, item);
+    setDraggedScholarIndex(null);
+    const reordered = currentList.map((s, idx) => ({ ...s, order_idx: idx + 1 }));
+    await saveScholarsOrder(reordered);
+    showToast('মনীষীদের ড্র্যাগ ও ড্রপ ক্রম সফলভাবে সংরক্ষিত হয়েছে!');
+  };
+
+  const handleResetScholarsToDefault = () => {
+    requestConfirm('আপনি কি আদি ৬ জন প্রখ্যাত মনীষীদের তথ্যে রিসেট করতে চান?', async () => {
+      setIsSaving(true);
+      try {
+        await saveScholarsOrder(DEFAULT_SCHOLARS);
+        setNewScholar({ name: '', title: '', date: '', image: '', order_idx: 0 });
+        setEditingScholarId(null);
+        showToast('আদি গুণীজনদের তালিকায় রিসেট সম্পন্ন হয়েছে!');
+      } catch (err) {
+        setErrorMsg('রিসেট করতে ব্যর্থ হয়েছে।');
+      } finally {
+        setIsSaving(false);
+      }
+    }, 'ডিফল্ট রিসেট নিশ্চিতকরণ');
+  };
+
+  const handleResetDefaultScholars = handleResetScholarsToDefault;
 
   // -- Donation Receipts Handlers --
   const [receiptSearch, setReceiptSearch] = useState('');
@@ -9077,6 +9698,11 @@ const AdminPanel = ({
             <div className="text-[10px] text-gray-500 font-bold">অভিযোগ/পরামর্শ</div>
             <div className="text-xs font-extrabold text-amber-800">{(complaintsSuggestions || []).length} টি</div>
           </div>
+          <div onClick={() => handleTabSwitch('scholars')} className="cursor-pointer bg-white p-3 rounded-2xl border border-gray-200 shadow-xs hover:border-amber-500 hover:shadow-sm transition-all text-center">
+            <i className="fas fa-graduation-cap text-amber-600 text-base mb-1"></i>
+            <div className="text-[10px] text-gray-500 font-bold">বরেণ্য মনীষী</div>
+            <div className="text-xs font-extrabold text-amber-900">{(scholars || DEFAULT_SCHOLARS).length} জন</div>
+          </div>
         </div>
       </div>
 
@@ -9142,6 +9768,14 @@ const AdminPanel = ({
                   {unreadComplaintsCount}
                 </span>
               )}
+            </button>
+            <button onClick={() => handleTabSwitch('scholars')} className={`px-5 py-3 text-left font-bold text-sm border-b flex items-center justify-between ${activeTab === 'scholars' ? 'bg-orange-50 text-orange-700 border-l-[5px] border-l-orange-600' : 'text-gray-600 hover:bg-gray-50 border-l-[5px] border-transparent'}`}>
+              <span className="flex items-center gap-2">
+                <i className="fas fa-graduation-cap w-5 text-amber-600"></i> বরেণ্য মনীষী ও গুণীজন
+              </span>
+              <span className="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold">
+                {(scholars || DEFAULT_SCHOLARS).length}
+              </span>
             </button>
             <button onClick={() => handleTabSwitch('security')} className={`px-5 py-3 text-left font-bold text-sm ${activeTab === 'security' ? 'bg-orange-50 text-orange-700 border-l-[5px] border-l-orange-600' : 'text-gray-600 hover:bg-gray-50 border-l-[5px] border-transparent'}`}>
               <i className="fas fa-shield-halved w-5 text-rose-600"></i> এডমিন আইডি ও পাসওয়ার্ড
@@ -9783,14 +10417,25 @@ const AdminPanel = ({
                 </div>
               </form>
 
-              <div className="flex justify-between items-center mb-6 border-b pb-3 mt-8">
-                <h3 className="text-xl font-bold text-gray-800"><i className="fas fa-list text-orange-500 mr-2"></i> বর্তমান দাতাদের তালিকা</h3>
-                <span className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full font-bold">Total: {donations ? donations.length : 0}</span>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 border-b pb-3 mt-8">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <i className="fas fa-list text-orange-500"></i> বর্তমান দাতাদের তালিকা ও ক্রমিক ব্যবস্থাপনা
+                  </h3>
+                  <p className="text-xs text-gray-500 mt-0.5">ড্র্যাগ-অ্যান্ড-ড্রপ (Drag & Drop), তীর চিহ্ন (▲ / ▼) অথবা সরাসরি সিরিয়াল লিখে তালিকা সাজান</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="bg-amber-100 text-amber-900 text-xs px-3 py-1 rounded-full font-bold">
+                    <i className="fas fa-arrows-up-down mr-1"></i> সাজানো সক্রিয়
+                  </span>
+                  <span className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full font-bold">Total: {donations ? donations.length : 0}</span>
+                </div>
               </div>
               <div className="overflow-x-auto rounded-xl border border-gray-200">
                 <table className="w-full text-left border-collapse bg-white">
                   <thead>
                     <tr className="bg-gray-100 text-gray-700 text-sm border-b">
+                      <th className="p-3 text-center font-bold w-28">সিরিয়াল / সাজান</th>
                       <th className="p-4 font-bold">নাম</th>
                       <th className="p-4 font-bold">ঠিকানা/পদবী</th>
                       <th className="p-4 font-bold">ধরণ</th>
@@ -9799,8 +10444,56 @@ const AdminPanel = ({
                     </tr>
                   </thead>
                   <tbody>
-                    {donations && donations.map(d => (
-                      <tr key={d.id} className={`border-b hover:bg-orange-50 transition-colors text-sm ${d.is_hidden ? 'opacity-60 bg-gray-50' : ''}`}>
+                    {donations && donations.map((d, index) => (
+                      <tr
+                        key={d.id}
+                        draggable={true}
+                        onDragStart={(e) => handleDonationDragStart(e, index)}
+                        onDragOver={(e) => handleDonationDragOver(e)}
+                        onDrop={(e) => handleDonationDrop(e, index)}
+                        className={`border-b hover:bg-orange-50 transition-colors text-sm ${d.is_hidden ? 'opacity-60 bg-gray-50' : ''} ${draggedDonationIndex === index ? 'opacity-30 bg-amber-100 border-2 border-dashed border-amber-400' : ''}`}
+                      >
+                        <td className="p-3 text-center whitespace-nowrap">
+                          <div className="flex items-center justify-center gap-1.5">
+                            <span
+                              className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-orange-600 p-1"
+                              title="টেনে উপরে বা নিচে স্থানান্তর করুন (Drag & Drop)"
+                            >
+                              <i className="fas fa-grip-vertical"></i>
+                            </span>
+                            <div className="flex flex-col gap-0.5">
+                              <button
+                                type="button"
+                                disabled={index === 0}
+                                onClick={() => handleMoveDonation(index, -1)}
+                                className="w-6 h-4 bg-gray-100 hover:bg-orange-500 hover:text-white disabled:opacity-30 disabled:hover:bg-gray-100 disabled:hover:text-gray-400 text-[10px] rounded flex items-center justify-center transition-colors"
+                                title="এক ঘর উপরে নিন"
+                              >
+                                ▲
+                              </button>
+                              <button
+                                type="button"
+                                disabled={index === donations.length - 1}
+                                onClick={() => handleMoveDonation(index, 1)}
+                                className="w-6 h-4 bg-gray-100 hover:bg-orange-500 hover:text-white disabled:opacity-30 disabled:hover:bg-gray-100 disabled:hover:text-gray-400 text-[10px] rounded flex items-center justify-center transition-colors"
+                                title="এক ঘর নিচে নিন"
+                              >
+                                ▼
+                              </button>
+                            </div>
+                            <input
+                              type="number"
+                              min="1"
+                              max={donations.length}
+                              defaultValue={index + 1}
+                              key={`serial_${d.id}_${index}`}
+                              onBlur={(e) => handleSetDonationSerial(index, e.target.value)}
+                              onKeyDown={(e) => { if (e.key === 'Enter') handleSetDonationSerial(index, e.target.value); }}
+                              className="w-11 text-center text-xs py-1 px-1 border border-gray-300 rounded font-bold bg-white focus:ring-1 focus:ring-amber-500 focus:outline-none"
+                              title="সরাসরি পজিশন বা সিরিয়াল নম্বর লিখুন"
+                            />
+                          </div>
+                        </td>
                         <td className="p-4 font-bold text-gray-800">
                           {d.name}
                           {d.is_hidden && <span className="ml-2 text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded border border-red-200 font-bold">Hidden</span>}
@@ -10573,35 +11266,99 @@ const AdminPanel = ({
               </div>
 
               {/* Filter and Search */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-                <div className="sm:col-span-2">
-                  <div className="relative">
-                    <i className="fas fa-search absolute left-3.5 top-3.5 text-gray-400 text-sm"></i>
-                    <input
-                      type="text"
-                      placeholder="নাম, ফোন নম্বর, গোত্র বা টোকেন লিখে খুঁজুন..."
-                      value={bookingSearch}
-                      onChange={(e) => setBookingSearch(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
-                    />
+              <div className="space-y-3 mb-6 bg-amber-50/50 p-4 rounded-2xl border border-amber-100">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="sm:col-span-2">
+                    <div className="relative">
+                      <i className="fas fa-search absolute left-3.5 top-3.5 text-gray-400 text-sm"></i>
+                      <input
+                        type="text"
+                        placeholder="নাম, ফোন নম্বর, গোত্র বা টোকেন লিখে খুঁজুন..."
+                        value={bookingSearch}
+                        onChange={(e) => setBookingSearch(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    {['all', 'pending', 'completed'].map(f => (
+                      <button
+                        key={f}
+                        onClick={() => setBookingFilter(f)}
+                        className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${bookingFilter === f ? 'bg-amber-600 text-white shadow-sm' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}
+                      >
+                        {f === 'all' ? 'সকল' : f === 'pending' ? 'পেন্ডিং' : 'সম্পন্ন'}
+                      </button>
+                    ))}
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  {['all', 'pending', 'completed'].map(f => (
-                    <button
-                      key={f}
-                      onClick={() => setBookingFilter(f)}
-                      className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${bookingFilter === f ? 'bg-amber-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-                    >
-                      {f === 'all' ? 'সকল' : f === 'pending' ? 'পেন্ডিং' : 'সম্পন্ন'}
-                    </button>
-                  ))}
+
+                {/* Date-to-Date and Preset System */}
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-amber-200/60">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="text-xs font-bold text-gray-700 mr-1 flex items-center gap-1">
+                      <i className="fas fa-calendar-day text-amber-600"></i> তারিখ ফিল্টার:
+                    </span>
+                    {[
+                      { id: 'all', label: 'সকল তারিখ' },
+                      { id: 'today', label: 'আজ' },
+                      { id: '7days', label: '১ সপ্তাহ (৭ দিন)' },
+                      { id: '30days', label: 'চলতি মাস (৩০ দিন)' },
+                      { id: 'custom', label: 'কাস্টম রেঞ্জ' }
+                    ].map(p => (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => setBookingDatePreset(p.id)}
+                        className={`text-xs px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer ${bookingDatePreset === p.id ? 'bg-amber-700 text-white shadow-xs' : 'bg-white text-gray-700 hover:bg-amber-100/70 border border-amber-200'}`}
+                      >
+                        {p.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Custom Date Pickers & Actions */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex items-center gap-1.5 bg-white px-2.5 py-1 rounded-xl border border-gray-200 text-xs">
+                      <span className="text-gray-500 font-medium">হতে:</span>
+                      <input
+                        type="date"
+                        value={bookingStartDate}
+                        onChange={(e) => { setBookingStartDate(e.target.value); setBookingDatePreset('custom'); }}
+                        className="border-0 p-0 text-xs focus:ring-0 focus:outline-none font-bold text-gray-800"
+                      />
+                    </div>
+                    <div className="flex items-center gap-1.5 bg-white px-2.5 py-1 rounded-xl border border-gray-200 text-xs">
+                      <span className="text-gray-500 font-medium">পর্যন্ত:</span>
+                      <input
+                        type="date"
+                        value={bookingEndDate}
+                        onChange={(e) => { setBookingEndDate(e.target.value); setBookingDatePreset('custom'); }}
+                        className="border-0 p-0 text-xs focus:ring-0 focus:outline-none font-bold text-gray-800"
+                      />
+                    </div>
+                    {(bookingStartDate || bookingEndDate || bookingDatePreset !== 'all') && (
+                      <button
+                        type="button"
+                        onClick={() => { setBookingStartDate(''); setBookingEndDate(''); setBookingDatePreset('all'); }}
+                        className="text-xs text-red-600 hover:text-red-800 font-bold px-2 py-1 bg-red-50 hover:bg-red-100 rounded-lg transition-colors cursor-pointer"
+                        title="ফিল্টার রিসেট করুন"
+                      >
+                        রিসেট
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* Bookings List */}
+              {/* Bookings List & Excel Export Action Bar */}
               {(() => {
                 const searchQ = (bookingSearch || '').toLowerCase().trim();
+                const now = new Date();
+                const todayStr = now.toISOString().split('T')[0];
+                const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
                 const filtered = (pujaBookings || []).filter(b => {
                   const matchFilter = bookingFilter === 'all' || (bookingFilter === 'completed' ? b.status === 'completed' : b.status !== 'completed');
                   const matchSearch = !searchQ ||
@@ -10610,20 +11367,79 @@ const AdminPanel = ({
                     (b.gotra && b.gotra.toLowerCase().includes(searchQ)) ||
                     (b.token && b.token.toLowerCase().includes(searchQ)) ||
                     (b.pujaType && b.pujaType.toLowerCase().includes(searchQ));
-                  return matchFilter && matchSearch;
+
+                  if (!matchFilter || !matchSearch) return false;
+
+                  // Date Filter
+                  if (bookingDatePreset === 'all') return true;
+
+                  let itemDate = null;
+                  let itemDateStr = '';
+                  if (b.pujaDate && /^\d{4}-\d{2}-\d{2}$/.test(b.pujaDate.trim())) {
+                    itemDateStr = b.pujaDate.trim();
+                    itemDate = new Date(itemDateStr);
+                  } else if (b.timestamp) {
+                    itemDate = new Date(b.timestamp);
+                    itemDateStr = b.timestamp.split('T')[0];
+                  } else if (b.date) {
+                    itemDateStr = b.date;
+                    itemDate = new Date(b.date);
+                  }
+
+                  if (bookingDatePreset === 'today') {
+                    return itemDateStr === todayStr;
+                  }
+                  if (bookingDatePreset === '7days') {
+                    if (!itemDate || isNaN(itemDate.getTime())) return true;
+                    return itemDate >= oneWeekAgo && itemDate <= new Date(now.getTime() + 86400000);
+                  }
+                  if (bookingDatePreset === '30days') {
+                    if (!itemDate || isNaN(itemDate.getTime())) return true;
+                    return itemDate >= thirtyDaysAgo && itemDate <= new Date(now.getTime() + 86400000);
+                  }
+                  if (bookingDatePreset === 'custom') {
+                    if (!bookingStartDate && !bookingEndDate) return true;
+                    if (bookingStartDate && itemDateStr && itemDateStr < bookingStartDate) return false;
+                    if (bookingEndDate && itemDateStr && itemDateStr > bookingEndDate) return false;
+                    return true;
+                  }
+
+                  return true;
                 });
 
-                if (filtered.length === 0) {
-                  return (
-                    <div className="text-center py-12 bg-amber-50/50 rounded-2xl border border-dashed border-amber-200">
-                      <i className="fas fa-pray text-4xl text-amber-300 mb-2"></i>
-                      <p className="text-gray-500 font-medium">কোনো পূজা বুকিং পাওয়া যায়নি</p>
-                    </div>
-                  );
-                }
-
                 return (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    {/* Excel Download Bar */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 bg-emerald-50/80 p-3.5 rounded-xl border border-emerald-200">
+                      <div className="flex items-center gap-2 text-xs sm:text-sm text-emerald-900 font-semibold">
+                        <i className="fas fa-file-excel text-emerald-600 text-lg"></i>
+                        <span>
+                          বর্তমান ফিল্টারে প্রদর্শিত হচ্ছে: <strong className="font-bold text-emerald-800">{filtered.length} টি</strong> পূজা বুকিং
+                          {bookingDatePreset === '7days' && ' (গত ১ সপ্তাহের)'}
+                          {bookingDatePreset === '30days' && ' (চলতি মাসের)'}
+                          {bookingDatePreset === 'today' && ' (আজকের)'}
+                          {bookingDatePreset === 'custom' && (bookingStartDate || bookingEndDate) && ` (${bookingStartDate || 'আদি'} হতে ${bookingEndDate || 'বর্তমান'} পর্যন্ত)`}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleExportPujaBookingsExcel(filtered)}
+                        disabled={filtered.length === 0}
+                        className="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold px-4 py-2 rounded-xl text-xs sm:text-sm shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer whitespace-nowrap"
+                        title="মাইক্রোসফট এক্সেল বা গুগল শিটে খোলার জন্য CSV ফাইল ডাউনলোড করুন"
+                      >
+                        <i className="fas fa-download text-yellow-300"></i>
+                        <span>📊 এক্সেল চার্ট ডাউনলোড করুন ({filtered.length})</span>
+                      </button>
+                    </div>
+
+                    {filtered.length === 0 ? (
+                      <div className="text-center py-12 bg-amber-50/50 rounded-2xl border border-dashed border-amber-200">
+                        <i className="fas fa-pray text-4xl text-amber-300 mb-2"></i>
+                        <p className="text-gray-500 font-medium">এই তারিখ রেঞ্জে কোনো পূজা বুকিং পাওয়া যায়নি</p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {filtered.map(b => (
                       <div key={b.id || b.token} className="p-5 rounded-2xl border border-amber-100 bg-amber-50/20 hover:border-amber-300 transition-all flex flex-col justify-between shadow-sm">
                         <div>
@@ -10681,8 +11497,10 @@ const AdminPanel = ({
                       </div>
                     ))}
                   </div>
-                );
-              })()}
+                )}
+              </div>
+            );
+          })()}
             </div>
           )}
 
@@ -11946,6 +12764,292 @@ const AdminPanel = ({
             </div>
           )}
 
+          {/* 15. Revered Scholars & Personalities Tab */}
+          {activeTab === 'scholars' && (
+            <div className="space-y-6">
+              {/* Header Banner */}
+              <div className="bg-white p-6 sm:p-7 rounded-2xl shadow-sm border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center text-xl border border-amber-200 shrink-0">
+                    <i className="fas fa-graduation-cap"></i>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-800">চিরস্মরণীয় গুণীজন ও বরেণ্য ব্যক্তিত্ব ব্যবস্থাপনা</h3>
+                    <p className="text-xs text-gray-500 mt-0.5">গৈলা ও মা মনসা মন্দিরের পুণ্যস্মৃতিতে অমর পরলোকগত মহান ব্যক্তিবর্গ, ছবি ও সিরিয়াল নিয়ন্ত্রণ</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleResetScholarsToDefault}
+                    className="bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer active:scale-95"
+                    title="মূল ৬ জন মনীষীর তথ্যে রিসেট করুন"
+                  >
+                    <i className="fas fa-rotate-left text-amber-700"></i> ডিফল্ট মনীষীদের তথ্যে রিসেট
+                  </button>
+                </div>
+              </div>
+
+              {/* Add / Edit Form */}
+              <div id="scholar-form-top" className="bg-white p-6 sm:p-7 rounded-2xl shadow-sm border border-gray-100">
+                <div className="flex items-center justify-between pb-3 border-b mb-5">
+                  <h4 className="font-bold text-gray-800 flex items-center gap-2 text-base">
+                    <i className={`fas ${editingScholarId ? 'fa-user-pen text-amber-600' : 'fa-user-plus text-orange-600'}`}></i>
+                    {editingScholarId ? 'গুণীজনের তথ্য সম্পাদন ও পরিবর্তন' : 'নতুন গুণীজন / মনীষী যোগ করুন'}
+                  </h4>
+                  {editingScholarId && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingScholarId(null);
+                        setNewScholar({ name: '', title: '', date: '', image: '', order_idx: 0 });
+                      }}
+                      className="text-xs text-gray-500 hover:text-red-600 font-bold flex items-center gap-1 cursor-pointer"
+                    >
+                      <i className="fas fa-times"></i> বাতিল
+                    </button>
+                  )}
+                </div>
+
+                <form onSubmit={handleSaveScholar} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">মনীষী / গুণীজনের নাম *</label>
+                      <input
+                        type="text"
+                        required
+                        value={newScholar.name}
+                        onChange={(e) => setNewScholar({ ...newScholar, name: e.target.value })}
+                        placeholder="যেমনঃ স্বর্গীয় শুকদেব হালদার"
+                        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:bg-white focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">মৃত্যু / তিরোধান তারিখ</label>
+                      <input
+                        type="text"
+                        value={newScholar.date}
+                        onChange={(e) => setNewScholar({ ...newScholar, date: e.target.value })}
+                        placeholder="যেমনঃ মৃত্যুঃ ২৫ সেপ্টেম্বর ২০০৯ ইং"
+                        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:bg-white focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">পরিচয়, উপাধি ও অবদান</label>
+                    <input
+                      type="text"
+                      value={newScholar.title}
+                      onChange={(e) => setNewScholar({ ...newScholar, title: e.target.value })}
+                      placeholder="যেমনঃ বিশিষ্ট সমাজসেবক ও শ্রদ্ধেয় ব্যক্তিত্ব"
+                      className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:bg-white focus:outline-none"
+                    />
+                  </div>
+
+                  {/* Image Path / Upload */}
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">ছবি নির্বাচন অথবা ইমেজ লিংক</label>
+                    <div className="flex flex-col sm:flex-row gap-3 items-start">
+                      <div className="flex-1 w-full">
+                        <input
+                          type="text"
+                          value={newScholar.image}
+                          onChange={(e) => setNewScholar({ ...newScholar, image: e.target.value })}
+                          placeholder="যেমনঃ images/Scholars/10r 1ps (1).jpg.jpeg অথবা ওয়েব লিংক"
+                          className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:bg-white focus:outline-none font-mono text-xs"
+                        />
+                        <div className="mt-2 flex items-center gap-2">
+                          <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-lg text-xs font-bold cursor-pointer transition-colors border border-stone-300">
+                            <i className="fas fa-upload text-amber-600"></i> কম্পিউটার / মোবাইল থেকে ছবি আপলোড
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => handleImageChange(e, setNewScholar, newScholar)}
+                            />
+                          </label>
+                          <span className="text-[11px] text-gray-500">বা ফাইল পাথ লিখুন</span>
+                        </div>
+                      </div>
+
+                      {newScholar.image && (
+                        <div className="w-20 h-24 rounded-xl overflow-hidden border-2 border-amber-300 bg-stone-900 shrink-0 shadow-xs relative">
+                          <img
+                            src={newScholar.image}
+                            alt="প্রিভিউ"
+                            className="w-full h-full object-cover object-top"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = 'manasaprofile.jpg';
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-3 pt-3 border-t">
+                    {editingScholarId && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingScholarId(null);
+                          setNewScholar({ name: '', title: '', date: '', image: '', order_idx: 0 });
+                        }}
+                        className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                      >
+                        বাতিল
+                      </button>
+                    )}
+                    <button
+                      type="submit"
+                      disabled={isSaving}
+                      className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-bold px-6 py-2.5 rounded-xl text-xs transition-all shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                    >
+                      {isSaving ? (
+                        <><i className="fas fa-spinner fa-spin"></i> সংরক্ষণ হচ্ছে...</>
+                      ) : (
+                        <><i className="fas fa-check"></i> {editingScholarId ? 'তথ্য আপডেট করুন' : 'তালিকায় যোগ করুন'}</>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              {/* Scholars List with Drag & Drop & Direct Serialing */}
+              <div className="bg-white p-6 sm:p-7 rounded-2xl shadow-sm border border-gray-100">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b mb-4 gap-2">
+                  <div>
+                    <h4 className="font-bold text-gray-800 text-base flex items-center gap-2">
+                      <i className="fas fa-list-ol text-amber-600"></i> বরেণ্য মনীষীদের বর্তমান তালিকা ও সিরিয়াল
+                    </h4>
+                    <p className="text-xs text-gray-500 mt-0.5">মোট {(scholars && scholars.length > 0 ? scholars : DEFAULT_SCHOLARS).length} জন গুণীজন যুক্ত রয়েছে</p>
+                  </div>
+                  <div className="text-xs bg-amber-50 text-amber-900 border border-amber-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+                    <i className="fas fa-lightbulb text-amber-600"></i>
+                    <span>সিরিয়াল বক্সে নতুন নম্বর লিখে সরাসরি পরিবর্তন করতে পারেন</span>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  {(scholars && scholars.length > 0 ? scholars : DEFAULT_SCHOLARS).map((sch, idx, arr) => (
+                    <div
+                      key={sch.id || idx}
+                      draggable
+                      onDragStart={(e) => handleScholarDragStart(e, idx)}
+                      onDragOver={handleScholarDragOver}
+                      onDrop={(e) => handleScholarDrop(e, idx)}
+                      className={`p-4 rounded-xl border-2 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
+                        draggedScholarIndex === idx ? 'border-dashed border-amber-500 bg-amber-50/70 opacity-60' : 'border-gray-200 bg-white hover:border-amber-300 hover:shadow-xs'
+                      }`}
+                    >
+                      {/* Left: Drag Handle, Serial Box, Up/Down */}
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-amber-600 p-1.5"
+                          title="ড্র্যাগ করে সরান"
+                        >
+                          <i className="fas fa-grip-vertical text-base"></i>
+                        </div>
+
+                        <div className="flex items-center gap-1">
+                          <label className="text-[11px] font-bold text-gray-500">সিরিয়াল:</label>
+                          <input
+                            type="number"
+                            min="1"
+                            max={arr.length}
+                            defaultValue={idx + 1}
+                            key={`serial_${sch.id}_${idx}`}
+                            onBlur={(e) => handleSetScholarSerial(idx, e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.target.blur();
+                              }
+                            }}
+                            className="w-12 text-center py-1 border border-gray-300 rounded-lg text-xs font-mono font-bold focus:ring-2 focus:ring-amber-500 focus:outline-none bg-stone-50"
+                            title="সিরিয়াল নম্বর লিখুন এবং এন্টার বা বাইরে ক্লিক করুন"
+                          />
+                        </div>
+
+                        <div className="flex flex-col gap-0.5">
+                          <button
+                            type="button"
+                            onClick={() => handleMoveScholar(idx, -1)}
+                            disabled={idx === 0}
+                            className="w-6 h-5 rounded bg-gray-100 hover:bg-amber-100 text-gray-700 hover:text-amber-800 text-[10px] flex items-center justify-center transition-colors disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
+                            title="উপরে সরান"
+                          >
+                            <i className="fas fa-chevron-up"></i>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleMoveScholar(idx, 1)}
+                            disabled={idx === arr.length - 1}
+                            className="w-6 h-5 rounded bg-gray-100 hover:bg-amber-100 text-gray-700 hover:text-amber-800 text-[10px] flex items-center justify-center transition-colors disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
+                            title="নিচে সরান"
+                          >
+                            <i className="fas fa-chevron-down"></i>
+                          </button>
+                        </div>
+
+                        {/* Thumbnail */}
+                        <div className="w-12 h-14 rounded-lg overflow-hidden border border-amber-300 bg-stone-900 shrink-0">
+                          <img
+                            src={sch.image}
+                            alt={sch.name}
+                            className="w-full h-full object-cover object-top"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = 'manasaprofile.jpg';
+                            }}
+                          />
+                        </div>
+
+                        {/* Name & Details */}
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h5 className="font-bold text-gray-900 text-sm font-serif">{sch.name}</h5>
+                            <span className="text-[10px] font-bold font-mono bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full">
+                              #{idx + 1}
+                            </span>
+                          </div>
+                          {sch.date && (
+                            <div className="text-xs font-semibold text-amber-800 mt-0.5">
+                              <i className="fas fa-calendar-times text-[10px] mr-1 text-amber-600"></i>{sch.date}
+                            </div>
+                          )}
+                          {sch.title && (
+                            <p className="text-xs text-gray-600 mt-0.5 line-clamp-1">{sch.title}</p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Right: Action Buttons */}
+                      <div className="flex items-center gap-2 self-end sm:self-center">
+                        <button
+                          type="button"
+                          onClick={() => handleStartEditScholar(sch)}
+                          className="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
+                        >
+                          <i className="fas fa-pen text-[10px]"></i> সম্পাদনা
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteScholar(sch.id)}
+                          className="w-8 h-8 rounded-lg text-red-500 hover:bg-red-50 flex items-center justify-center transition-colors cursor-pointer"
+                          title="মুছে ফেলুন"
+                        >
+                          <i className="fas fa-trash-alt text-xs"></i>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* 16. Security & Credentials Tab */}
           {activeTab === 'security' && (
             <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100 max-w-xl mx-auto">
@@ -12600,6 +13704,17 @@ function App() {
     return [];
   });
 
+  const [scholars, setScholars] = useState(() => {
+    try {
+      const saved = localStorage.getItem('temple_scholars');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return DEFAULT_SCHOLARS;
+  });
+
   const [isComplainModalOpen, setIsComplainModalOpen] = useState(false);
 
   const handleSaveComplaintSuggestion = async (newEntry) => {
@@ -12989,6 +14104,17 @@ function App() {
             }
           } catch (e) { }
         }
+
+        const sc = settingsData.find(s => s.key === 'temple_scholars');
+        if (sc && sc.value) {
+          try {
+            const parsed = JSON.parse(sc.value);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setScholars(parsed);
+              localStorage.setItem('temple_scholars', sc.value);
+            }
+          } catch (e) { }
+        }
       }
 
       // 2. Process Committee
@@ -13079,7 +14205,7 @@ function App() {
 
   const renderPage = () => {
     switch (currentPage) {
-      case 'home': return <Home dbError={dbError} marqueeText={marqueeText} marqueeTextEn={marqueeTextEn} testimonials={testimonials} featuredTestimonialIds={featuredTestimonialIds} committeeMembers={committeeMembers} events={events} notices={notices} timings={timings} travelInfo={travelInfo} mantras={mantras} galleryItems={galleryItems} navigateTo={navigateTo} showToast={showToast} lang={lang} openComplainModal={() => setIsComplainModalOpen(true)} />;
+      case 'home': return <Home dbError={dbError} marqueeText={marqueeText} marqueeTextEn={marqueeTextEn} testimonials={testimonials} featuredTestimonialIds={featuredTestimonialIds} committeeMembers={committeeMembers} events={events} notices={notices} timings={timings} travelInfo={travelInfo} mantras={mantras} galleryItems={galleryItems} scholars={scholars} navigateTo={navigateTo} showToast={showToast} lang={lang} openComplainModal={() => setIsComplainModalOpen(true)} />;
       case 'timings': return <TimingsPage timings={timings} navigateTo={navigateTo} lang={lang} />;
       case 'travel': return <TravelPage travelInfo={travelInfo} navigateTo={navigateTo} lang={lang} showToast={showToast} />;
       case 'mantras': return <MantrasPage mantras={mantras} navigateTo={navigateTo} lang={lang} showToast={showToast} />;
@@ -13112,9 +14238,10 @@ function App() {
         galleryItems={galleryItems} setGalleryItems={setGalleryItems}
         complaintsSuggestions={complaintsSuggestions} setComplaintsSuggestions={setComplaintsSuggestions}
         paymentGatewayConfig={paymentGatewayConfig} setPaymentGatewayConfig={setPaymentGatewayConfig}
+        scholars={scholars} setScholars={setScholars}
         showToast={showToast}
       />;
-      default: return <Home dbError={dbError} marqueeText={marqueeText} marqueeTextEn={marqueeTextEn} testimonials={testimonials} featuredTestimonialIds={featuredTestimonialIds} committeeMembers={committeeMembers} events={events} notices={notices} timings={timings} travelInfo={travelInfo} mantras={mantras} galleryItems={galleryItems} navigateTo={navigateTo} showToast={showToast} lang={lang} openComplainModal={() => setIsComplainModalOpen(true)} />;
+      default: return <Home dbError={dbError} marqueeText={marqueeText} marqueeTextEn={marqueeTextEn} testimonials={testimonials} featuredTestimonialIds={featuredTestimonialIds} committeeMembers={committeeMembers} events={events} notices={notices} timings={timings} travelInfo={travelInfo} mantras={mantras} galleryItems={galleryItems} scholars={scholars} navigateTo={navigateTo} showToast={showToast} lang={lang} openComplainModal={() => setIsComplainModalOpen(true)} />;
     }
   };
 
