@@ -1279,6 +1279,29 @@ const getMediaBlob = async (id) => {
   return null;
 };
 
+// Delete media blob from local IndexedDB and cloud Supabase Database
+const deleteMediaBlob = async (id) => {
+  if (!id) return;
+  try {
+    inMemoryMediaCache.delete(id);
+    const db = await openMediaDB();
+    if (db) {
+      const tx = db.transaction('media', 'readwrite');
+      tx.objectStore('media').delete(id);
+    }
+  } catch (e) {}
+
+  if (supabaseClient && typeof id === 'string' && id.startsWith('idb:')) {
+    try {
+      await supabaseClient.from('settings').delete().eq('key', id);
+      await supabaseClient.from('settings').delete().like('key', `${id}__c%`);
+      broadcastUniversalSync();
+    } catch (err) {
+      console.warn('Error deleting cloud media blob:', err);
+    }
+  }
+};
+
 // Store image to IndexedDB and sync to Supabase Database
 const saveImageToIndexedDB = async (base64Data, prefix = 'img') => {
   if (!base64Data) return null;
@@ -6759,6 +6782,7 @@ const AdminPanel = ({
         } catch (err) {
           console.error(err);
         }
+        broadcastUniversalSync();
       }
       if (showToast) showToast('অভিযোগ/পরামর্শটি সফলভাবে মুছে ফেলা হয়েছে!');
     });
@@ -7048,13 +7072,17 @@ const AdminPanel = ({
 
   const handleDeleteMember = (id) => {
     requestConfirm('আপনি কি নিশ্চিত যে এই সদস্যকে তালিকা থেকে মুছে ফেলতে চান?', async () => {
-    setIsSaving(true);
-    setErrorMsg('');
-    try {
-      const { error } = await supabaseClient.from('committee').delete().eq('id', id);
-      if (error) throw error;
-      setCommitteeMembers(committeeMembers.filter(m => m.id !== id));
-      showToast('সদস্য সফলভাবে মুছে ফেলা হয়েছে!');
+      setIsSaving(true);
+      setErrorMsg('');
+      try {
+        const targetMember = committeeMembers.find(m => m.id === id);
+        if (targetMember && targetMember.image && typeof targetMember.image === 'string' && targetMember.image.startsWith('idb:')) {
+          deleteMediaBlob(targetMember.image);
+        }
+        const { error } = await supabaseClient.from('committee').delete().eq('id', id);
+        if (error) throw error;
+        setCommitteeMembers(committeeMembers.filter(m => m.id !== id));
+        showToast('সদস্য সফলভাবে মুছে ফেলা হয়েছে!');
         broadcastUniversalSync();
       } catch (err) {
         setErrorMsg("সদস্য মুছে ফেলতে সমস্যা হয়েছে।");
@@ -7339,32 +7367,46 @@ const AdminPanel = ({
   };
 
   const handleDeleteEvent = (id) => {
-    requestConfirm('আপনি কি নিশ্চিত যে এই ইভেন্টটি মুছে ফেলতে চান?', async () => {
-    setIsSaving(true);
-    setErrorMsg('');
-    try {
-      const { error } = await supabaseClient.from('events').delete().eq('id', id);
-      if (error) throw error;
+    requestConfirm('আপনি কি নিশ্চিত যে এই অনুষ্ঠানটি মুছে ফেলতে চান?', async () => {
+      setIsSaving(true);
+      setErrorMsg('');
       try {
-        const { data: stData } = await supabaseClient.from('settings').select('value').eq('key', 'events_media').maybeSingle();
-        if (stData && stData.value) {
-          const eventsMedia = JSON.parse(stData.value) || {};
-          delete eventsMedia[id];
-          await supabaseClient.from('settings').upsert({
-            key: 'events_media',
-            value: JSON.stringify(eventsMedia)
-          }, { onConflict: 'key' });
-          localStorage.setItem('temple_events_media', JSON.stringify(eventsMedia));
+        const targetEv = events.find(item => item.id === id);
+        if (targetEv) {
+          if (targetEv.image && typeof targetEv.image === 'string' && targetEv.image.startsWith('idb:')) {
+            deleteMediaBlob(targetEv.image);
+          }
+          if (targetEv.images && Array.isArray(targetEv.images)) {
+            targetEv.images.forEach(img => {
+              if (typeof img === 'string' && img.startsWith('idb:')) deleteMediaBlob(img);
+            });
+          }
+          if (targetEv.video && typeof targetEv.video === 'string' && targetEv.video.startsWith('idb:')) {
+            deleteMediaBlob(targetEv.video);
+          }
         }
-      } catch (e) {}
-      setEvents(events.filter(item => item.id !== id));
-      showToast('ইভেন্ট সফলভাবে মুছে ফেলা হয়েছে!');
-      broadcastUniversalSync();
-    } catch (err) {
-      setErrorMsg("ইভেন্ট মুছে ফেলতে সমস্যা হয়েছে।");
-    } finally {
-      setIsSaving(false);
-    }
+        const { error } = await supabaseClient.from('events').delete().eq('id', id);
+        if (error) throw error;
+        try {
+          const { data: stData } = await supabaseClient.from('settings').select('value').eq('key', 'events_media').maybeSingle();
+          if (stData && stData.value) {
+            const eventsMedia = JSON.parse(stData.value) || {};
+            delete eventsMedia[id];
+            await supabaseClient.from('settings').upsert({
+              key: 'events_media',
+              value: JSON.stringify(eventsMedia)
+            }, { onConflict: 'key' });
+            localStorage.setItem('temple_events_media', JSON.stringify(eventsMedia));
+          }
+        } catch (e) {}
+        setEvents(events.filter(item => item.id !== id));
+        showToast('অনুষ্ঠানটি সফলভাবে মুছে ফেলা হয়েছে!');
+        broadcastUniversalSync();
+      } catch (err) {
+        setErrorMsg("অনুষ্ঠান মুছে ফেলতে সমস্যা হয়েছে।");
+      } finally {
+        setIsSaving(false);
+      }
     });
   };
 
@@ -8098,6 +8140,10 @@ const AdminPanel = ({
           setErrorMsg("গ্যালারিতে কমপক্ষে একটি ছবি থাকতে হবে!");
           setIsSaving(false);
           return;
+        }
+        const itemToDelete = currentList.find(item => item.id === id);
+        if (itemToDelete && itemToDelete.url && typeof itemToDelete.url === 'string' && itemToDelete.url.startsWith('idb:')) {
+          deleteMediaBlob(itemToDelete.url);
         }
         const updated = currentList.filter(item => item.id !== id);
         await handleSaveGalleryToCloud(updated);
@@ -11828,7 +11874,7 @@ function App() {
         if (gi && gi.value) {
           try {
             const parsed = JSON.parse(gi.value);
-            if (Array.isArray(parsed) && parsed.length > 0) {
+            if (Array.isArray(parsed)) {
               setGalleryItems(parsed);
               localStorage.setItem('temple_gallery_items', gi.value);
             }

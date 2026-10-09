@@ -79,3 +79,11 @@ CREATE POLICY "Public notices access" ON public.notices FOR ALL USING (true) WIT
 DROP POLICY IF EXISTS "Public donations access" ON public.donations;
 CREATE POLICY "Public donations access" ON public.donations FOR ALL USING (true) WITH CHECK (true);
 
+-- 3. Enable Realtime Push to All Connected Browsers and Devices
+DO $$
+BEGIN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.settings, public.committee, public.testimonials, public.events, public.notices, public.donations;
+EXCEPTION
+    WHEN duplicate_object THEN NULL;
+    WHEN others THEN NULL;
+END $$;
