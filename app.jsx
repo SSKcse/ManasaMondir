@@ -4,7 +4,7 @@ const { useState, useEffect, useRef } = React;
 
 // Clean preloaded initial data (no base64 overhead)
 const PRELOADED_DATA = {
-  "marquee": "গৈলার ঐতিহ্যবাহী শ্রীশ্রী মা-মনসা মন্দিরের বাৎসরিক পূজা ও উৎসব-২০২৬ আগামী ১৮ আগস্ট ২০২৬ (মঙ্গলবার) অনুষ্ঠিত হতে যাচ্ছে, উক্ত অনুষ্ঠানে আপনাদের সকলকে সবান্ধবে আমন্ত্রণ জানাচ্ছি।",
+  "marquee": "গৈলার ঐতিহ্যবাহী শ্রীশ্রী মা-মনসা মন্দিরের বাৎসরিক পূজা ও উৎসব-২০২৭ আগামী ১৭ আগস্ট ২০২৭ (মঙ্গলবার) অনুষ্ঠিত হতে যাচ্ছে, উক্ত অনুষ্ঠানে আপনাদের সকলকে সবান্ধবে আমন্ত্রণ জানাচ্ছি।",
   "featuredTestimonialIds": [
     5,
     6,
@@ -370,8 +370,8 @@ const PRELOADED_DATA = {
 };
 
 // --- Supabase Configuration ---
-const SUPABASE_URL = 'https://mvtuzkwslueesgszhcmm.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_KYDbVGr_25UA3jn9zfkC9g_L5TFDGoD';
+const SUPABASE_URL = 'https://abdgizkkfyhewehfearj.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_MsM2-K03tGNU3G-WWZvYUA_lKu53oT9';
 
 // Initialize Supabase Client
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1124,12 +1124,15 @@ const getYouTubeEmbedUrl = (url) => {
   return (match && match[2].length === 11) ? `https://www.youtube-nocookie.com/embed/${match[2]}` : null;
 };
 
-// IndexedDB media store for high-capacity local video storage (virtually unlimited size)
+// --- In-Memory Fast Cache for Instant Media Display ---
+const inMemoryMediaCache = new Map();
+
+// IndexedDB media store for high-capacity local video & photo storage (virtually unlimited size)
 const openMediaDB = () => {
   return new Promise((resolve) => {
     if (typeof window === 'undefined' || !window.indexedDB) return resolve(null);
     try {
-      const req = window.indexedDB.open('MaaManasaMediaDB', 1);
+      const req = window.indexedDB.open('MaaManasaMediaDB', 2);
       req.onupgradeneeded = (e) => {
         const db = e.target.result;
         if (!db.objectStoreNames.contains('media')) {
@@ -1145,7 +1148,11 @@ const openMediaDB = () => {
 };
 
 const storeMediaBlob = async (id, blobOrData) => {
+  if (!id) return false;
   try {
+    if (typeof blobOrData === 'string') {
+      inMemoryMediaCache.set(id, blobOrData);
+    }
     const db = await openMediaDB();
     if (!db) return false;
     return new Promise((resolve) => {
@@ -1160,20 +1167,126 @@ const storeMediaBlob = async (id, blobOrData) => {
   }
 };
 
+// Sync media data to Supabase Database (Settings table), strictly bypassing Supabase Storage buckets
+const syncMediaBlobToCloud = async (id, blobOrData) => {
+  if (!id || !supabaseClient) return false;
+  try {
+    let strData = blobOrData;
+    if (blobOrData instanceof Blob || blobOrData instanceof File) {
+      strData = await new Promise((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve(r.result);
+        r.onerror = reject;
+        r.readAsDataURL(blobOrData);
+      });
+    }
+
+    if (typeof strData !== 'string') return false;
+
+    // Small or medium media (<= 1.8MB, e.g. compressed photos & short video clips)
+    const CHUNK_SIZE = 1.8 * 1024 * 1024;
+    if (strData.length <= CHUNK_SIZE) {
+      await supabaseClient.from('settings').upsert({
+        key: id,
+        value: strData
+      }, { onConflict: 'key' });
+      broadcastUniversalSync();
+      return true;
+    }
+
+    // Large files (longer videos): split into DB chunks without ever using Supabase Storage
+    const totalChunks = Math.ceil(strData.length / CHUNK_SIZE);
+    await supabaseClient.from('settings').upsert({
+      key: id,
+      value: JSON.stringify({ isChunked: true, totalChunks, size: strData.length, time: Date.now() })
+    }, { onConflict: 'key' });
+
+    for (let i = 0; i < totalChunks; i++) {
+      const chunkStr = strData.substring(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+      await supabaseClient.from('settings').upsert({
+        key: `${id}__c${i}`,
+        value: chunkStr
+      }, { onConflict: 'key' });
+    }
+    broadcastUniversalSync();
+    return true;
+  } catch (err) {
+    console.warn('Sync media to Supabase Database error:', err);
+    return false;
+  }
+};
+
 const getMediaBlob = async (id) => {
+  if (!id) return null;
+  // 1. Fast in-memory check
+  if (inMemoryMediaCache.has(id)) {
+    return inMemoryMediaCache.get(id);
+  }
+
+  // 2. Local IndexedDB check (instant & unlimited local store)
   try {
     const db = await openMediaDB();
-    if (!db) return null;
-    return new Promise((resolve) => {
-      const tx = db.transaction('media', 'readonly');
-      const store = tx.objectStore('media');
-      const req = store.get(id);
-      req.onsuccess = () => resolve(req.result ? req.result.data : null);
-      req.onerror = () => resolve(null);
-    });
-  } catch {
-    return null;
+    if (db) {
+      const localResult = await new Promise((resolve) => {
+        const tx = db.transaction('media', 'readonly');
+        const store = tx.objectStore('media');
+        const req = store.get(id);
+        req.onsuccess = () => resolve(req.result ? req.result.data : null);
+        req.onerror = () => resolve(null);
+      });
+
+      if (localResult) {
+        if (typeof localResult === 'string') {
+          inMemoryMediaCache.set(id, localResult);
+        }
+        return localResult;
+      }
+    }
+  } catch (e) {}
+
+  // 3. Fallback: Retrieve from Supabase Database (never uses storage buckets) and cache into IndexedDB
+  if (supabaseClient && typeof id === 'string' && id.startsWith('idb:')) {
+    try {
+      const { data: row } = await supabaseClient.from('settings').select('value').eq('key', id).maybeSingle();
+      if (row && row.value) {
+        let fullData = row.value;
+        try {
+          const parsed = JSON.parse(row.value);
+          if (parsed && parsed.isChunked && parsed.totalChunks) {
+            const chunkPromises = [];
+            for (let i = 0; i < parsed.totalChunks; i++) {
+              chunkPromises.push(
+                supabaseClient.from('settings').select('value').eq('key', `${id}__c${i}`).maybeSingle()
+              );
+            }
+            const chunkResults = await Promise.all(chunkPromises);
+            fullData = chunkResults.map(r => r?.data?.value || '').join('');
+          }
+        } catch (pe) {}
+
+        if (fullData) {
+          // Cache in local IndexedDB for future instant 0ms loading
+          storeMediaBlob(id, fullData);
+          inMemoryMediaCache.set(id, fullData);
+          return fullData;
+        }
+      }
+    } catch (supaErr) {
+      console.warn('Could not fetch media from Supabase database:', supaErr);
+    }
   }
+
+  return null;
+};
+
+// Store image to IndexedDB and sync to Supabase Database
+const saveImageToIndexedDB = async (base64Data, prefix = 'img') => {
+  if (!base64Data) return null;
+  if (typeof base64Data === 'string' && base64Data.startsWith('idb:')) return base64Data;
+  const idbKey = `idb:${prefix}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+  await storeMediaBlob(idbKey, base64Data);
+  syncMediaBlobToCloud(idbKey, base64Data).catch(e => console.warn(e));
+  return idbKey;
 };
 
 const compressImageFile = (file) => {
@@ -1185,7 +1298,7 @@ const compressImageFile = (file) => {
       const img = new Image();
       img.onerror = () => resolve(reader.result);
       img.onload = () => {
-        const maxDim = 880;
+        const maxDim = 1200;
         let w = img.width;
         let h = img.height;
         if (w > maxDim || h > maxDim) {
@@ -1202,7 +1315,7 @@ const compressImageFile = (file) => {
         canvas.height = h;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL('image/jpeg', 0.68));
+        resolve(canvas.toDataURL('image/jpeg', 0.75));
       };
       img.src = reader.result;
     };
@@ -1210,101 +1323,62 @@ const compressImageFile = (file) => {
   });
 };
 
-// Fast availability check for local video upload server (only on localhost)
-const checkUploadServer = async () => {
-  if (typeof window === 'undefined' || !window.fetch) return false;
-  if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') return false;
-  try {
-    const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 400);
-    const res = await fetch('/api/upload-check', { signal: ctrl.signal });
-    clearTimeout(t);
-    return res.ok;
-  } catch {
-    return false;
-  }
-};
-
-// Video file reader & high-speed unlimited upload engine
+// Video file reader & IndexedDB unlimited storage engine (Strictly NO Supabase Storage buckets used)
 const readVideoFile = async (file) => {
   if (!file) return null;
 
-  // 1. Try direct cloud upload to Supabase Storage ('videos' bucket)
-  try {
-    if (typeof supabaseClient !== 'undefined' && supabaseClient?.storage) {
-      const ext = (file.name || 'video.mp4').split('.').pop().toLowerCase();
-      const cleanName = (file.name || 'clip').replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 30);
-      const safeName = `event_${Date.now()}_${cleanName}.${ext}`;
-      const { data: upData, error: upErr } = await supabaseClient.storage
-        .from('videos')
-        .upload(safeName, file, {
-          cacheControl: '3600',
-          upsert: true
-        });
+  // Read video into Base64 Data URL (virtually unlimited capacity via IndexedDB)
+  const videoData = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 
-      if (!upErr && upData) {
-        const { data: pubData } = supabaseClient.storage.from('videos').getPublicUrl(safeName);
-        if (pubData && pubData.publicUrl) {
-          return pubData.publicUrl;
-        }
-      }
-    }
-  } catch (supaErr) {
-    console.warn("Supabase storage upload attempt:", supaErr);
-  }
+  if (!videoData) throw new Error('ভিডিও ফাইল লোড করতে সমস্যা হয়েছে।');
 
-  // 2. Check if local upload streaming server is actively responding (e.g. localhost)
-  const serverReady = await checkUploadServer();
-  if (serverReady) {
-    try {
-      const uploadUrl = `/api/upload?filename=${encodeURIComponent(file.name)}`;
-      const res = await fetch(uploadUrl, {
-        method: 'POST',
-        body: file
-      });
-      if (res.ok) {
-        const json = await res.json();
-        if (json && json.success && json.url) {
-          return json.url;
-        }
-      }
-    } catch (err) {
-      console.warn("Direct upload error:", err);
-    }
-  }
+  const ext = (file.name || 'video.mp4').split('.').pop().toLowerCase();
+  const cleanName = (file.name || 'clip').replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 20);
+  const idbKey = `idb:video_${Date.now()}_${cleanName}.${ext}`;
 
-  // 3. For small videos under 4MB, convert to Base64 Data URL for instant cross-device playback
-  if (file.size <= 4.0 * 1024 * 1024) {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = () => resolve(null);
-      reader.readAsDataURL(file);
-    });
-  }
+  // 1. Immediately store into IndexedDB (unlimited local capacity, zero quota issues)
+  await storeMediaBlob(idbKey, videoData);
 
-  // 4. For large files when Supabase Storage bucket 'videos' is not yet configured,
-  // guide the user to paste a YouTube link or enable the bucket
-  throw new Error(`ভিডিও ফাইলটির সাইজ (${(file.size / (1024 * 1024)).toFixed(1)} MB)। ক্লাউডে সরাসরি বড় ফাইল আপলোডের জন্য Supabase-এ 'videos' পাবলিক বাকেট অন করুন, অথবা যেকোনো YouTube/ভিডিও লিংক পেস্ট করুন (অনলিমিটেড ও দ্রুত)।`);
+  // 2. Asynchronously sync to Supabase Database (chunked if large, strictly 0 bytes in Supabase Storage buckets)
+  syncMediaBlobToCloud(idbKey, videoData).catch(err => {
+    console.warn('Background video DB sync:', err);
+  });
+
+  return idbKey;
 };
 
 const MediaViewer = ({ url, isVideo, alt = "Media", className = "w-full h-full object-cover", controls = true, autoPlay = false, loop = false }) => {
-  const [activeUrl, setActiveUrl] = useState(url);
+  const [activeUrl, setActiveUrl] = useState(() => {
+    if (!url) return '';
+    if (typeof url === 'string' && url.startsWith('idb:')) {
+      return inMemoryMediaCache.get(url) || '';
+    }
+    return url;
+  });
 
   useEffect(() => {
     let isMounted = true;
     let createdBlobUrl = null;
 
     if (url && typeof url === 'string' && url.startsWith('idb:')) {
-      getMediaBlob(url).then(blobData => {
-        if (!isMounted) return;
-        if (blobData instanceof Blob || blobData instanceof File) {
-          createdBlobUrl = URL.createObjectURL(blobData);
-          setActiveUrl(createdBlobUrl);
-        } else if (typeof blobData === 'string') {
-          setActiveUrl(blobData);
-        }
-      });
+      if (inMemoryMediaCache.has(url)) {
+        setActiveUrl(inMemoryMediaCache.get(url));
+      } else {
+        getMediaBlob(url).then(blobData => {
+          if (!isMounted) return;
+          if (blobData instanceof Blob || blobData instanceof File) {
+            createdBlobUrl = URL.createObjectURL(blobData);
+            setActiveUrl(createdBlobUrl);
+          } else if (typeof blobData === 'string') {
+            setActiveUrl(blobData);
+          }
+        });
+      }
     } else {
       setActiveUrl(url);
     }
@@ -1593,8 +1667,8 @@ const I18N = {
     receipt: "প্রণামী রশিদ",
     receiptTitle: "স্বয়ংক্রিয় পবিত্র প্রণামী রশিদ",
     receiptSubtitle: "শ্রী শ্রী মা মনসা মন্দির তহবিলে প্রদত্ত প্রণামীর স্মারক রশিদ সংগ্রহ ও প্রিন্ট",
-    annualFestivalTarget: "বাৎসরিক মহোৎসব ও মনসা পূজা ২০২৬",
-    festivalCountdown: "মহোৎসব ও রয়ানী গানের বাকি",
+    annualFestivalTarget: "বাৎসরিক মহোৎসব ও মনসা পূজা",
+    festivalCountdown: "বাৎসরিক মহোৎসব ও পূজার বাকি",
     daysUnit: "দিন",
     hoursUnit: "ঘণ্টা",
     minsUnit: "মিনিট",
@@ -1773,6 +1847,9 @@ const I18N = {
     historyChap6Text: "While the ancient shrine endured numerous natural calamities over the centuries, the devotion of local and global devotees, organized under the 'Poet Bijoy Gupta Memorial, Shree Shree Maa Manasa Mandir Preservation & Development Committee', has restored and elevated the sanctum to majestic splendor. In 2005, a magnificent one-ton (1,000 kg) solid brass deity of Shree Shree Maa Manasa was consecrated in the inner sanctum. In 2013, a modern three-storey marble temple structure, expansive Natmandir (prayer hall), and pilgrim lodge were inaugurated beside the ancient Dighi. Today, it stands both as a living divine shrine and an eternal cultural monument to Bengali heritage.",
 
     // Footer
+    annualFestivalTarget: "Annual Grand Festival & Manasa Puja",
+    festivalCountdown: "Countdown to Annual Grand Festival",
+    complainSuggestion: "Complain & Suggestion",
     receipt: "Donation Receipt",
     receiptTitle: "Automated Donation Receipt",
     receiptSubtitle: "Download and print your official sacred devotee donation receipt",
@@ -2260,8 +2337,310 @@ const ScrollToTop = ({ lang }) => {
   );
 };
 
+// Floating Devotee Suggestion & Complaint Action Pill
+const FloatingFeedbackButton = ({ onClick, lang = 'bn' }) => (
+  <div className="fixed bottom-20 sm:bottom-24 right-5 sm:right-6 z-40 flex items-center no-print">
+    <button
+      onClick={onClick}
+      title={lang === 'en' ? "Devotee Suggestion & Complaint" : "অভিযোগ বা সুপরামর্শ বক্স"}
+      aria-label="Devotee Suggestion & Complaint"
+      className="relative flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full shadow-2xl backdrop-blur-md border-2 transition-all duration-300 active:scale-95 cursor-pointer group bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 hover:from-amber-500 hover:to-orange-500 text-white border-yellow-300/80 shadow-orange-600/30 ring-2 ring-yellow-400/30"
+    >
+      <div className="w-6 h-6 rounded-full bg-yellow-400/20 flex items-center justify-center text-yellow-200 group-hover:scale-110 group-hover:bg-yellow-400 group-hover:text-stone-900 transition-all">
+        <i className="fas fa-comment-dots text-xs"></i>
+      </div>
+      <span className="text-xs sm:text-[13px] font-bold tracking-wide">
+        {lang === 'en' ? 'Suggestion / Complain' : 'অভিযোগ বা পরামর্শ'}
+      </span>
+      <span className="absolute -top-1 -right-1 flex h-3 w-3">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+        <span className="relative inline-flex rounded-full h-3 w-3 bg-yellow-400"></span>
+      </span>
+    </button>
+  </div>
+);
+
+// ==========================================
+// Confidential Devotee Complaint & Suggestion Modal
+// (Submissions are strictly confidential and only visible in Admin Panel)
+// ==========================================
+const ComplainSuggestionModal = ({ isOpen, onClose, onSubmitComplaint, showToast, lang = 'bn' }) => {
+  const [type, setType] = useState('suggestion'); // 'suggestion' | 'complaint' | 'inquiry'
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    address: '',
+    subject: '',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submittedToken, setSubmittedToken] = useState(null);
+
+  if (!isOpen) return null;
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.name.trim() || !formData.phone.trim() || !formData.message.trim()) {
+      if (showToast) showToast(lang === 'en' ? 'Please fill in Name, Phone and Details' : 'অনুগ্রহ করে আপনার নাম, মোবাইল নম্বর এবং বিস্তারিত বিবরণ লিখুন');
+      return;
+    }
+    setIsSubmitting(true);
+    const token = 'MMG-FB-' + Math.floor(100000 + Math.random() * 900000);
+    const newEntry = {
+      id: 'cs_' + Date.now(),
+      type,
+      ...formData,
+      token,
+      date: new Date().toISOString(),
+      status: 'unread'
+    };
+
+    try {
+      if (onSubmitComplaint) await onSubmitComplaint(newEntry);
+      setSubmittedToken(token);
+      if (showToast) showToast(lang === 'en' ? 'Your message has been securely submitted to the temple committee!' : 'আপনার বার্তাটি সরাসরি মন্দির পরিচালনা কমিটির নিকট পৌঁছেছে!');
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleResetAndClose = () => {
+    setSubmittedToken(null);
+    setFormData({ name: '', phone: '', address: '', subject: '', message: '' });
+    setType('suggestion');
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-[120] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto anim-fade-in">
+      <div className="bg-white w-full max-w-xl rounded-3xl shadow-2xl border-2 border-amber-300 overflow-hidden relative my-auto max-h-[92vh] flex flex-col">
+        {/* Modal Header */}
+        <div className="bg-gradient-to-r from-orange-950 via-amber-950 to-orange-900 text-white p-5 sm:p-6 relative border-b-2 border-yellow-400/40 shrink-0">
+          <div className="inline-flex items-center gap-2 bg-yellow-400/20 text-yellow-300 px-3 py-1 rounded-full text-[11px] font-bold mb-2 border border-yellow-400/30">
+            <i className="fas fa-lock text-[10px]"></i>
+            <span>{lang === 'en' ? 'Confidential • Visible only in Admin Panel' : 'সম্পূর্ণ গোপনীয় • শুধুমাত্র এডমিন প্যানেলে সংরক্ষিত'}</span>
+          </div>
+          <h3 className="text-xl sm:text-2xl font-bold font-serif text-yellow-300 divine-title-glow">
+            {lang === 'en' ? 'Devotee Complaint & Suggestion Box' : 'অভিযোগ ও সুপরামর্শ বক্স'}
+          </h3>
+          <p className="text-xs sm:text-sm text-orange-200 mt-1">
+            {lang === 'en'
+              ? 'Share your constructive suggestions or concerns directly with the executive committee.'
+              : 'শ্রী শ্রী মা মনসা মন্দির উন্নয়ন ও পরিচালনায় আপনার গঠনমূলক পরামর্শ বা অভিযোগ আমাদের সরাসরি জানান।'}
+          </p>
+          <button
+            onClick={handleResetAndClose}
+            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center absolute top-4 right-4 transition-all text-sm cursor-pointer"
+            title={lang === 'en' ? "Close" : "বন্ধ করুন"}
+          >
+            <i className="fas fa-times"></i>
+          </button>
+        </div>
+
+        {/* Modal Body */}
+        <div className="p-5 sm:p-6 overflow-y-auto flex-1">
+          {submittedToken ? (
+            <div className="text-center py-6 sm:py-8 space-y-4">
+              <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl shadow-inner border border-emerald-300 animate-bounce">
+                <i className="fas fa-check"></i>
+              </div>
+              <h4 className="text-xl sm:text-2xl font-bold font-serif text-gray-900">
+                {lang === 'en' ? 'Thank you! Submission Received' : 'ধন্যবাদ! আপনার বার্তাটি সংরক্ষিত হয়েছে'}
+              </h4>
+              <div className="p-3 bg-amber-50 rounded-2xl border border-amber-200 inline-block text-center">
+                <span className="text-xs text-gray-500 font-bold block">{lang === 'en' ? 'Reference Tracking Token' : 'ট্র্যাকিং টোকেন নম্বর'}</span>
+                <span className="text-base font-mono font-extrabold text-amber-900">#{submittedToken}</span>
+              </div>
+              <p className="text-xs sm:text-sm text-gray-600 max-w-md mx-auto leading-relaxed">
+                {lang === 'en'
+                  ? 'Your submission has been securely delivered to the temple committee admin panel. Devotee privacy is strictly respected, and this is not shown publicly on the website.'
+                  : 'আপনার অভিযোগ/পরামর্শটি পরিচালনা কমিটির অভ্যন্তরীণ এডমিন প্যানেলে পৌঁছেছে। এটি ওয়েবসাইটে সর্বসাধারণের জন্য প্রদর্শিত হবে না। মন্দির উন্নয়নে আপনার সহযোগিতার জন্য ধন্যবাদ। জয় মা মনসা!'}
+              </p>
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={handleResetAndClose}
+                  className="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-bold px-6 py-2.5 rounded-full text-sm shadow-md transition-all active:scale-95 cursor-pointer"
+                >
+                  {lang === 'en' ? 'Close Window' : 'ঠিক আছে (উইন্ডো বন্ধ করুন)'}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Privacy Reassurance Banner */}
+              <div className="p-3 bg-amber-50/80 rounded-2xl border border-amber-200/90 flex items-start gap-2.5 text-xs text-amber-900">
+                <i className="fas fa-shield-alt text-amber-600 text-sm mt-0.5 shrink-0"></i>
+                <div className="leading-relaxed">
+                  <span className="font-bold">{lang === 'en' ? 'Strict Privacy:' : 'গোপনীয়তার প্রতিশ্রুতি:'}</span>{' '}
+                  {lang === 'en'
+                    ? 'Submissions are confidential and only accessible by authorized committee members in the admin panel.'
+                    : 'আপনার নাম ও বার্তা সম্পূর্ণ গোপনীয় থাকবে। এটি সাধারণের জন্য দৃশ্যমান নয়, শুধুমাত্র দায়িত্বপ্রাপ্ত কমিটি এডমিন প্যানেলে পর্যালোচনা করবেন।'}
+                </div>
+              </div>
+
+              {/* Type Selection Tabs */}
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                  {lang === 'en' ? 'Select Category' : 'বিষয় শ্রেণী নির্বাচন করুন'} <span className="text-red-500">*</span>
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setType('suggestion')}
+                    className={`py-2 px-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                      type === 'suggestion'
+                        ? 'bg-amber-100 border-amber-500 text-amber-950 shadow-xs ring-1 ring-amber-400'
+                        : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    <i className="fas fa-lightbulb text-amber-600"></i>
+                    <span>{lang === 'en' ? 'Suggestion' : '💡 সুপরামর্শ'}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setType('complaint')}
+                    className={`py-2 px-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                      type === 'complaint'
+                        ? 'bg-red-100 border-red-500 text-red-950 shadow-xs ring-1 ring-red-400'
+                        : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    <i className="fas fa-exclamation-triangle text-red-600"></i>
+                    <span>{lang === 'en' ? 'Complaint' : '⚠️ অভিযোগ'}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setType('inquiry')}
+                    className={`py-2 px-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                      type === 'inquiry'
+                        ? 'bg-blue-100 border-blue-500 text-blue-950 shadow-xs ring-1 ring-blue-400'
+                        : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    <i className="fas fa-question-circle text-blue-600"></i>
+                    <span>{lang === 'en' ? 'Inquiry' : '❓ জিজ্ঞাসা'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Devotee Name & Phone */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">
+                    {lang === 'en' ? 'Your Name' : 'আপনার নাম'} <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <i className="fas fa-user absolute left-3 top-3 text-gray-400 text-xs"></i>
+                    <input
+                      type="text"
+                      required
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      placeholder={lang === 'en' ? 'e.g. Subir Chakraborty' : 'উদা: শ্রী অমল চক্রবর্তী'}
+                      className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm rounded-xl border border-gray-300 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-gray-50/50"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">
+                    {lang === 'en' ? 'Mobile Number' : 'মোবাইল নম্বর'} <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <i className="fas fa-phone absolute left-3 top-3 text-gray-400 text-xs"></i>
+                    <input
+                      type="tel"
+                      required
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      placeholder="01XXXXXXXXX"
+                      className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm rounded-xl border border-gray-300 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-gray-50/50 bengali-num"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Address / Location */}
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">
+                  {lang === 'en' ? 'Your Location / Village / City' : 'গ্রাম / এলাকা / ঠিকানা (ঐচ্ছিক)'}
+                </label>
+                <div className="relative">
+                  <i className="fas fa-map-marker-alt absolute left-3 top-3 text-gray-400 text-xs"></i>
+                  <input
+                    type="text"
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    placeholder={lang === 'en' ? 'e.g. Goila, Barishal' : 'উদা: গৈলা, আগৈলঝাড়া, বরিশাল'}
+                    className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm rounded-xl border border-gray-300 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-gray-50/50"
+                  />
+                </div>
+              </div>
+
+              {/* Subject */}
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">
+                  {lang === 'en' ? 'Subject' : 'বিষয় / শিরোনাম'} <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.subject}
+                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                  placeholder={
+                    type === 'complaint'
+                      ? (lang === 'en' ? 'e.g. Issue regarding guest house facilities' : 'উদা: মন্দির প্রাঙ্গণের পরিচ্ছন্নতা সংক্রান্ত অভিযোগ')
+                      : (lang === 'en' ? 'e.g. Proposal for annual festival crowd management' : 'উদা: বাৎসরিক মহোৎসবে শৃঙ্খলা উন্নয়ন বিষয়ক প্রস্তাবনা')
+                  }
+                  className="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-gray-300 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-gray-50/50"
+                />
+              </div>
+
+              {/* Detailed Message */}
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">
+                  {lang === 'en' ? 'Detailed Message' : 'আপনার অভিযোগ বা সুপরামর্শ বিস্তারিত লিখুন'} <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  required
+                  rows="4"
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  placeholder={lang === 'en' ? 'Write your thoughts clearly here...' : 'আপনার অভিযোগ, মতামত বা মূল্যবান পরামর্শটি এখানে স্পষ্টভাবে লিখুন...'}
+                  className="w-full p-3 text-xs sm:text-sm rounded-xl border border-gray-300 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-gray-50/50 leading-relaxed"
+                ></textarea>
+              </div>
+
+              {/* Submit CTA */}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full bg-gradient-to-r from-orange-600 via-amber-600 to-yellow-600 hover:from-orange-700 hover:to-amber-700 text-white font-extrabold py-3 px-6 rounded-2xl shadow-md transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2 text-sm disabled:opacity-50"
+              >
+                {isSubmitting ? (
+                  <>
+                    <i className="fas fa-spinner fa-spin"></i>
+                    <span>{lang === 'en' ? 'Sending securely...' : 'কমিটিতে প্রেরণ করা হচ্ছে...'}</span>
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-paper-plane"></i>
+                    <span>{lang === 'en' ? 'Send Confidentially to Committee' : 'কমিটি বরাবর বার্তাটি পাঠান'}</span>
+                  </>
+                )}
+              </button>
+            </form>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // --- Header Component ---
-const Header = ({ navigateTo, isMenuOpen, setIsMenuOpen, lang, setLang, isMusicPlaying, toggleMusic }) => (
+const Header = ({ navigateTo, isMenuOpen, setIsMenuOpen, lang, setLang, isMusicPlaying, toggleMusic, openComplainModal }) => (
   <header className="bg-gradient-to-r from-orange-600 via-orange-650 to-red-600 text-white shadow-xl sticky top-0 z-50 border-b border-orange-500/40">
     <div className="container mx-auto px-4 py-3 flex justify-between items-center">
       <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigateTo('home')}>
@@ -2278,7 +2657,6 @@ const Header = ({ navigateTo, isMenuOpen, setIsMenuOpen, lang, setLang, isMusicP
       <nav className="hidden lg:flex items-center gap-4 xl:gap-5 font-medium text-xs xl:text-sm">
         <button onClick={() => navigateTo('home')} className="hover:text-yellow-300 transition-colors cursor-pointer">{t('home', lang)}</button>
         <button onClick={() => navigateTo('history')} className="hover:text-yellow-300 transition-colors cursor-pointer">{t('history', lang)}</button>
-        <button onClick={() => navigateTo('royani')} className="hover:text-yellow-300 transition-colors cursor-pointer flex items-center gap-1.5"><i className="fas fa-music text-yellow-300 text-xs"></i> {t('royani', lang)}</button>
         <button onClick={() => navigateTo('booking')} className="hover:text-yellow-300 transition-colors cursor-pointer flex items-center gap-1.5"><i className="fas fa-hands-praying text-yellow-300 text-xs"></i> {t('booking', lang)}</button>
         <button onClick={() => navigateTo('committee')} className="hover:text-yellow-300 transition-colors cursor-pointer">{t('committee', lang)}</button>
         <button onClick={() => navigateTo('event')} className="hover:text-yellow-300 transition-colors cursor-pointer">{t('events', lang)}</button>
@@ -2339,18 +2717,19 @@ const Header = ({ navigateTo, isMenuOpen, setIsMenuOpen, lang, setLang, isMusicP
               </button>
             </div>
           </div>
-          <button onClick={() => navigateTo('home')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3"><i className="fas fa-home text-yellow-400 w-5"></i> {t('home', lang)}</button>
-          <button onClick={() => navigateTo('booking')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3 text-amber-300 font-bold"><i className="fas fa-hands-praying text-amber-400 w-5"></i> {t('booking', lang)}</button>
-          <button onClick={() => navigateTo('royani')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3 text-amber-300"><i className="fas fa-music text-amber-400 w-5"></i> {t('royani', lang)}</button>
-          <button onClick={() => navigateTo('history')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3"><i className="fas fa-landmark text-yellow-400 w-5"></i> {t('history', lang)}</button>
-          <button onClick={() => navigateTo('timings')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3"><i className="fas fa-clock text-yellow-400 w-5"></i> {t('timings', lang)}</button>
-          <button onClick={() => navigateTo('travel')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3"><i className="fas fa-route text-yellow-400 w-5"></i> {t('travel', lang)}</button>
-          <button onClick={() => navigateTo('mantras')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3"><i className="fas fa-om text-yellow-400 w-5"></i> {t('mantras', lang)}</button>
-          <button onClick={() => navigateTo('committee')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3"><i className="fas fa-users text-yellow-400 w-5"></i> {t('committee', lang)}</button>
-          <button onClick={() => navigateTo('event')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3"><i className="fas fa-calendar-alt text-yellow-400 w-5"></i> {t('events', lang)}</button>
-          <button onClick={() => navigateTo('notice')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3"><i className="fas fa-bell text-yellow-400 w-5"></i> {t('noticeBoard', lang)}</button>
-          <button onClick={() => navigateTo('testimonials')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3"><i className="fas fa-comments text-yellow-400 w-5"></i> {t('testimonials', lang)}</button>
-          <button onClick={() => navigateTo('donation')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3 text-amber-400 font-extrabold"><i className="fas fa-heart text-red-500 w-5"></i> {t('donation', lang)}</button>
+          <button onClick={() => navigateTo('home')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3 text-white"><i className="fas fa-home text-yellow-400 w-5"></i> {t('home', lang)}</button>
+          <button onClick={() => navigateTo('booking')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3 text-white"><i className="fas fa-hands-praying text-yellow-400 w-5"></i> {t('booking', lang)}</button>
+          <button onClick={() => navigateTo('history')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3 text-white"><i className="fas fa-landmark text-yellow-400 w-5"></i> {t('history', lang)}</button>
+          <button onClick={() => navigateTo('royani')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3 text-white"><i className="fas fa-music text-yellow-400 w-5"></i> {t('royani', lang)}</button>
+          <button onClick={() => navigateTo('timings')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3 text-white"><i className="fas fa-clock text-yellow-400 w-5"></i> {t('timings', lang)}</button>
+          <button onClick={() => navigateTo('travel')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3 text-white"><i className="fas fa-route text-yellow-400 w-5"></i> {t('travel', lang)}</button>
+          <button onClick={() => navigateTo('mantras')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3 text-white"><i className="fas fa-om text-yellow-400 w-5"></i> {t('mantras', lang)}</button>
+          <button onClick={() => navigateTo('committee')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3 text-white"><i className="fas fa-users text-yellow-400 w-5"></i> {t('committee', lang)}</button>
+          <button onClick={() => navigateTo('event')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3 text-white"><i className="fas fa-calendar-alt text-yellow-400 w-5"></i> {t('events', lang)}</button>
+          <button onClick={() => navigateTo('notice')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3 text-white"><i className="fas fa-bell text-yellow-400 w-5"></i> {t('noticeBoard', lang)}</button>
+          <button onClick={() => navigateTo('testimonials')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3 text-white"><i className="fas fa-comments text-yellow-400 w-5"></i> {t('testimonials', lang)}</button>
+          <button onClick={() => { setIsMenuOpen(false); openComplainModal(); }} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3 text-white"><i className="fas fa-comment-dots text-yellow-400 w-5"></i> {lang === 'en' ? 'Complain / Suggestion' : 'অভিযোগ ও পরামর্শ'}</button>
+          <button onClick={() => navigateTo('donation')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3 text-white font-bold"><i className="fas fa-heart text-red-500 w-5"></i> {t('donation', lang)}</button>
           <button onClick={() => navigateTo('admin')} className="py-3 px-6 text-left bg-black text-gray-300 flex items-center gap-3 hover:text-white transition-colors">
             <i className="fas fa-cog text-orange-400 w-5"></i> {t('adminPanel', lang)}
           </button>
@@ -2361,7 +2740,7 @@ const Header = ({ navigateTo, isMenuOpen, setIsMenuOpen, lang, setLang, isMusicP
 );
 
 // --- Footer Component ---
-const Footer = ({ navigateTo, lang, setLang }) => (
+const Footer = ({ navigateTo, lang, setLang, openComplainModal }) => (
   <footer className="bg-gray-900 text-orange-100 pt-12 pb-6 border-t-4 border-orange-600">
     <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
       <div>
@@ -2379,15 +2758,16 @@ const Footer = ({ navigateTo, lang, setLang }) => (
       <div>
         <h4 className="text-lg font-bold text-white mb-4 border-b border-gray-700 pb-2">{t('quickLinks', lang)}</h4>
         <ul className="space-y-2">
-          <li><button onClick={() => navigateTo('booking')} className="hover:text-yellow-400 flex items-center gap-2 text-yellow-300 font-bold"><i className="fas fa-hands-praying text-xs text-yellow-400"></i> {t('booking', lang)}</button></li>
-          <li><button onClick={() => navigateTo('royani')} className="hover:text-yellow-400 flex items-center gap-2"><i className="fas fa-music text-xs text-yellow-400"></i> {t('royani', lang)}</button></li>
           <li><button onClick={() => navigateTo('history')} className="hover:text-yellow-400 flex items-center gap-2"><i className="fas fa-chevron-right text-xs"></i> {t('history', lang)}</button></li>
+          <li><button onClick={() => navigateTo('royani')} className="hover:text-yellow-400 flex items-center gap-2"><i className="fas fa-chevron-right text-xs"></i> {t('royani', lang)}</button></li>
+          <li><button onClick={() => navigateTo('booking')} className="hover:text-yellow-400 flex items-center gap-2"><i className="fas fa-chevron-right text-xs"></i> {t('booking', lang)}</button></li>
           <li><button onClick={() => navigateTo('timings')} className="hover:text-yellow-400 flex items-center gap-2"><i className="fas fa-chevron-right text-xs"></i> {t('timings', lang)}</button></li>
           <li><button onClick={() => navigateTo('travel')} className="hover:text-yellow-400 flex items-center gap-2"><i className="fas fa-chevron-right text-xs"></i> {t('travel', lang)}</button></li>
           <li><button onClick={() => navigateTo('mantras')} className="hover:text-yellow-400 flex items-center gap-2"><i className="fas fa-chevron-right text-xs"></i> {t('mantras', lang)}</button></li>
           <li><button onClick={() => navigateTo('committee')} className="hover:text-yellow-400 flex items-center gap-2"><i className="fas fa-chevron-right text-xs"></i> {t('committee', lang)}</button></li>
           <li><button onClick={() => navigateTo('notice')} className="hover:text-yellow-400 flex items-center gap-2"><i className="fas fa-chevron-right text-xs"></i> {t('noticeBoard', lang)}</button></li>
           <li><button onClick={() => navigateTo('donation')} className="hover:text-yellow-400 flex items-center gap-2"><i className="fas fa-chevron-right text-xs"></i> {t('donation', lang)}</button></li>
+          <li><button onClick={openComplainModal} className="hover:text-yellow-400 flex items-center gap-2"><i className="fas fa-chevron-right text-xs"></i> {lang === 'en' ? 'Complain / Suggestion' : 'অভিযোগ বা পরামর্শ'}</button></li>
           <li><button onClick={() => navigateTo('admin')} className="hover:text-yellow-400 flex items-center gap-2"><i className="fas fa-cog text-xs"></i> {t('adminLogin', lang)}</button></li>
         </ul>
       </div>
@@ -2408,6 +2788,17 @@ const Footer = ({ navigateTo, lang, setLang }) => (
             </a>
           </li>
         </ul>
+        {openComplainModal && (
+          <div className="mt-5 pt-4 border-t border-gray-800">
+            <button
+              onClick={openComplainModal}
+              className="w-full bg-stone-800 hover:bg-stone-700 text-amber-300 hover:text-white px-4 py-2.5 rounded-xl border border-stone-700 hover:border-amber-500/50 text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+            >
+              <i className="fas fa-comment-dots text-amber-400"></i>
+              {lang === 'en' ? 'Suggestion & Complaint Box' : 'পরামর্শ ও অভিযোগ বাক্স'}
+            </button>
+          </div>
+        )}
       </div>
     </div>
     <div className="text-center text-sm text-gray-500 border-t border-gray-800 pt-6">
@@ -2560,7 +2951,7 @@ const getLiveStatus = (timings, lang = 'bn') => {
 };
 
 // --- Home Component ---
-const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTestimonialIds, committeeMembers, events, notices, timings, travelInfo, mantras, galleryItems, navigateTo, showToast, lang }) => {
+const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTestimonialIds, committeeMembers, events, notices, timings, travelInfo, mantras, galleryItems, navigateTo, showToast, lang, openComplainModal }) => {
   const [currentImg, setCurrentImg] = useState(0);
   const [lightboxImg, setLightboxImg] = useState(null);
   const [testIdx, setTestIdx] = useState(0);
@@ -2951,7 +3342,7 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
                       </span>
                     </div>
                   ) : (
-                    <img src={item.url} alt={`Thumb ${i}`} className="w-full h-full object-cover" />
+                    <MediaViewer url={item.url} isVideo={false} alt={`Thumb ${i}`} className="w-full h-full object-cover" controls={false} />
                   )}
                   {i === currentImg && (
                     <div className="absolute inset-0 bg-amber-500/15 pointer-events-none"></div>
@@ -3081,7 +3472,7 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
                           <i className="fas fa-play text-xs"></i>
                         </div>
                       ) : (
-                        <img src={item.url} alt={`Thumb ${i}`} className="w-full h-full object-cover" />
+                        <MediaViewer url={item.url} isVideo={false} alt={`Thumb ${i}`} className="w-full h-full object-cover" controls={false} />
                       )}
                     </button>
                   );
@@ -3593,7 +3984,7 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
                 {event.image ? (
                   <div className="h-48 w-full overflow-hidden relative">
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent z-10"></div>
-                    <img src={event.image} alt={event.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onError={(e) => { e.target.src = 'images/events/event_4.jpg'; }} />
+                    <MediaViewer url={event.image} alt={event.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" controls={false} />
                     <span className="absolute bottom-3 left-4 z-20 text-white text-xs font-bold bg-orange-600/90 backdrop-blur-sm px-2.5 py-1 rounded-md shadow flex items-center gap-1 border border-orange-500/50">
                       <i className="fas fa-calendar-alt"></i> {formatDate(event.date, lang)}
                     </span>
@@ -3727,8 +4118,8 @@ const PanjikaWidget = ({ navigateTo, lang = 'bn' }) => {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
-    // Annual Festival Target: August 18, 2026, 06:00:00 AM BST
-    const targetDate = new Date('2026-08-18T06:00:00+06:00').getTime();
+    // Annual Festival Target: August 17, 2027, 06:00:00 AM BST
+    const targetDate = new Date('2027-08-17T06:00:00+06:00').getTime();
     const updateCountdown = () => {
       const now = new Date().getTime();
       const diff = targetDate - now;
@@ -3786,14 +4177,14 @@ const PanjikaWidget = ({ navigateTo, lang = 'bn' }) => {
   // Notable recurring and specific Hindu tithis/festivals
   const getSpecialDayInfo = (day) => {
     // Check specific known festival dates
-    if (curMonth === 7 && day === 18) {
+    if (curMonth === 7 && day === 17) {
       return {
         badge: 'মহোৎসব',
         badgeEn: 'Annual Festival',
-        titleBn: 'শ্রীশ্রী মা মনসা মন্দিরের বাৎসরিক মহোৎসব ও রয়ানী গান',
-        titleEn: 'Annual Maa Manasa Mahotsav & Royani Gaan',
-        descBn: 'মন্দিরের সবচেয়ে পবিত্র বাৎসরিক মহা উৎসব ও রাতভর রয়ানী গান।',
-        descEn: 'The supreme annual festival of Goila Manasa Temple with all-night Royani.',
+        titleBn: 'শ্রীশ্রী মা মনসা মন্দিরের বাৎসরিক মহোৎসব ও পূজা',
+        titleEn: 'Annual Maa Manasa Mahotsav & Puja',
+        descBn: 'মন্দিরের সবচেয়ে পবিত্র বাৎসরিক মহা উৎসব ও মনসা পূজা।',
+        descEn: 'The supreme annual festival & puja of Goila Manasa Temple.',
         isGrand: true,
         icon: 'fa-om'
       };
@@ -3926,49 +4317,59 @@ const PanjikaWidget = ({ navigateTo, lang = 'bn' }) => {
               {lang === 'en' ? 'Shree Shree Maa Manasa Daily Panjika' : 'শ্রীশ্রী মা মনসা নিত্য শুভ পঞ্জিকা'}
             </h3>
 
-            {/* Streamlined Header & Navigation Controls */}
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-500/20 pb-2 mb-2.5">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-400/40 flex items-center justify-center text-amber-300 text-sm shadow-inner shrink-0">
-                  <i className="fas fa-calendar-check"></i>
+            {/* Streamlined Header & Navigation Controls (Non-wrapping rock-solid layout) */}
+            <div className="flex items-center justify-between gap-2 sm:gap-3 border-b border-amber-500/30 pb-3 mb-3">
+              <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-amber-500/25 to-yellow-600/15 border border-amber-400/50 flex items-center justify-center text-amber-300 text-sm sm:text-base shadow-sm shrink-0">
+                  <i className="fas fa-calendar-alt"></i>
                 </div>
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] text-amber-200/80 font-medium">
+                <div className="min-w-0 flex-1">
+                  {/* Highly Highlighted & Readable Present Gregorian Month & Year */}
+                  <div className="flex items-center gap-1.5 sm:gap-2 mb-0.5 sm:mb-1 flex-wrap">
+                    <span className="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-0.5 rounded-full text-xs sm:text-sm font-black bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-stone-950 shadow-sm border border-yellow-200 tracking-wide shrink-0">
+                      <i className="fas fa-calendar-day text-[10px] sm:text-[11px] text-orange-950"></i>
                       {lang === 'en' ? `${monthNamesEn[curMonth]} ${curYear}` : `${monthNamesBn[curMonth]} ${formatNumber(curYear, lang)}`}
                     </span>
+                    {isCurrentMonth && (
+                      <span className="text-[10px] sm:text-[11px] font-bold text-emerald-400 bg-emerald-950/70 border border-emerald-500/40 px-2 py-0.5 rounded-full inline-flex items-center gap-1 shrink-0">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        {lang === 'en' ? 'Current Month' : 'চলতি মাস'}
+                      </span>
+                    )}
                   </div>
-                  <h4 className="text-sm sm:text-base font-bold font-serif text-amber-100">
-                    {bnMonthInfo.monthStr} • {bnMonthInfo.yearStr}
+                  <h4 className="text-xs sm:text-sm md:text-base font-bold font-serif text-amber-100 flex items-center gap-1.5 truncate">
+                    <span>{bnMonthInfo.monthStr}</span>
+                    <span className="text-amber-400 font-sans">•</span>
+                    <span>{bnMonthInfo.yearStr}</span>
                   </h4>
                 </div>
               </div>
 
-              {/* Minimalist Controls */}
-              <div className="flex items-center gap-1 no-print">
+              {/* Minimalist Controls - Permanently anchored on the right */}
+              <div className="flex items-center gap-1 sm:gap-1.5 shrink-0 no-print">
                 <button
                   onClick={prevMonth}
-                  className="bg-stone-800/80 hover:bg-stone-700 text-amber-200 hover:text-white px-2 py-0.5 rounded border border-amber-500/30 text-[10px] font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1"
-                  title="Previous Month"
+                  className="bg-stone-800/90 hover:bg-stone-700 text-amber-200 hover:text-white px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg border border-amber-500/40 text-[11px] sm:text-xs font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1 shadow-xs"
+                  title={lang === 'en' ? 'Previous Month' : 'পূর্ববর্তী মাস'}
                 >
-                  <i className="fas fa-chevron-left text-[9px]"></i>
+                  <i className="fas fa-chevron-left text-[10px]"></i>
                   <span className="hidden sm:inline">{lang === 'en' ? 'Prev' : 'পূর্ববর্তী'}</span>
                 </button>
                 <button
                   onClick={goToToday}
-                  className="bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-stone-950 px-2 py-0.5 rounded text-[10px] font-bold shadow-xs transition-all active:scale-95 cursor-pointer flex items-center gap-1"
-                  title="Today"
+                  className="bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-stone-950 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-black shadow-sm transition-all active:scale-95 cursor-pointer flex items-center gap-1 shrink-0"
+                  title={lang === 'en' ? 'Go to Today' : 'আজকের তারিখে যান'}
                 >
-                  <i className="fas fa-dot-circle text-[8px] text-red-700"></i>
+                  <i className="fas fa-dot-circle text-[9px] text-red-700"></i>
                   <span>{lang === 'en' ? 'Today' : 'আজ'}</span>
                 </button>
                 <button
                   onClick={nextMonth}
-                  className="bg-stone-800/80 hover:bg-stone-700 text-amber-200 hover:text-white px-2 py-0.5 rounded border border-amber-500/30 text-[10px] font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1"
-                  title="Next Month"
+                  className="bg-stone-800/90 hover:bg-stone-700 text-amber-200 hover:text-white px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg border border-amber-500/40 text-[11px] sm:text-xs font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1 shadow-xs"
+                  title={lang === 'en' ? 'Next Month' : 'পরবর্তী মাস'}
                 >
                   <span className="hidden sm:inline">{lang === 'en' ? 'Next' : 'পরবর্তী'}</span>
-                  <i className="fas fa-chevron-right text-[9px]"></i>
+                  <i className="fas fa-chevron-right text-[10px]"></i>
                 </button>
               </div>
             </div>
@@ -3978,7 +4379,7 @@ const PanjikaWidget = ({ navigateTo, lang = 'bn' }) => {
               <div className="flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span>
                 <span className="text-[11px] sm:text-xs font-serif font-bold text-amber-100/90">
-                  {t('annualFestivalTarget', lang)} • ১৮ আগস্ট ২০২৬
+                  {t('annualFestivalTarget', lang)} • {lang === 'en' ? '17 August 2027' : '১৭ আগস্ট ২০২৭'}
                 </span>
               </div>
               <div className="flex items-center gap-1 font-mono text-[10px] sm:text-[11px] font-semibold text-amber-200">
@@ -4184,7 +4585,7 @@ const BookingPage = ({ pujaBookings, setPujaBookings, supabaseClient, navigateTo
       id: 'annual_festival',
       nameBn: 'বাৎসরিক শ্রাবণী মহোৎসব বিশেষ সংকল্প',
       nameEn: 'Annual Shravani Mahotsav Special Puja',
-      descBn: 'ঐতিহাসিক ১৮ আগস্ট বাৎসরিক মহা মিলনোৎসব'
+      descBn: 'ঐতিহাসিক ১৭ আগস্ট বাৎসরিক মহা মিলনোৎসব'
     }
   ];
 
@@ -6288,6 +6689,7 @@ const AdminPanel = ({
   templeHistory, setTempleHistory,
   adminCredentials, setAdminCredentials,
   galleryItems, setGalleryItems,
+  complaintsSuggestions, setComplaintsSuggestions,
   showToast
 }) => {
   const [loginEmail, setLoginEmail] = useState('');
@@ -6315,6 +6717,54 @@ const AdminPanel = ({
   const [newGalleryBatch, setNewGalleryBatch] = useState([]);
   const [galleryTabMode, setGalleryTabMode] = useState('image');
   const [editGalleryPhoto, setEditGalleryPhoto] = useState({ url: '', captionBn: '', captionEn: '', image: null, mediaType: 'image' });
+
+  // Complaints & Suggestions Filter States & Handlers
+  const [complaintFilter, setComplaintFilter] = useState('all');
+  const [complaintSearch, setComplaintSearch] = useState('');
+
+  const handleUpdateComplaintStatus = async (id, newStatus) => {
+    const updated = (complaintsSuggestions || []).map(c => c.id === id ? { ...c, status: newStatus } : c);
+    if (setComplaintsSuggestions) setComplaintsSuggestions(updated);
+    try { localStorage.setItem('temple_complaints_suggestions', JSON.stringify(updated)); } catch (e) {}
+    if (supabaseClient) {
+      try {
+        const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'complaints_suggestions').maybeSingle();
+        if (existing) {
+          await supabaseClient.from('settings').update({ value: JSON.stringify(updated) }).eq('id', existing.id);
+        } else {
+          await supabaseClient.from('settings').insert({ key: 'complaints_suggestions', value: JSON.stringify(updated) });
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    if (showToast) {
+      showToast(newStatus === 'resolved' ? 'অভিযোগ/পরামর্শটি সমাধান হিসেবে চিহ্নিত করা হয়েছে!' : (newStatus === 'reviewed' ? 'দেখা হয়েছে হিসেবে চিহ্নিত করা হয়েছে!' : 'নতুন হিসেবে চিহ্নিত করা হয়েছে!'));
+    }
+  };
+
+  const handleDeleteComplaint = (id) => {
+    requestConfirm('আপনি কি নিশ্চিত যে এই অভিযোগ/পরামর্শটি স্থায়ীভাবে মুছে ফেলতে চান?', async () => {
+      const updated = (complaintsSuggestions || []).filter(c => c.id !== id);
+      if (setComplaintsSuggestions) setComplaintsSuggestions(updated);
+      try { localStorage.setItem('temple_complaints_suggestions', JSON.stringify(updated)); } catch (e) {}
+      if (supabaseClient) {
+        try {
+          const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'complaints_suggestions').maybeSingle();
+          if (existing) {
+            await supabaseClient.from('settings').update({ value: JSON.stringify(updated) }).eq('id', existing.id);
+          } else {
+            await supabaseClient.from('settings').insert({ key: 'complaints_suggestions', value: JSON.stringify(updated) });
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+      if (showToast) showToast('অভিযোগ/পরামর্শটি সফলভাবে মুছে ফেলা হয়েছে!');
+    });
+  };
+
+  const unreadComplaintsCount = (complaintsSuggestions || []).filter(c => c.status === 'unread' || !c.status).length;
 
   // Timings, Travel & Mantras Form States
   const [timingsForm, setTimingsForm] = useState(timings || PRELOADED_DATA.timings);
@@ -6509,7 +6959,8 @@ const AdminPanel = ({
       try {
         const compressed = await compressImageFile(file);
         if (compressed) {
-          setFunc({ ...stateVar, image: compressed });
+          const idbKey = await saveImageToIndexedDB(compressed, 'member');
+          setFunc({ ...stateVar, image: idbKey });
         }
       } catch (err) {
         console.warn('Image processing error:', err);
@@ -7414,14 +7865,19 @@ const AdminPanel = ({
     }
   };
 
-  // -- Photo Gallery Management Handlers --
+  // -- Photo Gallery Management Handlers (IndexedDB unlimited store + Supabase DB sync) --
   const handleSaveGalleryToCloud = async (updatedList) => {
-    // If any item has oversized base64 data, persist to IndexedDB first
+    // If any item has base64 data, persist to IndexedDB and sync to Supabase DB
     const safeList = await Promise.all(updatedList.map(async (item, idx) => {
-      if (item && item.url && typeof item.url === 'string' && item.url.startsWith('data:video/') && item.url.length > 400000) {
-        const idbKey = `idb:video_gal_${item.id || idx}_${Date.now()}`;
-        await storeMediaBlob(idbKey, item.url);
-        return { ...item, url: idbKey };
+      if (item && item.url && typeof item.url === 'string') {
+        if (item.url.startsWith('data:video/')) {
+          const idbKey = await saveImageToIndexedDB(item.url, `video_gal_${item.id || idx}`);
+          return { ...item, url: idbKey };
+        }
+        if (item.url.startsWith('data:image/')) {
+          const idbKey = await saveImageToIndexedDB(item.url, `img_gal_${item.id || idx}`);
+          return { ...item, url: idbKey };
+        }
       }
       return item;
     }));
@@ -7436,7 +7892,8 @@ const AdminPanel = ({
     try {
       const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'gallery_items').maybeSingle();
       if (existing) {
-        await supabaseClient.from('settings').upsert({ key: 'gallery_items', value: JSON.stringify(safeList) }, { onConflict: 'key' }); broadcastUniversalSync();
+        await supabaseClient.from('settings').upsert({ key: 'gallery_items', value: JSON.stringify(safeList) }, { onConflict: 'key' });
+        broadcastUniversalSync();
       } else {
         await supabaseClient.from('settings').insert({ key: 'gallery_items', value: JSON.stringify(safeList) });
       }
@@ -7445,14 +7902,18 @@ const AdminPanel = ({
     }
   };
 
-  // Event multi-images and video handlers
+  // Event multi-images and video handlers (IndexedDB Storage)
   const handleEventMultiFiles = async (e) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
     setIsSaving(true);
     try {
-      const compressedList = await Promise.all(files.map(compressImageFile));
-      const valid = compressedList.filter(Boolean);
+      const processed = await Promise.all(files.map(async (f) => {
+        const comp = await compressImageFile(f);
+        if (!comp) return null;
+        return await saveImageToIndexedDB(comp, 'event');
+      }));
+      const valid = processed.filter(Boolean);
       setNewEvent(prev => {
         const existing = prev.images || (prev.image ? [prev.image] : []);
         const merged = [...existing, ...valid];
@@ -7462,7 +7923,7 @@ const AdminPanel = ({
           images: merged
         };
       });
-      showToast(`${valid.length} টি ছবি সফলভাবে প্রস্তুত করা হয়েছে!`);
+      showToast(`${valid.length} টি ছবি IndexedDB স্টোরেজে সফলভাবে যুক্ত হয়েছে!`);
     } catch (err) {
       setErrorMsg("ছবি প্রসেস করতে সমস্যা হয়েছে।");
     } finally {
@@ -7475,11 +7936,11 @@ const AdminPanel = ({
     const file = e.target.files?.[0];
     if (!file) return;
     setIsSaving(true);
-    showToast('ভিডিও ফাইল প্রসেস ও আপলোড হচ্ছে... অনুগ্রহ করে অপেক্ষা করুন।');
+    showToast('ভিডিও ফাইল IndexedDB স্টোরেজে প্রসেস হচ্ছে... অনুগ্রহ করে অপেক্ষা করুন।');
     try {
       const videoData = await readVideoFile(file);
       setNewEvent(prev => ({ ...prev, video: videoData }));
-      showToast('ভিডিও ফাইল সফলভাবে প্রস্তুত ও যুক্ত হয়েছে!');
+      showToast('ভিডিও ফাইল সফলভাবে প্রস্তুত ও যুক্ত হয়েছে (IndexedDB স্টোরেজ)!');
     } catch (err) {
       setErrorMsg(err.message || 'ভিডিও আপলোড করতে সমস্যা হয়েছে।');
     } finally {
@@ -7488,23 +7949,27 @@ const AdminPanel = ({
     }
   };
 
-  // Gallery multi-files batch upload
+  // Gallery multi-files batch upload (IndexedDB Storage)
   const handleGalleryMultiFiles = async (e) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
     setIsSaving(true);
     try {
-      const compressedList = await Promise.all(files.map(compressImageFile));
-      const valid = compressedList.filter(Boolean);
-      const batchEntries = valid.map((imgUrl, i) => ({
-        id: 'gal_' + Date.now() + '_' + i,
-        url: imgUrl,
-        captionBn: 'শ্রীশ্রী মা মনসা মন্দির প্রাঙ্গণ',
-        captionEn: 'Maa Manasa Temple Premises',
-        mediaType: 'image'
+      const processed = await Promise.all(files.map(async (file, i) => {
+        const comp = await compressImageFile(file);
+        if (!comp) return null;
+        const idbKey = await saveImageToIndexedDB(comp, 'gal');
+        return {
+          id: 'gal_' + Date.now() + '_' + i,
+          url: idbKey,
+          captionBn: 'শ্রীশ্রী মা মনসা মন্দির প্রাঙ্গণ',
+          captionEn: 'Maa Manasa Temple Premises',
+          mediaType: 'image'
+        };
       }));
-      setNewGalleryBatch(prev => [...prev, ...batchEntries]);
-      showToast(`${valid.length} টি ছবি আপলোডের জন্য ব্যাচে যুক্ত হয়েছে!`);
+      const valid = processed.filter(Boolean);
+      setNewGalleryBatch(prev => [...prev, ...valid]);
+      showToast(`${valid.length} টি ছবি IndexedDB স্টোরেজে যুক্ত হয়েছে!`);
     } catch (err) {
       setErrorMsg('ছবি প্রসেসিং করতে সমস্যা হয়েছে।');
     } finally {
@@ -7533,7 +7998,7 @@ const AdminPanel = ({
     const file = e.target.files?.[0];
     if (!file) return;
     setIsSaving(true);
-    showToast('ভিডিও ফাইল প্রসেস ও আপলোড হচ্ছে... অনুগ্রহ করে অপেক্ষা করুন।');
+    showToast('ভিডিও ফাইল IndexedDB স্টোরেজে প্রসেস হচ্ছে... অনুগ্রহ করে অপেক্ষা করুন।');
     try {
       const videoData = await readVideoFile(file);
       setNewGalleryPhoto(prev => ({
@@ -7541,7 +8006,7 @@ const AdminPanel = ({
         image: videoData,
         mediaType: 'video'
       }));
-      showToast('ভিডিও ফাইল সফলভাবে প্রস্তুত ও আপলোড হয়েছে!');
+      showToast('ভিডিও ফাইল সফলভাবে IndexedDB স্টোরেজে যুক্ত হয়েছে!');
     } catch (err) {
       setErrorMsg(err.message || 'ভিডিও আপলোড করতে সমস্যা হয়েছে।');
     } finally {
@@ -7552,7 +8017,7 @@ const AdminPanel = ({
 
   const handleAddGalleryPhoto = async (e) => {
     e.preventDefault();
-    const mediaUrl = (newGalleryPhoto.image || newGalleryPhoto.url || '').trim();
+    let mediaUrl = (newGalleryPhoto.image || newGalleryPhoto.url || '').trim();
     if (!mediaUrl) {
       setErrorMsg("অনুগ্রহ করে একটি ছবি/ভিডিও আপলোড করুন অথবা অনলাইন লিংক প্রদান করুন।");
       return;
@@ -7561,6 +8026,11 @@ const AdminPanel = ({
     setIsSaving(true);
     setErrorMsg('');
     try {
+      if (mediaUrl.startsWith('data:image/')) {
+        mediaUrl = await saveImageToIndexedDB(mediaUrl, 'gal');
+      } else if (mediaUrl.startsWith('data:video/')) {
+        mediaUrl = await saveImageToIndexedDB(mediaUrl, 'video_gal');
+      }
       const newEntry = {
         id: 'gal_' + Date.now(),
         url: mediaUrl,
@@ -7810,6 +8280,16 @@ const AdminPanel = ({
             <div className="text-[10px] text-gray-500 font-bold">ফটোগ্যালারি</div>
             <div className="text-xs font-extrabold text-pink-700">{(galleryItems || DEFAULT_GALLERY_ITEMS).length} টি</div>
           </div>
+          <div onClick={() => handleTabSwitch('complaints')} className="cursor-pointer bg-white p-3 rounded-2xl border border-gray-200 shadow-xs hover:border-amber-500 hover:shadow-sm transition-all text-center relative">
+            {unreadComplaintsCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-xs animate-pulse">
+                {unreadComplaintsCount}
+              </span>
+            )}
+            <i className="fas fa-inbox text-amber-600 text-base mb-1"></i>
+            <div className="text-[10px] text-gray-500 font-bold">অভিযোগ/পরামর্শ</div>
+            <div className="text-xs font-extrabold text-amber-800">{(complaintsSuggestions || []).length} টি</div>
+          </div>
         </div>
       </div>
 
@@ -7857,6 +8337,16 @@ const AdminPanel = ({
             </button>
             <button onClick={() => handleTabSwitch('gallery')} className={`px-5 py-3 text-left font-bold text-sm border-b ${activeTab === 'gallery' ? 'bg-orange-50 text-orange-700 border-l-[5px] border-l-orange-600' : 'text-gray-600 hover:bg-gray-50 border-l-[5px] border-transparent'}`}>
               <i className="fas fa-images w-5 text-pink-500"></i> ফটোগ্যালারি ও চিত্রশালা
+            </button>
+            <button onClick={() => handleTabSwitch('complaints')} className={`px-5 py-3 text-left font-bold text-sm border-b flex items-center justify-between ${activeTab === 'complaints' ? 'bg-orange-50 text-orange-700 border-l-[5px] border-l-orange-600' : 'text-gray-600 hover:bg-gray-50 border-l-[5px] border-transparent'}`}>
+              <span className="flex items-center gap-2">
+                <i className="fas fa-inbox w-5 text-amber-600"></i> অভিযোগ ও পরামর্শ
+              </span>
+              {unreadComplaintsCount > 0 && (
+                <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold animate-pulse">
+                  {unreadComplaintsCount}
+                </span>
+              )}
             </button>
             <button onClick={() => handleTabSwitch('security')} className={`px-5 py-3 text-left font-bold text-sm ${activeTab === 'security' ? 'bg-orange-50 text-orange-700 border-l-[5px] border-l-orange-600' : 'text-gray-600 hover:bg-gray-50 border-l-[5px] border-transparent'}`}>
               <i className="fas fa-shield-halved w-5 text-rose-600"></i> এডমিন আইডি ও পাসওয়ার্ড
@@ -8264,7 +8754,7 @@ const AdminPanel = ({
                       <div className="flex flex-wrap gap-2.5">
                         {((newEvent.images && newEvent.images.length > 0) ? newEvent.images : [newEvent.image]).map((imgSrc, imgIdx) => (
                           <div key={imgIdx} className="relative group w-20 h-20 rounded-xl overflow-hidden border-2 border-amber-300 shadow-xs">
-                            <img src={imgSrc} alt={`Event media ${imgIdx + 1}`} className="w-full h-full object-cover" />
+                            <MediaViewer url={imgSrc} alt={`Event media ${imgIdx + 1}`} className="w-full h-full object-cover" controls={false} />
                             {imgIdx === 0 && (
                               <span className="absolute bottom-0 inset-x-0 bg-orange-600 text-[9px] text-white font-bold text-center py-0.5">
                                 কভার
@@ -8388,7 +8878,7 @@ const AdminPanel = ({
                     <div key={ev.id} className="border border-gray-200 rounded-2xl p-5 bg-white hover:shadow-md transition-shadow flex flex-col md:flex-row justify-between items-start gap-4">
                       {evImages.length > 0 ? (
                         <div className="w-full md:w-36 h-28 bg-gray-100 rounded-xl overflow-hidden shrink-0 relative">
-                          <img src={evImages[0]} alt={ev.title} className="w-full h-full object-cover" />
+                          <MediaViewer url={evImages[0]} alt={ev.title} className="w-full h-full object-cover" controls={false} />
                           {evImages.length > 1 && (
                             <span className="absolute bottom-1 right-1 bg-black/80 text-amber-300 text-[10px] px-1.5 py-0.5 rounded font-bold">
                               📷 {evImages.length}
@@ -8585,7 +9075,7 @@ const AdminPanel = ({
                     type="text"
                     value={timingsForm.special_notice || ''}
                     onChange={(e) => setTimingsForm({ ...timingsForm, special_notice: e.target.value })}
-                    placeholder="যেমন: আগামী ১৮ আগস্ট মনসা পূজায় মন্দির দিনরাত খোলা থাকবে..."
+                    placeholder="যেমন: আগামী ১৭ আগস্ট মনসা পূজায় মন্দির দিনরাত খোলা থাকবে..."
                     className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 text-sm"
                   />
                 </div>
@@ -10038,7 +10528,7 @@ const AdminPanel = ({
                         <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
                           {newGalleryBatch.map((batchItem, bIdx) => (
                             <div key={bIdx} className="relative group aspect-square rounded-lg overflow-hidden border shadow-xs">
-                              <img src={batchItem.url} alt={`Batch ${bIdx + 1}`} className="w-full h-full object-cover" />
+                              <MediaViewer url={batchItem.url} alt={`Batch ${bIdx + 1}`} className="w-full h-full object-cover" controls={false} />
                               <button
                                 type="button"
                                 onClick={() => setNewGalleryBatch(prev => prev.filter((_, idx) => idx !== bIdx))}
@@ -10197,10 +10687,11 @@ const AdminPanel = ({
                                   <i className="fas fa-play text-base"></i>
                                 </div>
                               ) : (
-                                <img
-                                  src={editGalleryPhoto.image || editGalleryPhoto.url || item.url}
+                                <MediaViewer
+                                  url={editGalleryPhoto.image || editGalleryPhoto.url || item.url}
                                   alt="Current"
                                   className="w-20 h-14 object-cover rounded-lg border shadow-xs shrink-0"
+                                  controls={false}
                                 />
                               )}
                               <div className="flex-1 min-w-0">
@@ -10262,10 +10753,11 @@ const AdminPanel = ({
                                   <span className="text-[11px] font-bold text-white mt-1">ভিডিও মিডিয়া</span>
                                 </div>
                               ) : (
-                                <img
-                                  src={item.url}
+                                <MediaViewer
+                                  url={item.url}
                                   alt={item.captionBn || `Gallery ${index + 1}`}
                                   className="w-full h-full object-cover"
+                                  controls={false}
                                 />
                               )}
                               <div className="absolute top-2 left-2 bg-black/70 backdrop-blur-xs text-white px-2 py-0.5 rounded-full text-[10px] font-mono font-bold flex items-center gap-1">
@@ -10416,6 +10908,328 @@ const AdminPanel = ({
                   </button>
                 </div>
               </form>
+            </div>
+          )}
+
+          {/* 17. Complaints & Suggestions Tab (Admin Only & Confidential) */}
+          {activeTab === 'complaints' && (
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-5 border-b">
+                <div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-lg font-bold shadow-xs">
+                      <i className="fas fa-inbox"></i>
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-black text-gray-800 flex items-center gap-2">
+                        পরামর্শ ও অভিযোগ বাক্স
+                        <span className="bg-red-100 text-red-700 text-xs px-2.5 py-0.5 rounded-full font-bold border border-red-200">
+                          <i className="fas fa-lock text-[10px] mr-1"></i> শুধুমাত্র এডমিন
+                        </span>
+                      </h3>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        ভক্ত ও দর্শনার্থীদের পাঠানো গোপনীয় মতামত, সুপরামর্শ ও অভিযোগসমূহ
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="bg-amber-50 border border-amber-200 text-amber-900 text-xs px-3.5 py-1.5 rounded-xl font-bold flex items-center gap-2">
+                    <i className="fas fa-shield-alt text-amber-600"></i>
+                    গোপনীয়তা সুরক্ষিত • জনসাধারণের জন্য সম্পূর্ণ অদৃশ্য
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Metrics Bar */}
+              {(() => {
+                const totalCount = (complaintsSuggestions || []).length;
+                const unreadCount = (complaintsSuggestions || []).filter(c => c.status === 'unread' || !c.status).length;
+                const sugCount = (complaintsSuggestions || []).filter(c => c.type === 'suggestion').length;
+                const compCount = (complaintsSuggestions || []).filter(c => c.type === 'complaint').length;
+
+                const filtered = (complaintsSuggestions || []).filter(item => {
+                  if (complaintFilter === 'unread' && item.status !== 'unread' && item.status) return false;
+                  if (complaintFilter === 'suggestion' && item.type !== 'suggestion') return false;
+                  if (complaintFilter === 'complaint' && item.type !== 'complaint') return false;
+                  if (complaintFilter === 'inquiry' && item.type !== 'inquiry') return false;
+                  if (complaintFilter === 'resolved' && item.status !== 'resolved') return false;
+
+                  if (complaintSearch && complaintSearch.trim()) {
+                    const q = complaintSearch.toLowerCase();
+                    const text = `${item.name || ''} ${item.phone || ''} ${item.address || ''} ${item.subject || ''} ${item.message || ''} ${item.token || ''}`.toLowerCase();
+                    return text.includes(q);
+                  }
+                  return true;
+                });
+
+                return (
+                  <div>
+                    {/* Metrics Grid */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 mb-6">
+                      <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 p-4 rounded-2xl">
+                        <div className="flex items-center justify-between text-amber-800 text-xs font-bold mb-1">
+                          <span>মোট বার্তা</span>
+                          <i className="fas fa-envelope-open-text text-amber-600"></i>
+                        </div>
+                        <div className="text-2xl font-black text-amber-950">{totalCount} <span className="text-xs font-medium text-amber-700">টি</span></div>
+                      </div>
+                      <div className="bg-gradient-to-br from-rose-50 to-red-50 border border-rose-200 p-4 rounded-2xl">
+                        <div className="flex items-center justify-between text-rose-800 text-xs font-bold mb-1">
+                          <span>নতুন / অপঠিত</span>
+                          <i className="fas fa-bell text-rose-600 animate-pulse"></i>
+                        </div>
+                        <div className="text-2xl font-black text-rose-950">{unreadCount} <span className="text-xs font-medium text-rose-700">টি</span></div>
+                      </div>
+                      <div className="bg-gradient-to-br from-yellow-50 to-amber-50 border border-yellow-200 p-4 rounded-2xl">
+                        <div className="flex items-center justify-between text-yellow-800 text-xs font-bold mb-1">
+                          <span>সুপরামর্শ</span>
+                          <i className="fas fa-lightbulb text-yellow-600"></i>
+                        </div>
+                        <div className="text-2xl font-black text-yellow-950">{sugCount} <span className="text-xs font-medium text-yellow-700">টি</span></div>
+                      </div>
+                      <div className="bg-gradient-to-br from-red-50 to-orange-50 border border-red-200 p-4 rounded-2xl">
+                        <div className="flex items-center justify-between text-red-800 text-xs font-bold mb-1">
+                          <span>অভিযোগ</span>
+                          <i className="fas fa-triangle-exclamation text-red-600"></i>
+                        </div>
+                        <div className="text-2xl font-black text-red-950">{compCount} <span className="text-xs font-medium text-red-700">টি</span></div>
+                      </div>
+                    </div>
+
+                    {/* Search & Filter Controls */}
+                    <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between mb-6 bg-gray-50 p-3.5 rounded-2xl border border-gray-200">
+                      <div className="relative flex-1">
+                        <input
+                          type="text"
+                          value={complaintSearch}
+                          onChange={(e) => setComplaintSearch(e.target.value)}
+                          placeholder="নাম, মোবাইল নম্বর, বিষয়, ট্র্যাকিং টোকেন বা বার্তা খুঁজুন..."
+                          className="w-full pl-9 pr-4 py-2 bg-white border border-gray-300 rounded-xl text-xs sm:text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                        />
+                        <i className="fas fa-search absolute left-3 top-2.5 sm:top-3 text-gray-400 text-xs"></i>
+                        {complaintSearch && (
+                          <button
+                            type="button"
+                            onClick={() => setComplaintSearch('')}
+                            className="absolute right-3 top-2.5 sm:top-3 text-gray-400 hover:text-gray-600 text-xs"
+                          >
+                            <i className="fas fa-times"></i>
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="flex flex-wrap gap-1.5 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => setComplaintFilter('all')}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${complaintFilter === 'all' ? 'bg-gray-800 text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}
+                        >
+                          সবগুলো ({totalCount})
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setComplaintFilter('unread')}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${complaintFilter === 'unread' ? 'bg-rose-600 text-white shadow-xs' : 'bg-white text-rose-700 hover:bg-rose-50 border border-rose-200'}`}
+                        >
+                          অপঠিত ({unreadCount})
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setComplaintFilter('suggestion')}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${complaintFilter === 'suggestion' ? 'bg-amber-600 text-white shadow-xs' : 'bg-white text-amber-700 hover:bg-amber-50 border border-amber-200'}`}
+                        >
+                          পরামর্শ ({sugCount})
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setComplaintFilter('complaint')}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${complaintFilter === 'complaint' ? 'bg-red-600 text-white shadow-xs' : 'bg-white text-red-700 hover:bg-red-50 border border-red-200'}`}
+                        >
+                          অভিযোগ ({compCount})
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setComplaintFilter('resolved')}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${complaintFilter === 'resolved' ? 'bg-emerald-600 text-white shadow-xs' : 'bg-white text-emerald-700 hover:bg-emerald-50 border border-emerald-200'}`}
+                        >
+                          সমাধানকৃত
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Complaints List */}
+                    {filtered.length === 0 ? (
+                      <div className="text-center py-16 bg-amber-50/30 rounded-2xl border-2 border-dashed border-amber-200/80">
+                        <div className="w-16 h-16 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center mx-auto mb-3 text-2xl shadow-inner">
+                          <i className="fas fa-shield-cat"></i>
+                        </div>
+                        <h4 className="text-base font-bold text-gray-800">কোনো বার্তা পাওয়া যায়নি</h4>
+                        <p className="text-xs text-gray-500 mt-1 max-w-sm mx-auto">
+                          {complaintSearch || complaintFilter !== 'all'
+                            ? 'বর্তমান ফিল্টারের সাথে মিলে এমন কোনো বার্তা মেলেনি।'
+                            : 'এখনো পর্যন্ত কোনো অভিযোগ বা পরামর্শ জমা পড়েনি। ভক্তরা ওয়েবসাইট থেকে বার্তা পাঠালে এখানে তা সুরক্ষিতভাবে দেখতে পারবেন।'}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {filtered.map((item) => {
+                          const isUnread = item.status === 'unread' || !item.status;
+                          const isResolved = item.status === 'resolved';
+                          const isSuggestion = item.type === 'suggestion';
+                          const isComplaint = item.type === 'complaint';
+
+                          return (
+                            <div
+                              key={item.id}
+                              className={`p-5 rounded-2xl border-2 transition-all ${
+                                isUnread
+                                  ? 'bg-amber-50/40 border-amber-300 shadow-sm'
+                                  : isResolved
+                                  ? 'bg-gray-50/60 border-gray-200 opacity-90'
+                                  : 'bg-white border-gray-200 hover:border-gray-300 shadow-xs'
+                              }`}
+                            >
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 mb-3 border-b border-gray-200/80">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  {/* Type Badge */}
+                                  <span className={`px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 ${
+                                    isSuggestion
+                                      ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                                      : isComplaint
+                                      ? 'bg-red-100 text-red-900 border border-red-300'
+                                      : 'bg-sky-100 text-sky-900 border border-sky-300'
+                                  }`}>
+                                    <i className={`fas ${isSuggestion ? 'fa-lightbulb' : isComplaint ? 'fa-triangle-exclamation' : 'fa-circle-question'}`}></i>
+                                    {isSuggestion ? 'সুপরামর্শ' : isComplaint ? 'অভিযোগ' : 'জিজ্ঞাসা'}
+                                  </span>
+
+                                  {/* Status Badge */}
+                                  <span className={`px-2 py-0.5 rounded-md text-[11px] font-bold ${
+                                    isUnread
+                                      ? 'bg-rose-100 text-rose-800 border border-rose-300 animate-pulse'
+                                      : isResolved
+                                      ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                                      : 'bg-blue-100 text-blue-800 border border-blue-300'
+                                  }`}>
+                                    {isUnread ? 'নতুন / অপঠিত' : isResolved ? 'সমাধানকৃত' : 'দেখা হয়েছে'}
+                                  </span>
+
+                                  {/* Token */}
+                                  {item.token && (
+                                    <span className="font-mono text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded border border-gray-300 font-bold">
+                                      #{item.token}
+                                    </span>
+                                  )}
+                                </div>
+
+                                <div className="text-xs text-gray-500 font-medium flex items-center gap-2">
+                                  <i className="far fa-clock text-gray-400"></i>
+                                  {item.date ? new Date(item.date).toLocaleString('bn-BD', { dateStyle: 'medium', timeStyle: 'short' }) : 'তারিখ নেই'}
+                                </div>
+                              </div>
+
+                              {/* Devotee Info Bar */}
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs bg-white/80 p-3 rounded-xl border border-gray-200 mb-3">
+                                <div>
+                                  <span className="text-gray-500 font-semibold">প্রেরক: </span>
+                                  <strong className="text-gray-800 font-bold">{item.name || 'নামহীন'}</strong>
+                                </div>
+                                <div>
+                                  <span className="text-gray-500 font-semibold">মোবাইল: </span>
+                                  {item.phone ? (
+                                    <a href={`tel:${item.phone}`} className="text-amber-700 font-bold hover:underline inline-flex items-center gap-1">
+                                      <i className="fas fa-phone-alt text-[10px]"></i> {item.phone}
+                                    </a>
+                                  ) : (
+                                    <span className="text-gray-400">উল্লেখ নেই</span>
+                                  )}
+                                </div>
+                                <div>
+                                  <span className="text-gray-500 font-semibold">ঠিকানা/এলাকা: </span>
+                                  <span className="text-gray-700">{item.address || 'উল্লেখ নেই'}</span>
+                                </div>
+                              </div>
+
+                              {/* Subject & Message Content */}
+                              <div className="mb-4">
+                                {item.subject && (
+                                  <h5 className="font-bold text-gray-900 text-sm mb-1.5 flex items-center gap-1.5">
+                                    <i className="fas fa-tag text-amber-600 text-xs"></i>
+                                    {item.subject}
+                                  </h5>
+                                )}
+                                <div className="bg-amber-50/20 p-3.5 rounded-xl border border-amber-200/60 text-xs sm:text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
+                                  {item.message}
+                                </div>
+                              </div>
+
+                              {/* Action Footer */}
+                              <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-gray-100">
+                                <div className="flex flex-wrap items-center gap-1.5">
+                                  <span className="text-[11px] font-bold text-gray-500 mr-1">স্ট্যাটাস পরিবর্তন:</span>
+                                  {isUnread ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleUpdateComplaintStatus(item.id, 'reviewed')}
+                                      className="px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition-colors"
+                                    >
+                                      <i className="fas fa-eye text-[10px] mr-1"></i> দেখা হয়েছে চিহ্নিত করুন
+                                    </button>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleUpdateComplaintStatus(item.id, 'unread')}
+                                      className="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 transition-colors"
+                                    >
+                                      <i className="fas fa-envelope text-[10px] mr-1"></i> পুনরায় অপঠিত করুন
+                                    </button>
+                                  )}
+
+                                  {!isResolved ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleUpdateComplaintStatus(item.id, 'resolved')}
+                                      className="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 transition-colors"
+                                    >
+                                      <i className="fas fa-check-double text-[10px] mr-1"></i> সমাধান হিসেবে চিহ্নিত করুন
+                                    </button>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleUpdateComplaintStatus(item.id, 'reviewed')}
+                                      className="px-2.5 py-1 rounded-lg text-xs font-bold bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300 transition-colors"
+                                    >
+                                      <i className="fas fa-undo text-[10px] mr-1"></i> সমাধান বাতিল করুন
+                                    </button>
+                                  )}
+
+                                  {item.phone && (
+                                    <a
+                                      href={`tel:${item.phone}`}
+                                      className="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-500 text-white hover:bg-amber-600 transition-colors inline-flex items-center gap-1 shadow-2xs"
+                                    >
+                                      <i className="fas fa-phone-alt text-[10px]"></i> কল করুন
+                                    </a>
+                                  )}
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteComplaint(item.id)}
+                                  className="px-2.5 py-1 rounded-lg text-xs font-bold text-red-600 hover:bg-red-50 hover:text-red-700 border border-transparent hover:border-red-200 transition-colors flex items-center gap-1"
+                                >
+                                  <i className="fas fa-trash-alt text-[10px]"></i> মুছে ফেলুন
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           )}
         </div>
@@ -10639,6 +11453,42 @@ function App() {
     } catch (e) { }
     return { username: 'admin@manasamondirgoila.com', password: 'admin1234' };
   });
+
+  const [complaintsSuggestions, setComplaintsSuggestions] = useState(() => {
+    try {
+      const saved = localStorage.getItem('temple_complaints_suggestions');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (e) {}
+    return [];
+  });
+
+  const [isComplainModalOpen, setIsComplainModalOpen] = useState(false);
+
+  const handleSaveComplaintSuggestion = async (newEntry) => {
+    try {
+      const updated = [newEntry, ...(complaintsSuggestions || [])];
+      setComplaintsSuggestions(updated);
+      try {
+        localStorage.setItem('temple_complaints_suggestions', JSON.stringify(updated));
+      } catch (e) {}
+
+      if (supabaseClient) {
+        const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'complaints_suggestions').maybeSingle();
+        if (existing) {
+          await supabaseClient.from('settings').update({ value: JSON.stringify(updated) }).eq('id', existing.id);
+        } else {
+          await supabaseClient.from('settings').insert({ key: 'complaints_suggestions', value: JSON.stringify(updated) });
+        }
+      }
+      return true;
+    } catch (err) {
+      console.error('Error saving complaint/suggestion:', err);
+      return false;
+    }
+  };
 
   const audioRef = useRef(null);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
@@ -10984,6 +11834,17 @@ function App() {
             }
           } catch (e) { }
         }
+
+        const cs = settingsData.find(s => s.key === 'complaints_suggestions');
+        if (cs && cs.value) {
+          try {
+            const parsed = JSON.parse(cs.value);
+            if (Array.isArray(parsed)) {
+              setComplaintsSuggestions(parsed);
+              localStorage.setItem('temple_complaints_suggestions', cs.value);
+            }
+          } catch (e) { }
+        }
       }
 
       // 2. Process Committee
@@ -11074,7 +11935,7 @@ function App() {
 
   const renderPage = () => {
     switch (currentPage) {
-      case 'home': return <Home dbError={dbError} marqueeText={marqueeText} marqueeTextEn={marqueeTextEn} testimonials={testimonials} featuredTestimonialIds={featuredTestimonialIds} committeeMembers={committeeMembers} events={events} notices={notices} timings={timings} travelInfo={travelInfo} mantras={mantras} galleryItems={galleryItems} navigateTo={navigateTo} showToast={showToast} lang={lang} />;
+      case 'home': return <Home dbError={dbError} marqueeText={marqueeText} marqueeTextEn={marqueeTextEn} testimonials={testimonials} featuredTestimonialIds={featuredTestimonialIds} committeeMembers={committeeMembers} events={events} notices={notices} timings={timings} travelInfo={travelInfo} mantras={mantras} galleryItems={galleryItems} navigateTo={navigateTo} showToast={showToast} lang={lang} openComplainModal={() => setIsComplainModalOpen(true)} />;
       case 'timings': return <TimingsPage timings={timings} navigateTo={navigateTo} lang={lang} />;
       case 'travel': return <TravelPage travelInfo={travelInfo} navigateTo={navigateTo} lang={lang} showToast={showToast} />;
       case 'mantras': return <MantrasPage mantras={mantras} navigateTo={navigateTo} lang={lang} showToast={showToast} />;
@@ -11105,9 +11966,10 @@ function App() {
         templeHistory={templeHistory} setTempleHistory={setTempleHistory}
         adminCredentials={adminCredentials} setAdminCredentials={setAdminCredentials}
         galleryItems={galleryItems} setGalleryItems={setGalleryItems}
+        complaintsSuggestions={complaintsSuggestions} setComplaintsSuggestions={setComplaintsSuggestions}
         showToast={showToast}
       />;
-      default: return <Home dbError={dbError} marqueeText={marqueeText} marqueeTextEn={marqueeTextEn} testimonials={testimonials} featuredTestimonialIds={featuredTestimonialIds} committeeMembers={committeeMembers} events={events} notices={notices} timings={timings} travelInfo={travelInfo} mantras={mantras} galleryItems={galleryItems} navigateTo={navigateTo} showToast={showToast} lang={lang} />;
+      default: return <Home dbError={dbError} marqueeText={marqueeText} marqueeTextEn={marqueeTextEn} testimonials={testimonials} featuredTestimonialIds={featuredTestimonialIds} committeeMembers={committeeMembers} events={events} notices={notices} timings={timings} travelInfo={travelInfo} mantras={mantras} galleryItems={galleryItems} navigateTo={navigateTo} showToast={showToast} lang={lang} openComplainModal={() => setIsComplainModalOpen(true)} />;
     }
   };
 
@@ -11121,7 +11983,18 @@ function App() {
         </div>
       )}
 
-      {currentPage !== 'admin' && <Header navigateTo={navigateTo} isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} lang={lang} setLang={setLang} isMusicPlaying={isMusicPlaying} toggleMusic={toggleMusic} />}
+      {currentPage !== 'admin' && (
+        <Header
+          navigateTo={navigateTo}
+          isMenuOpen={isMenuOpen}
+          setIsMenuOpen={setIsMenuOpen}
+          lang={lang}
+          setLang={setLang}
+          isMusicPlaying={isMusicPlaying}
+          toggleMusic={toggleMusic}
+          openComplainModal={() => setIsComplainModalOpen(true)}
+        />
+      )}
       <main className="min-h-screen bg-white">
         {isLoading && currentPage === 'home' ? (
           <div className="flex flex-col gap-4 items-center justify-center h-screen bg-orange-50">
@@ -11132,9 +12005,23 @@ function App() {
           renderPage()
         )}
       </main>
-      {currentPage !== 'admin' && <Footer navigateTo={navigateTo} lang={lang} setLang={setLang} />}
+      {currentPage !== 'admin' && (
+        <Footer
+          navigateTo={navigateTo}
+          lang={lang}
+          setLang={setLang}
+          openComplainModal={() => setIsComplainModalOpen(true)}
+        />
+      )}
       <audio ref={audioRef} id="global-audio" src="music/theme.mp3" loop preload="auto" autoPlay playsInline></audio>
       <FloatingMusicWidget isMusicPlaying={isMusicPlaying} toggleMusic={toggleMusic} lang={lang} />
+      <ComplainSuggestionModal
+        isOpen={isComplainModalOpen}
+        onClose={() => setIsComplainModalOpen(false)}
+        onSubmitComplaint={handleSaveComplaintSuggestion}
+        showToast={showToast}
+        lang={lang}
+      />
       <ScrollToTop lang={lang} />
     </div>
   );
