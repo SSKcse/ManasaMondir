@@ -11175,32 +11175,36 @@ const AdminPanel = ({
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-bold text-gray-700 mb-1">
-                        Store ID / Merchant ID *
+                        {pgConfig.provider === 'uddoktapay' ? 'স্টোর / মন্দিরের নাম (ঐচ্ছিক)' : 'Store ID / Merchant ID *'}
                       </label>
                       <input
                         type="text"
-                        required
+                        required={pgConfig.provider !== 'uddoktapay'}
                         value={pgConfig.storeId || ''}
                         onChange={(e) => setPgConfig({ ...pgConfig, storeId: e.target.value })}
-                        placeholder="e.g. aamarpaytest"
+                        placeholder={pgConfig.provider === 'uddoktapay' ? 'e.g. ManasaMondir' : 'e.g. aamarpaytest'}
                         className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 font-mono text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                       />
-                      <span className="text-[10px] text-gray-400 mt-1 block">স্যান্ডবক্সে ডিফল্ট: aamarpaytest</span>
+                      <span className="text-[10px] text-gray-400 mt-1 block">
+                        {pgConfig.provider === 'uddoktapay' ? 'উদ্যোক্তাপেতে শুধু নিচের API Key-টি প্রয়োজন' : 'স্যান্ডবক্সে ডিফল্ট: aamarpaytest'}
+                      </span>
                     </div>
 
                     <div>
                       <label className="block text-xs font-bold text-gray-700 mb-1">
-                        Signature Key / API Key / Secret *
+                        {pgConfig.provider === 'uddoktapay' ? 'UddoktaPay API Key *' : 'Signature Key / API Key / Secret *'}
                       </label>
                       <input
                         type="password"
                         required
                         value={pgConfig.signatureKey || ''}
                         onChange={(e) => setPgConfig({ ...pgConfig, signatureKey: e.target.value })}
-                        placeholder="••••••••••••••••••••••••••••••••"
+                        placeholder={pgConfig.provider === 'uddoktapay' ? 'UddoktaPay ড্যাশবোর্ডের API Key বসান' : '••••••••••••••••••••••••••••••••'}
                         className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 font-mono text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                       />
-                      <span className="text-[10px] text-gray-400 mt-1 block">মার্চেন্ট প্যানেল থেকে প্রাপ্ত সিক্রেট কি</span>
+                      <span className="text-[10px] text-gray-400 mt-1 block">
+                        {pgConfig.provider === 'uddoktapay' ? 'উদ্যোক্তাপে ড্যাশবোর্ড > API Settings থেকে প্রাপ্ত API Key' : 'মার্চেন্ট প্যানেল থেকে প্রাপ্ত সিক্রেট কি'}
+                      </span>
                     </div>
 
                     <div>
