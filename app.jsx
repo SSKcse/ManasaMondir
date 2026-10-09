@@ -1192,6 +1192,43 @@ const broadcastUniversalSync = () => {
   } catch (e) {}
 };
 
+// Universal cloud setting helper that uses select + update/insert to strictly avoid PostgreSQL RLS 401 errors on ON CONFLICT DO UPDATE
+const saveCloudSetting = async (key, value) => {
+  if (!supabaseClient || !key) return false;
+  try {
+    const strValue = typeof value === 'string' ? value : JSON.stringify(value);
+    const { data: existing, error: selErr } = await supabaseClient
+      .from('settings')
+      .select('id')
+      .eq('key', key)
+      .maybeSingle();
+
+    let success = false;
+    if (existing && existing.id) {
+      const { error: updErr } = await supabaseClient
+        .from('settings')
+        .update({ value: strValue })
+        .eq('id', existing.id);
+      if (!updErr) success = true;
+      else console.warn(`saveCloudSetting update error for ${key}:`, updErr);
+    } else {
+      const { error: insErr } = await supabaseClient
+        .from('settings')
+        .insert({ key, value: strValue });
+      if (!insErr) success = true;
+      else console.warn(`saveCloudSetting insert error for ${key}:`, insErr);
+    }
+
+    if (success) {
+      broadcastUniversalSync();
+    }
+    return success;
+  } catch (err) {
+    console.warn(`saveCloudSetting error for ${key}:`, err);
+    return false;
+  }
+};
+
 const isVideoUrl = (url) => {
   if (!url) return false;
   const str = String(url).toLowerCase().trim();
@@ -1283,29 +1320,18 @@ const syncMediaBlobToCloud = async (id, blobOrData) => {
     // Small or medium media (<= 1.8MB, e.g. compressed photos & short video clips)
     const CHUNK_SIZE = 1.8 * 1024 * 1024;
     if (strData.length <= CHUNK_SIZE) {
-      await supabaseClient.from('settings').upsert({
-        key: id,
-        value: strData
-      }, { onConflict: 'key' });
-      broadcastUniversalSync();
+      await saveCloudSetting(id, strData);
       return true;
     }
 
     // Large files (longer videos): split into DB chunks without ever using Supabase Storage
     const totalChunks = Math.ceil(strData.length / CHUNK_SIZE);
-    await supabaseClient.from('settings').upsert({
-      key: id,
-      value: JSON.stringify({ isChunked: true, totalChunks, size: strData.length, time: Date.now() })
-    }, { onConflict: 'key' });
+    await saveCloudSetting(id, JSON.stringify({ isChunked: true, totalChunks, size: strData.length, time: Date.now() }));
 
     for (let i = 0; i < totalChunks; i++) {
       const chunkStr = strData.substring(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
-      await supabaseClient.from('settings').upsert({
-        key: `${id}__c${i}`,
-        value: chunkStr
-      }, { onConflict: 'key' });
+      await saveCloudSetting(`${id}__c${i}`, chunkStr);
     }
-    broadcastUniversalSync();
     return true;
   } catch (err) {
     console.warn('Sync media to Supabase Database error:', err);
@@ -6860,11 +6886,7 @@ const DonationPage = ({ donations, setDonations, donationReceipts, setDonationRe
           try { currentList = JSON.parse(existingRow.value); } catch (e) {}
         }
         const updatedCloud = [verifiedPayment, ...(currentList || []).filter(item => item.receiptNo !== verifiedPayment.receiptNo)];
-        await supabaseClient.from('settings').upsert({
-          key: 'donation_receipts',
-          value: JSON.stringify(updatedCloud.slice(0, 150))
-        }, { onConflict: 'key' });
-        broadcastUniversalSync();
+        await saveCloudSetting('donation_receipts', JSON.stringify(updatedCloud.slice(0, 150)));
       } catch (err) {
         console.error('Receipt sync error:', err);
       }
@@ -8013,17 +8035,8 @@ const AdminPanel = ({
         password: newPass ? newPass : (adminCredentials?.password || 'admin1234')
       };
 
-      const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'admin_credentials').maybeSingle();
-      let err;
-      if (existing) {
-        const { error } = await supabaseClient.from('settings').upsert({ key: 'puja_bookings', value: JSON.stringify(updated) }, { onConflict: 'key' }); broadcastUniversalSync();
-        err = error;
-      } else {
-        const { error } = await supabaseClient.from('settings').insert({ key: 'admin_credentials', value: JSON.stringify(updated) });
-        err = error;
-      }
-
-      if (err) throw err;
+      const ok = await saveCloudSetting('admin_credentials', JSON.stringify(updated));
+      if (!ok) throw new Error('ডাটাবেসে সংরক্ষণ ব্যর্থ হয়েছে');
 
       setAdminCredentials(updated);
       try { localStorage.setItem('temple_admin_credentials', JSON.stringify(updated)); } catch (e) { }
@@ -8068,11 +8081,11 @@ const AdminPanel = ({
     setErrorMsg('');
     try {
       const enVal = (marqueeTextEn && marqueeTextEn.trim() !== '') ? marqueeTextEn : translateMarqueeToEnglish(marqueeText);
-      const { error: errBn } = await supabaseClient.from('settings').upsert({ key: 'marquee', value: marqueeText }, { onConflict: 'key' });
-      if (errBn) throw errBn;
+      const okBn = await saveCloudSetting('marquee', marqueeText);
+      if (!okBn) throw new Error('বাংলা নোটিশ আপডেট ব্যর্থ');
 
-      const { error: errEn } = await supabaseClient.from('settings').upsert({ key: 'marquee_en', value: enVal }, { onConflict: 'key' });
-      if (errEn) throw errEn;
+      const okEn = await saveCloudSetting('marquee_en', enVal);
+      if (!okEn) throw new Error('ইংরেজি নোটিশ আপডেট ব্যর্থ');
 
       if (setMarqueeTextEn) setMarqueeTextEn(enVal);
       showToast('স্ক্রলিং নোটিশ (বাংলা ও ইংরেজি) সফলভাবে আপডেট করা হয়েছে!');
@@ -8241,8 +8254,7 @@ const AdminPanel = ({
       if (featuredTestimonialIds.includes(id)) {
         const updatedIds = featuredTestimonialIds.filter(x => x !== id);
         setFeaturedTestimonialIds(updatedIds);
-        const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'featured_test_ids').maybeSingle();
-        if (existing) await supabaseClient.from('settings').upsert({ key: 'featured_test_ids', value: JSON.stringify(updatedIds) }, { onConflict: 'key' }); broadcastUniversalSync();
+        await saveCloudSetting('featured_test_ids', JSON.stringify(updatedIds));
       }
 
       showToast('মতামত সফলভাবে মুছে ফেলা হয়েছে!');
@@ -8266,12 +8278,7 @@ const AdminPanel = ({
         updatedIds.push(id);
       }
 
-      const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'featured_test_ids').maybeSingle();
-      if (existing) {
-        await supabaseClient.from('settings').upsert({ key: 'featured_test_ids', value: JSON.stringify(updatedIds) }, { onConflict: 'key' }); broadcastUniversalSync();
-      } else {
-        await supabaseClient.from('settings').insert({ key: 'featured_test_ids', value: JSON.stringify(updatedIds) });
-      }
+      await saveCloudSetting('featured_test_ids', JSON.stringify(updatedIds));
 
       setFeaturedTestimonialIds(updatedIds);
       showToast('হোমপেজ ফিচার্ড লিস্ট আপডেট হয়েছে!');
@@ -8395,12 +8402,9 @@ const AdminPanel = ({
       }
 
       try {
-        await supabaseClient.from('settings').upsert({
-          key: 'events_media',
-          value: JSON.stringify(eventsMedia)
-        }, { onConflict: 'key' });
+        await saveCloudSetting('events_media', JSON.stringify(eventsMedia));
       } catch (upsertErr) {
-        console.warn("Could not upsert events_media to Supabase:", upsertErr);
+        console.warn("Could not save events_media to Supabase:", upsertErr);
       }
 
       try {
@@ -8461,10 +8465,7 @@ const AdminPanel = ({
           if (stData && stData.value) {
             const eventsMedia = JSON.parse(stData.value) || {};
             delete eventsMedia[id];
-            await supabaseClient.from('settings').upsert({
-              key: 'events_media',
-              value: JSON.stringify(eventsMedia)
-            }, { onConflict: 'key' });
+            await saveCloudSetting('events_media', JSON.stringify(eventsMedia));
             localStorage.setItem('temple_events_media', JSON.stringify(eventsMedia));
           }
         } catch (e) {}
@@ -8564,11 +8565,7 @@ const AdminPanel = ({
       const orderIds = reorderedList.map(d => d.id);
       localStorage.setItem('temple_donations_order', JSON.stringify(orderIds));
       if (supabaseClient) {
-        await supabaseClient.from('settings').upsert({
-          key: 'donations_order',
-          value: JSON.stringify(orderIds)
-        }, { onConflict: 'key' });
-        broadcastUniversalSync();
+        await saveCloudSetting('donations_order', JSON.stringify(orderIds));
       }
       showToast('দাতাদের ক্রমিক ও অবস্থান সফলভাবে সংরক্ষিত হয়েছে!');
     } catch (e) {
@@ -8626,12 +8623,7 @@ const AdminPanel = ({
       setTimings(timingsForm);
       try { localStorage.setItem('temple_timings', JSON.stringify(timingsForm)); } catch (e) { }
 
-      const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'temple_timings').maybeSingle();
-      if (existing) {
-        await supabaseClient.from('settings').upsert({ key: 'temple_timings', value: JSON.stringify(timingsForm) }, { onConflict: 'key' }); broadcastUniversalSync();
-      } else {
-        await supabaseClient.from('settings').insert({ key: 'temple_timings', value: JSON.stringify(timingsForm) });
-      }
+      await saveCloudSetting('temple_timings', JSON.stringify(timingsForm));
       showToast('পূজা ও আরতির সময়সূচি সফলভাবে সংরক্ষিত হয়েছে!');
     } catch (err) {
       setErrorMsg("সময়সূচি আপডেট করতে সমস্যা হয়েছে।");
@@ -8649,12 +8641,7 @@ const AdminPanel = ({
       setTravelInfo(travelForm);
       try { localStorage.setItem('temple_travel', JSON.stringify(travelForm)); } catch (e) { }
 
-      const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'travel_info').maybeSingle();
-      if (existing) {
-        await supabaseClient.from('settings').upsert({ key: 'travel_info', value: JSON.stringify(travelForm) }, { onConflict: 'key' }); broadcastUniversalSync();
-      } else {
-        await supabaseClient.from('settings').insert({ key: 'travel_info', value: JSON.stringify(travelForm) });
-      }
+      await saveCloudSetting('travel_info', JSON.stringify(travelForm));
       showToast('তীর্থযাত্রী ভ্রমণ গাইড ও যোগাযোগের তথ্য সংরক্ষিত হয়েছে!');
     } catch (err) {
       setErrorMsg("ভ্রমণ গাইড আপডেট করতে সমস্যা হয়েছে।");
@@ -8689,12 +8676,7 @@ const AdminPanel = ({
       setMantras(updatedMantras);
       try { localStorage.setItem('temple_mantras', JSON.stringify(updatedMantras)); } catch (e) { }
 
-      const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'sacred_mantras').maybeSingle();
-      if (existing) {
-        await supabaseClient.from('settings').upsert({ key: 'sacred_mantras', value: JSON.stringify(updatedMantras) }, { onConflict: 'key' }); broadcastUniversalSync();
-      } else {
-        await supabaseClient.from('settings').insert({ key: 'sacred_mantras', value: JSON.stringify(updatedMantras) });
-      }
+      await saveCloudSetting('sacred_mantras', JSON.stringify(updatedMantras));
       setNewMantra({
         category: 'ধ্যান',
         category_en: 'Dhyana',
@@ -8721,10 +8703,7 @@ const AdminPanel = ({
       setMantras(updatedMantras);
       try { localStorage.setItem('temple_mantras', JSON.stringify(updatedMantras)); } catch (e) { }
 
-      const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'sacred_mantras').maybeSingle();
-      if (existing) {
-        await supabaseClient.from('settings').upsert({ key: 'sacred_mantras', value: JSON.stringify(updatedMantras) }, { onConflict: 'key' }); broadcastUniversalSync();
-      }
+      await saveCloudSetting('sacred_mantras', JSON.stringify(updatedMantras));
       showToast('মন্ত্র মুছে ফেলা হয়েছে!');
         broadcastUniversalSync();
       } catch (err) {
@@ -8812,12 +8791,7 @@ const AdminPanel = ({
       if (setPujaBookings) setPujaBookings(updated);
       try { localStorage.setItem('mmg_puja_bookings', JSON.stringify(updated)); } catch (e) { }
 
-      const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'puja_bookings').maybeSingle();
-      if (existing) {
-        await supabaseClient.from('settings').upsert({ key: 'puja_bookings', value: JSON.stringify(updated) }, { onConflict: 'key' }); broadcastUniversalSync();
-      } else {
-        await supabaseClient.from('settings').insert({ key: 'puja_bookings', value: JSON.stringify(updated) });
-      }
+      await saveCloudSetting('puja_bookings', JSON.stringify(updated));
       showToast(nextStatus === 'completed' ? 'পূজা বুকিং সম্পন্ন হিসেবে চিহ্নিত করা হয়েছে!' : 'বুকিং পুনরায় পেন্ডিং করা হয়েছে!');
     } catch (err) {
       setErrorMsg("বুকিং স্ট্যাটাস পরিবর্তন করতে সমস্যা হয়েছে।");
@@ -8835,10 +8809,7 @@ const AdminPanel = ({
       if (setPujaBookings) setPujaBookings(updated);
       try { localStorage.setItem('mmg_puja_bookings', JSON.stringify(updated)); } catch (e) { }
 
-      const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'puja_bookings').maybeSingle();
-      if (existing) {
-        await supabaseClient.from('settings').upsert({ key: 'puja_bookings', value: JSON.stringify(updated) }, { onConflict: 'key' }); broadcastUniversalSync();
-      }
+      await saveCloudSetting('puja_bookings', JSON.stringify(updated));
       showToast('পূজা বুকিং মুছে ফেলা হয়েছে!');
         broadcastUniversalSync();
       } catch (err) {
@@ -8926,11 +8897,7 @@ const AdminPanel = ({
     try {
       localStorage.setItem('temple_scholars', JSON.stringify(reorderedList));
       if (supabaseClient) {
-        await supabaseClient.from('settings').upsert({
-          key: 'temple_scholars',
-          value: JSON.stringify(reorderedList)
-        }, { onConflict: 'key' });
-        broadcastUniversalSync();
+        await saveCloudSetting('temple_scholars', JSON.stringify(reorderedList));
       }
       showToast('মনীষীদের তালিকা ও ক্রমিক সফলভাবে সংরক্ষিত হয়েছে!');
     } catch (e) {
@@ -9134,19 +9101,13 @@ const AdminPanel = ({
         }
       }
 
-      // 2. Atomic upsert to Supabase
-      const { error: upErr } = await supabaseClient.from('settings').upsert({
-        key: 'donation_receipts',
-        value: JSON.stringify(updated.slice(0, 150))
-      }, { onConflict: 'key' });
-      if (upErr) throw upErr;
+      // 2. Save to Supabase using safe cloud helper
+      const upOk = await saveCloudSetting('donation_receipts', JSON.stringify(updated.slice(0, 150)));
+      if (!upOk) throw new Error('ডাটাবেসে রশিদ সংরক্ষণ ব্যর্থ হয়েছে');
 
       // 3. Update local state & localStorage
       if (setDonationReceipts) setDonationReceipts(updated);
       try { localStorage.setItem('mmg_donation_receipts', JSON.stringify(updated.slice(0, 150))); } catch (e) { }
-
-      // 4. Universal sync broadcast
-      broadcastUniversalSync();
 
       showToast('নতুন স্মারক প্রণামী রশিদ ইস্যু ও সংরক্ষিত হয়েছে!');
       setAdminReceiptForm({
@@ -9186,12 +9147,7 @@ const AdminPanel = ({
       if (setDonationReceipts) setDonationReceipts(updated);
       try { localStorage.setItem('mmg_donation_receipts', JSON.stringify(updated)); } catch (e) { }
 
-      await supabaseClient.from('settings').upsert({
-        key: 'donation_receipts',
-        value: JSON.stringify(updated)
-      }, { onConflict: 'key' });
-
-      broadcastUniversalSync();
+      await saveCloudSetting('donation_receipts', JSON.stringify(updated));
       showToast('রশিদ মুছে ফেলা হয়েছে!');
         broadcastUniversalSync();
       } catch (err) {
@@ -9222,12 +9178,7 @@ const AdminPanel = ({
       if (setRoyaniPalas) setRoyaniPalas(royaniForm);
       try { localStorage.setItem('temple_royani_palas', JSON.stringify(royaniForm)); } catch (e) { }
 
-      const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'royani_palas').maybeSingle();
-      if (existing) {
-        await supabaseClient.from('settings').upsert({ key: 'royani_palas', value: JSON.stringify(royaniForm) }, { onConflict: 'key' }); broadcastUniversalSync();
-      } else {
-        await supabaseClient.from('settings').insert({ key: 'royani_palas', value: JSON.stringify(royaniForm) });
-      }
+      await saveCloudSetting('royani_palas', JSON.stringify(royaniForm));
       showToast('ঐতিহ্যবাহী রয়ানী গানের চার পালা সফলভাবে সংরক্ষিত হয়েছে!');
     } catch (err) {
       setErrorMsg("রয়ানী পালা সংরক্ষণ করতে সমস্যা হয়েছে।");
@@ -9250,12 +9201,7 @@ const AdminPanel = ({
       if (setTempleHistory) setTempleHistory(historyForm);
       try { localStorage.setItem('temple_history_data', JSON.stringify(historyForm)); } catch (e) { }
 
-      const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'temple_history').maybeSingle();
-      if (existing) {
-        await supabaseClient.from('settings').upsert({ key: 'temple_history', value: JSON.stringify(historyForm) }, { onConflict: 'key' }); broadcastUniversalSync();
-      } else {
-        await supabaseClient.from('settings').insert({ key: 'temple_history', value: JSON.stringify(historyForm) });
-      }
+      await saveCloudSetting('temple_history', JSON.stringify(historyForm));
       showToast('মন্দিরের ঐতিহাসিক পটভূমি ও পরিচিতি সংরক্ষিত হয়েছে!');
     } catch (err) {
       setErrorMsg("ইতিহাস তথ্য সংরক্ষণ করতে সমস্যা হয়েছে।");
@@ -9289,13 +9235,7 @@ const AdminPanel = ({
     }
 
     try {
-      const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'gallery_items').maybeSingle();
-      if (existing) {
-        await supabaseClient.from('settings').upsert({ key: 'gallery_items', value: JSON.stringify(safeList) }, { onConflict: 'key' });
-        broadcastUniversalSync();
-      } else {
-        await supabaseClient.from('settings').insert({ key: 'gallery_items', value: JSON.stringify(safeList) });
-      }
+      await saveCloudSetting('gallery_items', JSON.stringify(safeList));
     } catch (err) {
       console.warn("Could not save gallery to Supabase:", err);
     }
