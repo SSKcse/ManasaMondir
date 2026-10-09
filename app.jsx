@@ -1392,6 +1392,7 @@ const MediaViewer = ({ url, isVideo, alt = "Media", className = "w-full h-full o
       if (inMemoryMediaCache.has(url)) {
         setActiveUrl(inMemoryMediaCache.get(url));
       } else {
+        setActiveUrl('');
         getMediaBlob(url).then(blobData => {
           if (!isMounted) return;
           if (blobData instanceof Blob || blobData instanceof File) {
@@ -1403,7 +1404,7 @@ const MediaViewer = ({ url, isVideo, alt = "Media", className = "w-full h-full o
         });
       }
     } else {
-      setActiveUrl(url);
+      setActiveUrl(url || '');
     }
 
     return () => {
@@ -1414,11 +1415,13 @@ const MediaViewer = ({ url, isVideo, alt = "Media", className = "w-full h-full o
     };
   }, [url]);
 
-  const targetUrl = activeUrl || url;
-  const isVid = isVideo || isVideoUrl(targetUrl) || (typeof url === 'string' && url.startsWith('idb:video_'));
+  const isVid = isVideo || (activeUrl && isVideoUrl(activeUrl)) || (url && (isVideoUrl(url) || (typeof url === 'string' && url.startsWith('idb:video_'))));
 
   if (isVid) {
-    const ytEmbed = getYouTubeEmbedUrl(targetUrl);
+    const vidSrc = (activeUrl && !activeUrl.startsWith('idb:'))
+      ? activeUrl
+      : (url && !url.startsWith('idb:') ? url : '');
+    const ytEmbed = vidSrc ? getYouTubeEmbedUrl(vidSrc) : null;
     if (ytEmbed) {
       return (
         <iframe
@@ -1430,9 +1433,16 @@ const MediaViewer = ({ url, isVideo, alt = "Media", className = "w-full h-full o
         />
       );
     }
+    if (!vidSrc) {
+      return (
+        <div className={`${className} bg-stone-900 flex items-center justify-center text-white/50 animate-pulse`}>
+          <i className="fas fa-video text-xl opacity-40"></i>
+        </div>
+      );
+    }
     return (
       <video
-        src={targetUrl}
+        src={vidSrc}
         controls={controls}
         playsInline
         autoPlay={autoPlay}
@@ -1441,8 +1451,34 @@ const MediaViewer = ({ url, isVideo, alt = "Media", className = "w-full h-full o
       />
     );
   }
-  return <img src={targetUrl} alt={alt} className={className} />;
+
+  const imgSrc = (activeUrl && !activeUrl.startsWith('idb:'))
+    ? activeUrl
+    : (url && !url.startsWith('idb:') ? url : '');
+
+  if (!imgSrc) {
+    return (
+      <div className={`${className} bg-gray-200 flex items-center justify-center text-gray-400 animate-pulse`}>
+        <i className="fas fa-image text-xl opacity-40"></i>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={imgSrc}
+      alt={alt}
+      className={className}
+      onError={(e) => {
+        if (!e.target.dataset.fallback) {
+          e.target.dataset.fallback = 'true';
+          e.target.src = 'images/events/event_4.jpg';
+        }
+      }}
+    />
+  );
 };
+
 
 // গ্যালারির ছবিগুলো
 const DEFAULT_GALLERY_ITEMS = [
@@ -3959,7 +3995,7 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
               <div key={member.id} className="bg-white rounded-3xl p-6 text-center shadow-md border-2 border-orange-100/80 card-hover-glow transition-all duration-300 flex flex-col h-full justify-between items-center group">
                 <div className="w-28 h-28 mx-auto bg-gradient-to-br from-amber-100 to-orange-200 rounded-full flex items-center justify-center mb-4 text-orange-400 border-4 border-yellow-300 shadow-md overflow-hidden text-5xl shrink-0 group-hover:scale-105 group-hover:border-orange-500 transition-all duration-300">
                   {member.image ? (
-                    <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
+                    <MediaViewer url={member.image} alt={member.name} className="w-full h-full object-cover" controls={false} />
                   ) : (
                     <i className="fas fa-user"></i>
                   )}
@@ -5646,7 +5682,7 @@ const CommitteePage = ({ committeeMembers, navigateTo, lang }) => (
           <div key={member.id} className="bg-white rounded-3xl overflow-hidden shadow-md border-2 border-orange-100/80 flex flex-col h-full justify-between items-center p-6 card-hover-glow transition-all duration-300 group">
             <div className="w-28 h-28 bg-gradient-to-br from-amber-100 to-orange-200 rounded-full flex items-center justify-center border-4 border-yellow-300 shadow-md mb-4 text-orange-400 overflow-hidden text-5xl group-hover:scale-105 group-hover:border-orange-500 transition-all duration-300 shrink-0">
               {member.image ? (
-                <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
+                <MediaViewer url={member.image} alt={member.name} className="w-full h-full object-cover" controls={false} />
               ) : (
                 <i className="fas fa-user"></i>
               )}
@@ -5741,11 +5777,11 @@ const EventCard = ({ event, showToast, lang }) => {
       {/* Media Column (Image carousel or Video placeholder or Date block) */}
       {imagesList.length > 0 ? (
         <div className="md:w-5/12 h-72 md:h-auto relative overflow-hidden bg-gray-900 flex-shrink-0 select-none">
-          <img
-            src={imagesList[activeImgIdx]}
+          <MediaViewer
+            url={imagesList[activeImgIdx]}
             alt={`${event.title} ${activeImgIdx + 1}`}
             className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
-            onError={(e) => { e.target.src = 'images/events/event_4.jpg'; }}
+            controls={false}
           />
 
           {/* Date Badge */}
@@ -8512,7 +8548,9 @@ const AdminPanel = ({
                     <input type="text" value={(!newMember.image || newMember.image.startsWith('data:')) ? '' : newMember.image} onChange={(e) => setNewMember(prev => ({ ...prev, image: e.target.value }))} className="w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-orange-500" placeholder="অথবা ড্রাইভ লিংক দিন..." />
                   </div>
                   {newMember.image && (
-                    <img src={newMember.image} alt="Preview" className="w-16 h-16 object-cover rounded-lg border border-gray-300 shadow-sm mt-2" />
+                    <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-300 shadow-sm mt-2">
+                      <MediaViewer url={newMember.image} alt="Preview" className="w-full h-full object-cover" controls={false} />
+                    </div>
                   )}
                 </div>
                 <div className="lg:col-span-4 mt-2 flex gap-3">
@@ -8551,7 +8589,9 @@ const AdminPanel = ({
                         </td>
                         <td className="p-3">
                           {m.image ? (
-                            <img src={m.image} alt={m.name} className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm" />
+                            <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm">
+                              <MediaViewer url={m.image} alt={m.name} className="w-full h-full object-cover" controls={false} />
+                            </div>
                           ) : (
                             <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-500 text-lg border-2 border-white shadow-sm">
                               <i className="fas fa-user"></i>
@@ -10489,11 +10529,14 @@ const AdminPanel = ({
                       {/* Photo Preview if selected */}
                       {(newGalleryPhoto.image || newGalleryPhoto.url) && (
                         <div className="flex items-center gap-4 p-3 bg-white rounded-xl border border-pink-200">
-                          <img
-                            src={newGalleryPhoto.image || newGalleryPhoto.url}
-                            alt="Preview"
-                            className="w-24 h-16 object-cover rounded-lg border shadow-xs"
-                          />
+                          <div className="w-24 h-16 rounded-lg overflow-hidden border shadow-xs">
+                            <MediaViewer
+                              url={newGalleryPhoto.image || newGalleryPhoto.url}
+                              alt="Preview"
+                              className="w-full h-full object-cover"
+                              controls={false}
+                            />
+                          </div>
                           <div className="text-xs text-gray-600">
                             <span className="font-bold text-pink-700">ছবি প্রাকদর্শন:</span> {newGalleryPhoto.image ? 'ডিভাইস ফাইল আপলোড' : 'ওয়েব লিংক'}
                           </div>
@@ -11769,7 +11812,7 @@ function App() {
         noticesRes,
         donationsRes
       ] = await Promise.allSettled([
-        supabaseClient.from('settings').select('id, key, value'),
+        supabaseClient.from('settings').select('id, key, value').not('key', 'like', 'idb:%'),
         supabaseClient.from('committee').select('id, name, role, phone, order_idx, image').order('order_idx', { ascending: true }).order('id', { ascending: true }),
         supabaseClient.from('testimonials').select('*').order('date', { ascending: false }).order('id', { ascending: false }),
         supabaseClient.from('events').select('id, title, date, description, image').order('date', { ascending: false }).order('id', { ascending: false }),
