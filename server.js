@@ -48,6 +48,43 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // Payment Gateway Callback Endpoint (aamarPay & UddoktaPay)
+  if (reqPath === '/api/payment-callback' || reqPath === '/payment-callback') {
+    let raw = '';
+    req.on('data', chunk => raw += chunk);
+    req.on('end', () => {
+      let data = {};
+      try {
+        data = JSON.parse(raw);
+      } catch (e) {
+        data = require('querystring').parse(raw);
+      }
+      const urlObj = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+      urlObj.searchParams.forEach((v, k) => { if (!data[k]) data[k] = v; });
+
+      const status = (data.pay_status || data.status || data.status_code || '').toString().toLowerCase();
+      const isSuccess = status === 'successful' || status === 'completed' || status === 'success' || status === '2';
+      const tranId = data.mer_txnid || data.tran_id || data.invoice_id || '';
+      const bankTrxid = data.bank_trxid || data.pg_txnid || data.trx_id || '';
+      const amount = data.amount || data.amount_original || '';
+      const cardType = data.card_type || data.card_brand || data.payment_method || 'Online';
+      const cusName = data.cus_name || data.full_name || '';
+      const cusPhone = data.cus_phone || '';
+
+      const redirectUrl = `/?payment_status=${isSuccess ? 'success' : 'failed'}` +
+        `&tran_id=${encodeURIComponent(tranId)}` +
+        `&bank_trxid=${encodeURIComponent(bankTrxid)}` +
+        `&amount=${encodeURIComponent(amount)}` +
+        `&method=${encodeURIComponent(cardType)}` +
+        `&name=${encodeURIComponent(cusName)}` +
+        `&phone=${encodeURIComponent(cusPhone)}`;
+
+      res.writeHead(302, { Location: redirectUrl });
+      res.end();
+    });
+    return;
+  }
+
   // Direct unlimited video / media upload endpoint
   if (req.method === 'POST' && (reqPath === '/api/upload' || reqPath === '/upload')) {
     const urlObj = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
