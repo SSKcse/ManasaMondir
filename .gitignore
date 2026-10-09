@@ -6,4 +6,6 @@ node_modules/
 *.lock
 supabase_data.json
 *.sql
+*.mp4
+
 

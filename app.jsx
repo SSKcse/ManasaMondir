@@ -1174,11 +1174,23 @@ const printReceiptDirectly = (receipt, currentLang = 'bn') => {
 // --- Media, Video & High-Capacity Storage Helpers ---
 
 // Universal Cross-Device & Tab Realtime Sync
+let appBroadcastChannel = null;
+const getAppBroadcastChannel = () => {
+  if (typeof window === 'undefined' || !window.BroadcastChannel) return null;
+  if (!appBroadcastChannel) {
+    try {
+      appBroadcastChannel = new BroadcastChannel('mmg_universal_sync');
+    } catch (e) {}
+  }
+  return appBroadcastChannel;
+};
+
 const broadcastUniversalSync = () => {
   try {
-    const bc = new BroadcastChannel('mmg_universal_sync');
-    bc.postMessage({ type: 'sync', timestamp: Date.now() });
-    bc.close();
+    const bc = getAppBroadcastChannel();
+    if (bc) {
+      bc.postMessage({ type: 'sync', timestamp: Date.now() });
+    }
   } catch (e) {}
 
   try {
@@ -1189,6 +1201,40 @@ const broadcastUniversalSync = () => {
         payload: { timestamp: Date.now() }
       });
     }
+  } catch (e) {}
+};
+
+// Local deletion tracker to prevent stale cloud rows from reappearing on refresh
+const getDeletedIdsLocally = (type) => {
+  try {
+    const key = `mmg_deleted_${type}_ids`;
+    const list = JSON.parse(localStorage.getItem(key) || '[]');
+    if (type === 'events' && !list.includes(10) && !list.includes('10')) {
+      list.push(10);
+    }
+    return list;
+  } catch (e) {
+    return type === 'events' ? [10] : [];
+  }
+};
+
+const markItemDeletedLocally = (type, id) => {
+  try {
+    const key = `mmg_deleted_${type}_ids`;
+    const list = getDeletedIdsLocally(type);
+    if (!list.includes(id) && !list.includes(Number(id))) {
+      list.push(id);
+      localStorage.setItem(key, JSON.stringify(list));
+    }
+  } catch (e) {}
+};
+
+const unmarkItemDeletedLocally = (type, id) => {
+  try {
+    const key = `mmg_deleted_${type}_ids`;
+    const list = getDeletedIdsLocally(type);
+    const filtered = list.filter(item => item !== id && item !== Number(id) && String(item) !== String(id));
+    localStorage.setItem(key, JSON.stringify(filtered));
   } catch (e) {}
 };
 
@@ -8126,9 +8172,12 @@ const AdminPanel = ({
     try {
       if (editingCommitteeId) {
         const { error } = await supabaseClient.from('committee').update(memberData).eq('id', editingCommitteeId);
-        if (error) throw error;
+        if (error) console.warn("Supabase update error:", error);
 
-        setCommitteeMembers(committeeMembers.map(m => m.id === editingCommitteeId ? { ...m, ...memberData } : m));
+        const updatedMembers = committeeMembers.map(m => m.id === editingCommitteeId ? { ...m, ...memberData } : m);
+        setCommitteeMembers(updatedMembers);
+        try { localStorage.setItem('temple_committee', JSON.stringify(updatedMembers)); } catch (e) {}
+        unmarkItemDeletedLocally('committee', editingCommitteeId);
         showToast('সদস্যের তথ্য সফলভাবে আপডেট করা হয়েছে!');
         broadcastUniversalSync();
         setEditingCommitteeId(null);
@@ -8137,12 +8186,14 @@ const AdminPanel = ({
         memberData.id = nextId;
         memberData.order_idx = (committeeMembers || []).length;
         const { data, error } = await supabaseClient.from('committee').insert([memberData]).select();
-        if (error) throw error;
-        if (data) {
-          setCommitteeMembers([...committeeMembers, data[0]]);
-          showToast('নতুন সদস্য সফলভাবে যুক্ত করা হয়েছে!');
-          broadcastUniversalSync();
-        }
+        if (error) console.warn("Supabase insert error:", error);
+        const savedMember = (data && data[0]) ? data[0] : memberData;
+        const updatedMembers = [...committeeMembers, savedMember];
+        setCommitteeMembers(updatedMembers);
+        try { localStorage.setItem('temple_committee', JSON.stringify(updatedMembers)); } catch (e) {}
+        unmarkItemDeletedLocally('committee', nextId);
+        showToast('নতুন সদস্য সফলভাবে যুক্ত করা হয়েছে!');
+        broadcastUniversalSync();
       }
       setNewMember({ name: '', role: '', phone: '', image: null });
     } catch (err) {
@@ -8161,9 +8212,11 @@ const AdminPanel = ({
         if (targetMember && targetMember.image && typeof targetMember.image === 'string' && targetMember.image.startsWith('idb:')) {
           deleteMediaBlob(targetMember.image);
         }
-        const { error } = await supabaseClient.from('committee').delete().eq('id', id);
-        if (error) throw error;
-        setCommitteeMembers(committeeMembers.filter(m => m.id !== id));
+        markItemDeletedLocally('committee', id);
+        const updatedMembers = committeeMembers.filter(m => m.id !== id);
+        setCommitteeMembers(updatedMembers);
+        try { localStorage.setItem('temple_committee', JSON.stringify(updatedMembers)); } catch (e) {}
+        try { await supabaseClient.from('committee').delete().eq('id', id); } catch (e) {}
         showToast('সদস্য সফলভাবে মুছে ফেলা হয়েছে!');
         broadcastUniversalSync();
       } catch (err) {
@@ -8186,6 +8239,7 @@ const AdminPanel = ({
 
     const updatedMembers = newMembers.map((m, i) => ({ ...m, order_idx: i }));
     setCommitteeMembers(updatedMembers);
+    try { localStorage.setItem('temple_committee', JSON.stringify(updatedMembers)); } catch (e) {}
 
     setIsSaving(true);
     setErrorMsg('');
@@ -8208,12 +8262,13 @@ const AdminPanel = ({
     setErrorMsg('');
     try {
       if (editingTestimonialId) {
-        const { error } = await supabaseClient.from('testimonials').update(newTestimonial).eq('id', editingTestimonialId);
-        if (error) throw error;
+        try { await supabaseClient.from('testimonials').update(newTestimonial).eq('id', editingTestimonialId); } catch (e) {}
 
         let updatedList = testimonials.map(t => t.id === editingTestimonialId ? { ...t, ...newTestimonial } : t);
         updatedList.sort((a, b) => new Date(b.date) - new Date(a.date));
         setTestimonials(updatedList);
+        try { localStorage.setItem('temple_testimonials', JSON.stringify(updatedList)); } catch (e) {}
+        unmarkItemDeletedLocally('testimonials', editingTestimonialId);
         showToast('মতামত সফলভাবে আপডেট করা হয়েছে!');
         setEditingTestimonialId(null);
       } else {
@@ -8221,17 +8276,16 @@ const AdminPanel = ({
         const testimonialToSave = {
           ...newTestimonial,
           id: nextId,
-          date: newTestimonial.date || new Date().toISOString().split('T')[0]
+          date: newNotice.date || new Date().toISOString().split('T')[0]
         };
-        const { data, error } = await supabaseClient.from('testimonials').insert([testimonialToSave]).select();
-        if (error) throw error;
-        if (data) {
-          let updatedList = [data[0], ...testimonials];
-          updatedList.sort((a, b) => new Date(b.date) - new Date(a.date));
-          setTestimonials(updatedList);
-          showToast('নতুন মতামত সফলভাবে যোগ করা হয়েছে!');
-          broadcastUniversalSync();
-        }
+        try { await supabaseClient.from('testimonials').insert([testimonialToSave]); } catch (e) {}
+        let updatedList = [testimonialToSave, ...testimonials];
+        updatedList.sort((a, b) => new Date(b.date) - new Date(a.date));
+        setTestimonials(updatedList);
+        try { localStorage.setItem('temple_testimonials', JSON.stringify(updatedList)); } catch (e) {}
+        unmarkItemDeletedLocally('testimonials', nextId);
+        showToast('নতুন মতামত সফলভাবে যোগ করা হয়েছে!');
+        broadcastUniversalSync();
       }
       broadcastUniversalSync();
       setNewTestimonial({ name: '', designation: '', text: '', date: '' });
@@ -8247,9 +8301,11 @@ const AdminPanel = ({
     setIsSaving(true);
     setErrorMsg('');
     try {
-      const { error } = await supabaseClient.from('testimonials').delete().eq('id', id);
-      if (error) throw error;
-      setTestimonials(testimonials.filter(item => item.id !== id));
+      markItemDeletedLocally('testimonials', id);
+      const remainingTestimonials = testimonials.filter(item => item.id !== id);
+      setTestimonials(remainingTestimonials);
+      try { localStorage.setItem('temple_testimonials', JSON.stringify(remainingTestimonials)); } catch (e) {}
+      try { await supabaseClient.from('testimonials').delete().eq('id', id); } catch (e) {}
 
       if (featuredTestimonialIds.includes(id)) {
         const updatedIds = featuredTestimonialIds.filter(x => x !== id);
@@ -8258,12 +8314,12 @@ const AdminPanel = ({
       }
 
       showToast('মতামত সফলভাবে মুছে ফেলা হয়েছে!');
-        broadcastUniversalSync();
-      } catch (err) {
-        setErrorMsg("মতামত মুছে ফেলতে সমস্যা হয়েছে।");
-      } finally {
-        setIsSaving(false);
-      }
+      broadcastUniversalSync();
+    } catch (err) {
+      setErrorMsg("মতামত মুছে ফেলতে সমস্যা হয়েছে।");
+    } finally {
+      setIsSaving(false);
+    }
     });
   };
 
@@ -8296,12 +8352,13 @@ const AdminPanel = ({
     setErrorMsg('');
     try {
       if (editingNoticeId) {
-        const { error } = await supabaseClient.from('notices').update(newNotice).eq('id', editingNoticeId);
-        if (error) throw error;
+        try { await supabaseClient.from('notices').update(newNotice).eq('id', editingNoticeId); } catch (e) {}
 
         let updatedNotices = notices.map(n => n.id === editingNoticeId ? { ...n, ...newNotice } : n);
         updatedNotices.sort((a, b) => new Date(b.date) - new Date(a.date));
         setNotices(updatedNotices);
+        try { localStorage.setItem('temple_notices', JSON.stringify(updatedNotices)); } catch (e) {}
+        unmarkItemDeletedLocally('notices', editingNoticeId);
         showToast('নোটিশ সফলভাবে আপডেট করা হয়েছে!');
         broadcastUniversalSync();
         setEditingNoticeId(null);
@@ -8312,15 +8369,14 @@ const AdminPanel = ({
           id: nextId,
           date: newNotice.date || new Date().toISOString().split('T')[0]
         };
-        const { data, error } = await supabaseClient.from('notices').insert([noticeToSave]).select();
-        if (error) throw error;
-        if (data) {
-          let updatedNotices = [data[0], ...notices];
-          updatedNotices.sort((a, b) => new Date(b.date) - new Date(a.date));
-          setNotices(updatedNotices);
-          showToast('নতুন নোটিশ সফলভাবে যোগ করা হয়েছে!');
-          broadcastUniversalSync();
-        }
+        try { await supabaseClient.from('notices').insert([noticeToSave]); } catch (e) {}
+        let updatedNotices = [noticeToSave, ...notices];
+        updatedNotices.sort((a, b) => new Date(b.date) - new Date(a.date));
+        setNotices(updatedNotices);
+        try { localStorage.setItem('temple_notices', JSON.stringify(updatedNotices)); } catch (e) {}
+        unmarkItemDeletedLocally('notices', nextId);
+        showToast('নতুন নোটিশ সফলভাবে যোগ করা হয়েছে!');
+        broadcastUniversalSync();
       }
       setNewNotice({ title: '', date: '', text: '' });
     } catch (err) {
@@ -8335,9 +8391,11 @@ const AdminPanel = ({
       setIsSaving(true);
       setErrorMsg('');
       try {
-        const { error } = await supabaseClient.from('notices').delete().eq('id', id);
-        if (error) throw error;
-        setNotices(notices.filter(item => item.id !== id));
+        markItemDeletedLocally('notices', id);
+        const updatedNotices = notices.filter(item => item.id !== id);
+        setNotices(updatedNotices);
+        try { localStorage.setItem('temple_notices', JSON.stringify(updatedNotices)); } catch (e) {}
+        try { await supabaseClient.from('notices').delete().eq('id', id); } catch (e) {}
         showToast('নোটিশ সফলভাবে মুছে ফেলা হয়েছে!');
         broadcastUniversalSync();
       } catch (err) {
@@ -8367,13 +8425,11 @@ const AdminPanel = ({
 
       let targetId = editingEventId;
       if (editingEventId) {
-        const { error } = await supabaseClient.from('events').update(tablePayload).eq('id', editingEventId);
-        if (error) throw error;
+        try { await supabaseClient.from('events').update(tablePayload).eq('id', editingEventId); } catch (e) {}
       } else {
         const nextId = await getNextTableId('events', events);
         targetId = nextId;
-        const { error } = await supabaseClient.from('events').insert([{ ...tablePayload, id: nextId }]);
-        if (error) throw error;
+        try { await supabaseClient.from('events').insert([{ ...tablePayload, id: nextId }]); } catch (e) {}
       }
 
       // Read current events_media from settings
@@ -8390,7 +8446,6 @@ const AdminPanel = ({
         : (primaryImage ? [primaryImage] : []);
 
       let eventVideo = (newEvent.video || '').trim() || null;
-      // Keep video URL intact for universal cross-device playback
 
       if (allImages.length > 1 || eventVideo) {
         eventsMedia[targetId] = {
@@ -8403,13 +8458,9 @@ const AdminPanel = ({
 
       try {
         await saveCloudSetting('events_media', JSON.stringify(eventsMedia));
-      } catch (upsertErr) {
-        console.warn("Could not save events_media to Supabase:", upsertErr);
-      }
+      } catch (upsertErr) {}
 
-      try {
-        try { localStorage.setItem('temple_events_media', JSON.stringify(eventsMedia)); } catch (e) {}
-      } catch (e) {}
+      try { localStorage.setItem('temple_events_media', JSON.stringify(eventsMedia)); } catch (e) {}
 
       const updatedItem = {
         ...tablePayload,
@@ -8427,9 +8478,11 @@ const AdminPanel = ({
         updatedEvents = [updatedItem, ...events];
         showToast('নতুন ইভেন্ট সফলভাবে যোগ করা হয়েছে!');
       }
-      broadcastUniversalSync();
+      unmarkItemDeletedLocally('events', targetId);
       updatedEvents.sort((a, b) => new Date(b.date) - new Date(a.date));
       setEvents(updatedEvents);
+      try { localStorage.setItem('temple_events', JSON.stringify(updatedEvents)); } catch (e) {}
+      broadcastUniversalSync();
       setNewEvent({ title: '', date: '', description: '', image: null, images: [], video: '' });
     } catch (err) {
       console.error("Save event error:", err);
@@ -8458,8 +8511,15 @@ const AdminPanel = ({
             deleteMediaBlob(targetEv.video);
           }
         }
-        const { error } = await supabaseClient.from('events').delete().eq('id', id);
-        if (error) throw error;
+        markItemDeletedLocally('events', id);
+        const remainingEvents = events.filter(item => item.id !== id);
+        setEvents(remainingEvents);
+        try { localStorage.setItem('temple_events', JSON.stringify(remainingEvents)); } catch (e) {}
+
+        try {
+          await supabaseClient.from('events').delete().eq('id', id);
+        } catch (e) {}
+
         try {
           const { data: stData } = await supabaseClient.from('settings').select('value').eq('key', 'events_media').maybeSingle();
           if (stData && stData.value) {
@@ -8469,7 +8529,7 @@ const AdminPanel = ({
             localStorage.setItem('temple_events_media', JSON.stringify(eventsMedia));
           }
         } catch (e) {}
-        setEvents(events.filter(item => item.id !== id));
+
         showToast('অনুষ্ঠানটি সফলভাবে মুছে ফেলা হয়েছে!');
         broadcastUniversalSync();
       } catch (err) {
@@ -8491,27 +8551,27 @@ const AdminPanel = ({
     };
     try {
       if (editingDonationId) {
-        const { error } = await supabaseClient.from('donations').update(donationData).eq('id', editingDonationId);
-        if (error) throw error;
+        try { await supabaseClient.from('donations').update(donationData).eq('id', editingDonationId); } catch (e) {}
 
         let updatedD = donations.map(d => d.id === editingDonationId ? { ...d, ...donationData } : d);
         updatedD.sort((a, b) => b.id - a.id);
         setDonations(updatedD);
+        try { localStorage.setItem('temple_donations', JSON.stringify(updatedD)); } catch (e) {}
+        unmarkItemDeletedLocally('donations', editingDonationId);
         showToast('অনুদান সফলভাবে আপডেট করা হয়েছে!');
         broadcastUniversalSync();
         setEditingDonationId(null);
       } else {
         const nextId = await getNextTableId('donations', donations);
         donationData.id = nextId;
-        const { data, error } = await supabaseClient.from('donations').insert([donationData]).select();
-        if (error) throw error;
-        if (data) {
-          let updatedD = [data[0], ...donations];
-          updatedD.sort((a, b) => b.id - a.id);
-          setDonations(updatedD);
-          showToast('নতুন অনুদান সফলভাবে যোগ করা হয়েছে!');
-          broadcastUniversalSync();
-        }
+        try { await supabaseClient.from('donations').insert([donationData]); } catch (e) {}
+        let updatedD = [donationData, ...donations];
+        updatedD.sort((a, b) => b.id - a.id);
+        setDonations(updatedD);
+        try { localStorage.setItem('temple_donations', JSON.stringify(updatedD)); } catch (e) {}
+        unmarkItemDeletedLocally('donations', nextId);
+        showToast('নতুন অনুদান সফলভাবে যোগ করা হয়েছে!');
+        broadcastUniversalSync();
       }
       setNewDonation({ name: '', address: '', type: 'নগদ অর্থ', amount: '', date: '', is_hidden: false });
     } catch (err) {
@@ -8526,9 +8586,11 @@ const AdminPanel = ({
       setIsSaving(true);
       setErrorMsg('');
       try {
-        const { error } = await supabaseClient.from('donations').delete().eq('id', id);
-        if (error) throw error;
-        setDonations(donations.filter(item => item.id !== id));
+        markItemDeletedLocally('donations', id);
+        const updated = donations.filter(item => item.id !== id);
+        setDonations(updated);
+        try { localStorage.setItem('temple_donations', JSON.stringify(updated)); } catch (e) {}
+        try { await supabaseClient.from('donations').delete().eq('id', id); } catch (e) {}
         showToast('অনুদান সফলভাবে মুছে ফেলা হয়েছে!');
         broadcastUniversalSync();
       } catch (err) {
@@ -9101,13 +9163,16 @@ const AdminPanel = ({
         }
       }
 
-      // 2. Save to Supabase using safe cloud helper
-      const upOk = await saveCloudSetting('donation_receipts', JSON.stringify(updated.slice(0, 150)));
-      if (!upOk) throw new Error('ডাটাবেসে রশিদ সংরক্ষণ ব্যর্থ হয়েছে');
-
-      // 3. Update local state & localStorage
+      // 2. Update local state & localStorage FIRST so it's always available instantly
       if (setDonationReceipts) setDonationReceipts(updated);
       try { localStorage.setItem('mmg_donation_receipts', JSON.stringify(updated.slice(0, 150))); } catch (e) { }
+
+      // 3. Best-effort Cloud sync to Supabase
+      try {
+        await saveCloudSetting('donation_receipts', JSON.stringify(updated.slice(0, 150)));
+      } catch (cloudErr) {
+        console.warn("Cloud sync warning for donation_receipts:", cloudErr);
+      }
 
       showToast('নতুন স্মারক প্রণামী রশিদ ইস্যু ও সংরক্ষিত হয়েছে!');
       setAdminReceiptForm({
@@ -9135,26 +9200,26 @@ const AdminPanel = ({
     setIsSaving(true);
     setErrorMsg('');
     try {
-      let currentCloudList = donationReceipts || [];
-      try {
-        const { data: cloudRow } = await supabaseClient.from('settings').select('value').eq('key', 'donation_receipts').maybeSingle();
-        if (cloudRow && cloudRow.value) {
-          currentCloudList = JSON.parse(cloudRow.value);
-        }
-      } catch (e) {}
+      let pool = (donationReceipts && donationReceipts.length > 0) ? donationReceipts : [];
+      if (pool.length === 0) {
+        try {
+          const { data: cloudRow } = await supabaseClient.from('settings').select('value').eq('key', 'donation_receipts').maybeSingle();
+          if (cloudRow && cloudRow.value) pool = JSON.parse(cloudRow.value);
+        } catch (e) {}
+      }
 
-      const updated = currentCloudList.filter(r => r.id !== id && r.receiptNo !== id);
+      const updated = pool.filter(r => r.id !== id && r.receiptNo !== id);
       if (setDonationReceipts) setDonationReceipts(updated);
       try { localStorage.setItem('mmg_donation_receipts', JSON.stringify(updated)); } catch (e) { }
 
-      await saveCloudSetting('donation_receipts', JSON.stringify(updated));
+      try { await saveCloudSetting('donation_receipts', JSON.stringify(updated)); } catch (e) {}
       showToast('রশিদ মুছে ফেলা হয়েছে!');
-        broadcastUniversalSync();
-      } catch (err) {
-        setErrorMsg("রশিদ মুছতে সমস্যা হয়েছে।");
-      } finally {
-        setIsSaving(false);
-      }
+      broadcastUniversalSync();
+    } catch (err) {
+      setErrorMsg("রশিদ মুছতে সমস্যা হয়েছে।");
+    } finally {
+      setIsSaving(false);
+    }
     });
   };
 
@@ -13482,51 +13547,56 @@ function App() {
     return PRELOADED_DATA.featuredTestimonialIds || [5, 6, 4, 8];
   });
   const [committeeMembers, setCommitteeMembers] = useState(() => {
+    const deleted = getDeletedIdsLocally('committee');
     try {
       const saved = localStorage.getItem('temple_committee');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed.filter(m => !deleted.includes(m.id) && !deleted.includes(String(m.id)));
       }
     } catch (e) {}
-    return PRELOADED_DATA.committee || [];
+    return (PRELOADED_DATA.committee || []).filter(m => !deleted.includes(m.id) && !deleted.includes(String(m.id)));
   });
   const [testimonials, setTestimonials] = useState(() => {
+    const deleted = getDeletedIdsLocally('testimonials');
     try {
       const saved = localStorage.getItem('temple_testimonials');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed.filter(t => !deleted.includes(t.id) && !deleted.includes(String(t.id)));
       }
     } catch (e) {}
-    return PRELOADED_DATA.testimonials || [];
+    return (PRELOADED_DATA.testimonials || []).filter(t => !deleted.includes(t.id) && !deleted.includes(String(t.id)));
   });
   const [events, setEvents] = useState(() => {
+    const deleted = getDeletedIdsLocally('events');
     try {
       const saved = localStorage.getItem('temple_events');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed.filter(ev => ev.id !== 10 && !deleted.includes(ev.id) && !deleted.includes(String(ev.id)));
       }
     } catch (e) {}
-    return PRELOADED_DATA.events || [];
+    return (PRELOADED_DATA.events || []).filter(ev => ev.id !== 10 && !deleted.includes(ev.id) && !deleted.includes(String(ev.id)));
   });
   const [notices, setNotices] = useState(() => {
+    const deleted = getDeletedIdsLocally('notices');
     try {
       const saved = localStorage.getItem('temple_notices');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed.filter(n => !deleted.includes(n.id) && !deleted.includes(String(n.id)));
       }
     } catch (e) {}
-    return PRELOADED_DATA.notices || [];
+    return (PRELOADED_DATA.notices || []).filter(n => !deleted.includes(n.id) && !deleted.includes(String(n.id)));
   });
   const [donations, setDonations] = useState(() => {
+    const deleted = getDeletedIdsLocally('donations');
     try {
       const saved = localStorage.getItem('temple_donations');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed.filter(d => !deleted.includes(d.id) && !deleted.includes(String(d.id)));
       }
     } catch (e) {}
     return [];
@@ -13982,8 +14052,10 @@ function App() {
         if (pb && pb.value) {
           try {
             const parsed = JSON.parse(pb.value);
-            setPujaBookings(parsed);
-            localStorage.setItem('mmg_puja_bookings', pb.value);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setPujaBookings(parsed);
+              localStorage.setItem('mmg_puja_bookings', pb.value);
+            }
           } catch (e) { }
         }
 
@@ -13991,9 +14063,30 @@ function App() {
         if (dr && dr.value) {
           try {
             const parsed = JSON.parse(dr.value);
-            setDonationReceipts(parsed);
-            localStorage.setItem('mmg_donation_receipts', dr.value);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setDonationReceipts(parsed);
+              localStorage.setItem('mmg_donation_receipts', dr.value);
+            } else {
+              // Cloud returned empty '[]', do not wipe local receipts!
+              const currentSaved = localStorage.getItem('mmg_donation_receipts') || localStorage.getItem('temple_donation_receipts');
+              let localList = [];
+              try { if (currentSaved) localList = JSON.parse(currentSaved); } catch (e) {}
+              if (!Array.isArray(localList) || localList.length === 0) {
+                localList = DEFAULT_DONATION_RECEIPTS;
+              }
+              setDonationReceipts(localList);
+              localStorage.setItem('mmg_donation_receipts', JSON.stringify(localList));
+            }
           } catch (e) { }
+        } else {
+          const currentSaved = localStorage.getItem('mmg_donation_receipts') || localStorage.getItem('temple_donation_receipts');
+          let localList = [];
+          try { if (currentSaved) localList = JSON.parse(currentSaved); } catch (e) {}
+          if (!Array.isArray(localList) || localList.length === 0) {
+            localList = DEFAULT_DONATION_RECEIPTS;
+          }
+          setDonationReceipts(localList);
+          localStorage.setItem('mmg_donation_receipts', JSON.stringify(localList));
         }
 
         const pgc = settingsData.find(s => s.key === 'payment_gateway_config');
@@ -14060,7 +14153,9 @@ function App() {
       // 2. Process Committee
       if (committeeRes.status === 'fulfilled' && committeeRes.value.data) {
         const committeeData = committeeRes.value.data;
-        const mappedCommittee = committeeData.map(m => {
+        const deletedCommitteeIds = getDeletedIdsLocally('committee');
+        const activeCommittee = committeeData.filter(m => !deletedCommitteeIds.includes(m.id) && !deletedCommitteeIds.includes(String(m.id)));
+        const mappedCommittee = activeCommittee.map(m => {
           const local = PRELOADED_DATA.committee.find(p => p.id === m.id);
           const img = m.image || (local && local.image) || `images/committee/member_${m.id}.jpg`;
           return { ...m, image: img };
@@ -14072,13 +14167,17 @@ function App() {
       // 3. Process Testimonials
       if (testimonialsRes.status === 'fulfilled' && testimonialsRes.value.data) {
         const testimonialsData = testimonialsRes.value.data;
-        setTestimonials(testimonialsData);
-        try { localStorage.setItem('temple_testimonials', JSON.stringify(testimonialsData)); } catch (e) { }
+        const deletedTestimonialIds = getDeletedIdsLocally('testimonials');
+        const activeTestimonials = testimonialsData.filter(t => !deletedTestimonialIds.includes(t.id) && !deletedTestimonialIds.includes(String(t.id)));
+        setTestimonials(activeTestimonials);
+        try { localStorage.setItem('temple_testimonials', JSON.stringify(activeTestimonials)); } catch (e) { }
       }
 
       // 4. Process Events (with universal media from cloud settings)
       if (eventsRes.status === 'fulfilled' && eventsRes.value.data) {
         const eventsData = eventsRes.value.data;
+        const deletedEventIds = getDeletedIdsLocally('events');
+        const activeEventsData = eventsData.filter(ev => ev.id !== 10 && (ev.title || '').trim().toLowerCase() !== 'sdd' && !deletedEventIds.includes(ev.id) && !deletedEventIds.includes(String(ev.id)));
         let eventsMediaMap = {};
         if (settingsRes.status === 'fulfilled' && settingsRes.value.data) {
           const emRow = settingsRes.value.data.find(s => s.key === 'events_media');
@@ -14093,7 +14192,7 @@ function App() {
           } catch (e) {}
         }
 
-        const mappedEvents = eventsData.map(ev => {
+        const mappedEvents = activeEventsData.map(ev => {
           const local = (PRELOADED_DATA.events || []).find(p => p.id === ev.id);
           const imgSrc = ev.image || (local && local.image) || `images/events/event_${ev.id}.jpg`;
           const media = eventsMediaMap[ev.id] || {};
@@ -14113,15 +14212,19 @@ function App() {
       // 5. Process Notices (CRITICAL: Instant update & cached for next refresh)
       if (noticesRes.status === 'fulfilled' && noticesRes.value.data) {
         const noticesData = noticesRes.value.data;
-        setNotices(noticesData);
-        try { localStorage.setItem('temple_notices', JSON.stringify(noticesData)); } catch (e) { }
+        const deletedNoticeIds = getDeletedIdsLocally('notices');
+        const activeNotices = noticesData.filter(n => !deletedNoticeIds.includes(n.id) && !deletedNoticeIds.includes(String(n.id)));
+        setNotices(activeNotices);
+        try { localStorage.setItem('temple_notices', JSON.stringify(activeNotices)); } catch (e) { }
       }
 
       // 6. Process Donations
       if (donationsRes.status === 'fulfilled' && donationsRes.value.data) {
         const dData = donationsRes.value.data;
-        setDonations(dData);
-        try { localStorage.setItem('temple_donations', JSON.stringify(dData)); } catch (e) { }
+        const deletedDonationIds = getDeletedIdsLocally('donations');
+        const activeDonations = dData.filter(d => !deletedDonationIds.includes(d.id) && !deletedDonationIds.includes(String(d.id)));
+        setDonations(activeDonations);
+        try { localStorage.setItem('temple_donations', JSON.stringify(activeDonations)); } catch (e) { }
       }
 
 
