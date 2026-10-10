@@ -70,6 +70,7 @@ const server = http.createServer((req, res) => {
           orderRef = '',
           devoteeName = 'ভক্ত',
           phone = '',
+          email = '',
           purpose = 'সাধারণ প্রণামী ও সেবা',
           selectedMethod = 'bkash',
           callbackUrl,
@@ -90,6 +91,8 @@ const server = http.createServer((req, res) => {
         const effectiveCallback = callbackUrl || `${origin}/api/payment-callback`;
         const effectiveCancel = cancelUrl || `${origin}/?payment_status=cancelled`;
 
+        const userEmail = String(email || '').trim();
+
         if (provider === 'uddoktapay') {
           const normalizeUddoktaEndpoint = (rawUrl, m) => {
             if (!rawUrl || !rawUrl.trim()) {
@@ -109,9 +112,20 @@ const server = http.createServer((req, res) => {
 
           const endpoint = normalizeUddoktaEndpoint(body.apiBaseUrl, mode);
 
+          const orderToken = String(orderRef || Date.now()).toLowerCase().replace(/[^a-z0-9]/g, '').slice(-6) || Math.floor(1000 + Math.random() * 9000);
+          let effectiveEmail = `donor.${orderToken}@manasamondirgoila.com`;
+          if (userEmail && userEmail.includes('@')) {
+            if (userEmail.includes('+')) {
+              effectiveEmail = userEmail;
+            } else {
+              const parts = userEmail.split('@');
+              effectiveEmail = `${parts[0]}+${orderToken}@${parts[1]}`;
+            }
+          }
+
           const uddoktaPayload = {
             full_name: devoteeName || 'ভক্ত',
-            email: 'devotee@manasamondirgoila.com',
+            email: effectiveEmail,
             amount: String(amount),
             metadata: {
               order_id: orderRef,
@@ -166,12 +180,16 @@ const server = http.createServer((req, res) => {
             ? 'https://secure.aamarpay.com/jsonpost.php'
             : 'https://sandbox.aamarpay.com/jsonpost.php';
 
+          const cleanPhone = String(phone || '').replace(/\D/g, '') || '01722428334';
+          const orderToken = String(orderRef || Date.now()).toLowerCase().replace(/[^a-z0-9]/g, '') || Date.now().toString(36);
+          const effectiveEmail = userEmail || `donor.${orderToken}@manasamondirgoila.com`;
+
           const aamarPayload = {
             store_id: (storeId || 'aamarpaytest').trim(),
             signature_key: effectiveKey,
             cus_name: devoteeName || 'শ্রদ্ধেয় ভক্ত',
-            cus_email: 'devotee@manasamondirgoila.com',
-            cus_phone: phone || '01722428334',
+            cus_email: effectiveEmail,
+            cus_phone: cleanPhone,
             amount: String(amount),
             currency: 'BDT',
             tran_id: orderRef,
