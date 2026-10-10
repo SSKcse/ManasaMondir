@@ -5339,6 +5339,126 @@ const PanjikaWidget = ({ navigateTo, lang = 'bn' }) => {
   );
 };
 
+// ==========================================
+// SACRED PAYMENT MAINTENANCE & COMING SOON MODAL
+// ==========================================
+const PaymentComingSoonModal = ({ isOpen, onClose, onGoToBank, lang = 'bn' }) => {
+  if (!isOpen) return null;
+  const isBn = lang === 'bn';
+
+  return (
+    <div className="fixed inset-0 z-[999999] flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md anim-fade-up">
+      <div className="relative w-full max-w-lg bg-white rounded-3xl overflow-hidden shadow-2xl border-2 border-amber-300 flex flex-col max-h-[95vh]">
+        {/* Sacred Modal Header */}
+        <div className="bg-gradient-to-r from-orange-950 via-amber-950 to-orange-900 text-white p-5 flex items-center justify-between border-b-2 border-amber-400">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-amber-400/20 border border-amber-400 flex items-center justify-center text-amber-300 text-lg shadow-inner">
+              <i className="fas fa-om"></i>
+            </div>
+            <div>
+              <h3 className="font-bold text-base sm:text-lg font-serif text-yellow-300">
+                {isBn ? 'শ্রী শ্রী মা মনসা মন্দির • গৈলা' : 'Shree Shree Maa Manasa Mandir, Goila'}
+              </h3>
+              <p className="text-[11px] text-amber-200/90 flex items-center gap-1.5 font-medium">
+                <i className="fas fa-shield-alt text-emerald-400"></i>
+                {isBn ? 'পবিত্র প্রণামী ও পুণ্য তহবিল ডেস্ক' : 'Sacred Devotion & Donation Desk'}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
+            title="Close"
+          >
+            <i className="fas fa-times text-sm"></i>
+          </button>
+        </div>
+
+        {/* Modal Body */}
+        <div className="p-6 sm:p-8 text-center space-y-5 overflow-y-auto">
+          {/* Animated Icon & Badge */}
+          <div className="relative inline-block mx-auto">
+            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-amber-400 via-orange-500 to-amber-600 text-white flex items-center justify-center text-3xl shadow-xl shadow-orange-500/25 border-4 border-yellow-200">
+              <i className="fas fa-tools animate-pulse"></i>
+            </div>
+            <span className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 bg-yellow-400 text-amber-950 font-black text-[10px] tracking-wider uppercase px-3 py-0.5 rounded-full border border-amber-200 shadow-sm whitespace-nowrap">
+              {isBn ? 'রক্ষণাবেক্ষণ চলছে' : 'Under Maintenance'}
+            </span>
+          </div>
+
+          {/* Heading */}
+          <div>
+            <span className="inline-block bg-orange-100 text-orange-900 text-xs font-bold px-3.5 py-1 rounded-full mb-2.5 border border-orange-200">
+              {isBn ? 'শীঘ্রই আসছে • Coming Soon' : 'Coming Soon • শীঘ্রই আসছে'}
+            </span>
+            <h4 className="text-xl sm:text-2xl font-bold font-serif text-gray-900 leading-snug">
+              {isBn ? 'সরাসরি অনলাইন পেমেন্ট গেটওয়ে রক্ষণাবেক্ষণাধীন' : 'Online Payment Gateway Under Maintenance'}
+            </h4>
+            <p className="text-sm text-gray-600 mt-2.5 leading-relaxed max-w-md mx-auto">
+              {isBn
+                ? 'শ্রদ্ধেয় ভক্তবৃন্দ, ব্যাংকিং গেটওয়ে আপগ্রেডেশন ও সিস্টেম রক্ষণাবেক্ষণের কাজ চলছে। খুব শীঘ্রই সরাসরি বিকাশ, নগদ, রকেট, কার্ড ও অনলাইন প্রণামী সেবাটি পুনরায় পুরোদমে চালু করা হবে।'
+                : 'Dear devotees, our automated banking gateway (bKash / Nagad / Rocket / Cards) is currently undergoing scheduled system maintenance & security upgrades. This service will be live very soon!'}
+            </p>
+          </div>
+
+          {/* Alternative Suggestion Box */}
+          <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200/90 rounded-2xl p-4 text-left shadow-inner">
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-xl bg-orange-600 text-white flex items-center justify-center text-base shrink-0 shadow-sm">
+                <i className="fas fa-university"></i>
+              </div>
+              <div>
+                <h5 className="font-bold text-gray-900 text-sm">
+                  {isBn ? 'বিকল্প ব্যবস্থা: মন্দিরের অফিশিয়াল ব্যাংক অ্যাকাউন্ট' : 'Alternative: Direct Bank Donation'}
+                </h5>
+                <p className="text-xs text-gray-600 mt-1 leading-normal">
+                  {isBn
+                    ? 'ততক্ষণ পর্যন্ত আপনি মন্দিরের অনুমোদিত ব্যাংক অ্যাকাউন্টের মাধ্যমে আপনার প্রণামী ও দক্ষিণা নিরাপদে প্রদান করতে পারেন।'
+                    : 'In the meantime, you can easily send your sacred donation directly to the temple official bank account.'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Action CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
+            {onGoToBank && (
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onGoToBank();
+                }}
+                className="btn-shine flex-1 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-extrabold py-3.5 px-6 rounded-2xl text-sm shadow-lg shadow-orange-500/25 transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer border border-yellow-300"
+              >
+                <i className="fas fa-university text-xs"></i>
+                <span>{isBn ? '🏛️ ব্যাংক ও সরাসরি তথ্য দেখুন' : 'View Official Bank Details'}</span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 sm:flex-initial bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3.5 px-6 rounded-2xl text-sm transition-all active:scale-95 cursor-pointer"
+            >
+              {isBn ? 'ঠিক আছে, বুঝেছি' : 'Close'}
+            </button>
+          </div>
+        </div>
+
+        {/* Footer reassurance */}
+        <div className="bg-gray-50 px-5 py-3 border-t border-gray-100 text-center text-xs text-gray-500 flex items-center justify-center gap-2">
+          <i className="fas fa-phone-alt text-amber-600"></i>
+          <span>
+            {isBn
+              ? 'যেকোনো সহযোগিতার জন্য মন্দিরের সহায়তা ডেস্কে যোগাযোগ করতে পারেন'
+              : 'Temple Help Desk is available for any donation assistance'}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // 3. Online Puja & Sankalpa Booking Page
 // ==========================================
 const BookingPage = ({ pujaBookings, setPujaBookings, paymentGatewayConfig, setDonations, setDonationReceipts, supabaseClient, navigateTo, showToast, lang = 'bn' }) => {
@@ -5354,6 +5474,7 @@ const BookingPage = ({ pujaBookings, setPujaBookings, paymentGatewayConfig, setD
   });
   const [confirmedBooking, setConfirmedBooking] = useState(null);
   const [isGatewayOpen, setIsGatewayOpen] = useState(false);
+  const [isComingSoonOpen, setIsComingSoonOpen] = useState(false);
   const [pendingPayment, setPendingPayment] = useState(null);
 
   const gotraPresets = ['ভরদ্বাজ', 'কাশ্যপ', 'শাণ্ডিল্য', 'আলম্বায়ন', 'সাবর্ণ্য', 'মৌদ্গল্য', 'পরাশর', 'শিবগোত্র'];
@@ -5832,31 +5953,31 @@ const BookingPage = ({ pujaBookings, setPujaBookings, paymentGatewayConfig, setD
                 <button
                   type="button"
                   onClick={() => {
-                    if (!formData.devoteeName.trim() || !formData.phone.trim()) {
-                      if (showToast) showToast(lang === 'en' ? 'Please enter Devotee Name and Phone number' : 'অনুগ্রহ করে ভক্তের নাম ও মোবাইল নম্বর লিখুন');
-                      return;
+                    if (showToast) {
+                      showToast(lang === 'en' ? 'Online payment is currently under maintenance. Please use Cash / Pay Later option.' : 'অনলাইন পেমেন্ট সেবাটি রক্ষণাবেক্ষণাধীন রয়েছে। অনুগ্রহ করে নগদ / পরে পরিশোধ অপশনটি বেছে নিন।');
                     }
-                    const amt = parseFloat(formData.amount) || 500;
-                    setPendingPayment({
-                      amount: amt,
-                      devoteeName: formData.devoteeName.trim(),
-                      phone: formData.phone.trim(),
-                      gotra: formData.gotra.trim(),
-                      purpose: formData.pujaType + ' (দক্ষিণা ও প্রণামী)',
-                      type: 'puja_booking'
-                    });
-                    setIsGatewayOpen(true);
+                    setIsComingSoonOpen(true);
                   }}
-                  className="btn-shine w-full sm:w-auto bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold px-8 py-3.5 rounded-full text-base shadow-xl shadow-emerald-600/30 transition-all hover:scale-[1.02] active:scale-95 border-2 border-emerald-300 cursor-pointer"
+                  className="btn-shine w-full sm:w-auto bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold px-8 py-3.5 rounded-full text-base shadow-xl shadow-emerald-600/30 transition-all hover:scale-[1.02] active:scale-95 border-2 border-emerald-300 cursor-pointer flex items-center justify-center gap-2"
                 >
-                  <i className="fas fa-credit-card mr-2"></i>
-                  {lang === 'en' ? 'Pay Dakshina Online & Confirm' : '💳 অনলাইনে দক্ষিণা দিন ও বুকিং করুন'}
+                  <i className="fas fa-credit-card mr-1"></i>
+                  <span>{lang === 'en' ? 'Pay Dakshina Online' : '💳 অনলাইনে দক্ষিণা দিন'}</span>
+                  <span className="text-[10px] bg-yellow-400 text-emerald-950 font-black px-2 py-0.5 rounded-full uppercase">
+                    {lang === 'en' ? 'Coming Soon' : 'শীঘ্রই আসছে'}
+                  </span>
                 </button>
               </div>
             </form>
           </div>
         )}
       </div>
+
+      {/* Online Payment Maintenance / Coming Soon Modal for Puja Dakshina */}
+      <PaymentComingSoonModal
+        isOpen={isComingSoonOpen}
+        onClose={() => setIsComingSoonOpen(false)}
+        lang={lang}
+      />
 
       {/* Online Payment Modal for Puja Dakshina */}
       <PaymentGatewayModal
@@ -7021,6 +7142,7 @@ const PaymentGatewayModal = ({
 }) => {
   const [selectedMethod, setSelectedMethod] = useState('bkash');
   const [walletNumber, setWalletNumber] = useState('');
+  const [donorEmail, setDonorEmail] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -7036,6 +7158,7 @@ const PaymentGatewayModal = ({
   useEffect(() => {
     if (isOpen && paymentDetails) {
       setWalletNumber(paymentDetails.phone || '');
+      setDonorEmail(paymentDetails.email || '');
       setCardName(paymentDetails.devoteeName || paymentDetails.name || 'ভক্ত');
       setCardNumber('');
       setCardExpiry('');
@@ -7169,6 +7292,22 @@ const PaymentGatewayModal = ({
       let paymentUrl = null;
       let errorDetail = null;
 
+      // Prepare order token and unique dynamic email per donation so Paymently treats each checkout
+      // as a fresh customer record and displays the newly entered devotee name without stale caching
+      const orderToken = String(orderRef || Date.now()).toLowerCase().replace(/[^a-z0-9]/g, '').slice(-6) || Math.floor(1000 + Math.random() * 9000);
+      const typedEmail = (donorEmail || paymentDetails.email || '').trim();
+      let effectiveEmailForPgw = `donor.${orderToken}@manasamondirgoila.com`;
+      if (typedEmail && typedEmail.includes('@')) {
+        if (typedEmail.includes('+')) {
+          effectiveEmailForPgw = typedEmail;
+        } else {
+          const parts = typedEmail.split('@');
+          effectiveEmailForPgw = `${parts[0]}+${orderToken}@${parts[1]}`;
+        }
+      }
+
+      const donorFullName = (selectedMethod === 'card' && cardName) ? cardName : (paymentDetails.devoteeName || paymentDetails.name || 'ভক্ত');
+
       // 1. Try Backend Proxy first
       try {
         const res = await fetch('/api/payment-initiate', {
@@ -7185,8 +7324,9 @@ const PaymentGatewayModal = ({
             storeId: (cfg.storeId || '').trim(),
             amount: amount,
             orderRef: orderRef,
-            devoteeName: (selectedMethod === 'card' && cardName) ? cardName : (paymentDetails.devoteeName || paymentDetails.name || 'ভক্ত'),
+            devoteeName: donorFullName,
             phone: walletNumber || paymentDetails.phone || '',
+            email: effectiveEmailForPgw,
             purpose: paymentDetails.purpose || 'সাধারণ প্রণামী ও সেবা',
             selectedMethod: selectedMethod,
             callbackUrl: callbackUrl,
@@ -7216,8 +7356,8 @@ const PaymentGatewayModal = ({
               'Accept': 'application/json'
             },
             body: JSON.stringify({
-              full_name: (selectedMethod === 'card' && cardName) ? cardName : (paymentDetails.devoteeName || paymentDetails.name || 'ভক্ত'),
-              email: 'devotee@manasamondirgoila.com',
+              full_name: donorFullName,
+              email: effectiveEmailForPgw,
               amount: String(amount),
               metadata: {
                 order_id: orderRef,
@@ -7547,6 +7687,24 @@ const PaymentGatewayModal = ({
                   </div>
                 </div>
 
+                <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-200">
+                  <label className="block text-xs font-bold text-gray-800 mb-1">
+                    {isBn ? 'ইমেইল অ্যাড্রেস (ঐচ্ছিক / নিজস্ব ইমেইল)' : 'Email Address (Optional / Your Email)'}
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                      <i className="fas fa-envelope text-xs"></i>
+                    </div>
+                    <input
+                      type="email"
+                      placeholder="e.g. name@example.com"
+                      value={donorEmail}
+                      onChange={(e) => setDonorEmail(e.target.value)}
+                      className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-300 font-sans text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white"
+                    />
+                  </div>
+                </div>
+
                 <div className="flex gap-2 pt-1">
                   <button
                     type="button"
@@ -7805,6 +7963,7 @@ const PaymentGatewayModal = ({
 const DonationPage = ({ donations, setDonations, donationReceipts, setDonationReceipts, paymentGatewayConfig, setPaymentGatewayConfig, supabaseClient, navigateTo, showToast, lang, defaultTab = 'online' }) => {
   const [activeTab, setActiveTab] = useState(defaultTab || 'online'); // 'online' | 'accounts' | 'receipts'
   const [isGatewayOpen, setIsGatewayOpen] = useState(false);
+  const [isComingSoonOpen, setIsComingSoonOpen] = useState(false);
   const [pendingPayment, setPendingPayment] = useState(null);
 
   useEffect(() => {
@@ -7814,6 +7973,7 @@ const DonationPage = ({ donations, setDonations, donationReceipts, setDonationRe
   const [donationForm, setDonationForm] = useState({
     name: '',
     phone: '',
+    email: '',
     gotra: '',
     amount: '500',
     purpose: 'সাধারণ প্রণামী ও সেবা',
@@ -7899,6 +8059,17 @@ const DonationPage = ({ donations, setDonations, donationReceipts, setDonationRe
     if (showToast) showToast(label + ' ' + t('copiedToast', lang));
   };
 
+  const handleShowComingSoon = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setIsComingSoonOpen(true);
+    if (showToast) {
+      showToast(lang === 'en' ? 'Online payment gateway is under maintenance. Coming Soon!' : 'অনলাইন পেমেন্ট গেটওয়ে রক্ষণাবেক্ষণ চলছে। খুব শীঘ্রই আসছে!');
+    }
+  };
+
   const handleStartPayment = (e) => {
     e.preventDefault();
     const amt = parseFloat(donationForm.amount);
@@ -7920,6 +8091,7 @@ const DonationPage = ({ donations, setDonations, donationReceipts, setDonationRe
       amount: amt,
       devoteeName: donationForm.name.trim(),
       phone: donationForm.phone.trim(),
+      email: (donationForm.email || '').trim(),
       gotra: donationForm.gotra.trim(),
       purpose: donationForm.purpose,
       type: 'donation'
@@ -7971,6 +8143,16 @@ const DonationPage = ({ donations, setDonations, donationReceipts, setDonationRe
         console.error('Receipt sync error:', err);
       }
     }
+
+    setDonationForm({
+      name: '',
+      phone: '',
+      email: '',
+      gotra: '',
+      amount: '500',
+      purpose: 'সাধারণ প্রণামী ও সেবা',
+      date: new Date().toISOString().split('T')[0]
+    });
 
     if (showToast) showToast(lang === 'en' ? 'Sacred Donation Verified & Received!' : 'প্রণামী সফলভাবে পরিশোধিত ও পুণ্য তহবিলে গৃহীত হয়েছে!');
   };
@@ -8205,7 +8387,39 @@ const DonationPage = ({ donations, setDonations, donationReceipts, setDonationRe
                   </p>
                 </div>
 
-                <form onSubmit={handleStartPayment} className="space-y-6 max-w-2xl mx-auto">
+                {/* Maintenance Notice Banner */}
+                <div className="max-w-2xl mx-auto mb-6 p-4 rounded-2xl bg-gradient-to-r from-amber-50 via-orange-50 to-yellow-50 border-2 border-amber-300/80 text-amber-950 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
+                  <div className="flex items-center gap-3 text-left">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center text-base shrink-0 shadow-sm shadow-orange-500/20">
+                      <i className="fas fa-tools"></i>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-xs sm:text-sm text-gray-900 font-serif">
+                          {lang === 'en' ? 'Online Payment Gateway Under Maintenance' : 'অনলাইন পেমেন্ট গেটওয়ে রক্ষণাবেক্ষণ চলছে'}
+                        </span>
+                        <span className="bg-yellow-400 text-amber-950 font-black text-[10px] px-2 py-0.5 rounded-full uppercase shadow-2xs">
+                          {lang === 'en' ? 'Coming Soon' : 'শীঘ্রই আসছে'}
+                        </span>
+                      </div>
+                      <p className="text-[11px] sm:text-xs text-gray-600 mt-0.5">
+                        {lang === 'en'
+                          ? 'Security upgrades in progress. Please use Bank Accounts tab for direct donations.'
+                          : 'নিরাপদ গেটওয়ে আপগ্রেডের কাজ চলছে। বিকল্প হিসেবে সরাসরি ব্যাংক অ্যাকাউন্টে প্রণামী প্রদান করা যাবে।'}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('accounts')}
+                    className="shrink-0 bg-white hover:bg-orange-600 hover:text-white text-orange-700 font-bold px-3.5 py-1.5 rounded-xl text-xs border border-orange-300 shadow-xs transition-all active:scale-95 cursor-pointer flex items-center gap-1.5"
+                  >
+                    <i className="fas fa-university text-[11px]"></i>
+                    <span>{lang === 'en' ? 'Bank Details' : 'ব্যাংক তথ্য'}</span>
+                  </button>
+                </div>
+
+                <form onSubmit={handleShowComingSoon} className="space-y-6 max-w-2xl mx-auto">
                   {/* Amount Selector */}
                   <div>
                     <label className="block text-sm font-bold text-gray-800 mb-2">
@@ -8271,6 +8485,18 @@ const DonationPage = ({ donations, setDonations, donationReceipts, setDonationRe
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-bold text-gray-800 mb-1">
+                        {lang === 'en' ? 'Email Address (Optional)' : 'ইমেইল ঠিকানা (ঐচ্ছিক)'}
+                      </label>
+                      <input
+                        type="email"
+                        placeholder={lang === 'en' ? 'e.g. name@example.com' : 'যেমন: name@example.com'}
+                        value={donationForm.email || ''}
+                        onChange={(e) => setDonationForm({ ...donationForm, email: e.target.value })}
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none text-sm font-sans"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-800 mb-1">
                         {lang === 'en' ? 'Gotra (Optional)' : 'গোত্র (ঐচ্ছিক)'}
                       </label>
                       <input
@@ -8293,35 +8519,40 @@ const DonationPage = ({ donations, setDonations, donationReceipts, setDonationRe
                         ))}
                       </div>
                     </div>
-                    <div>
-                      <label className="block text-sm font-bold text-gray-800 mb-1">
-                        {lang === 'en' ? 'Donation Purpose' : 'প্রণামীর উদ্দেশ্য'}
-                      </label>
-                      <select
-                        value={donationForm.purpose}
-                        onChange={(e) => setDonationForm({ ...donationForm, purpose: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none text-sm"
-                      >
-                        {purposePresets.map(p => (
-                          <option key={p} value={p}>{p}</option>
-                        ))}
-                      </select>
-                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-bold text-gray-800 mb-1">
+                      {lang === 'en' ? 'Donation Purpose' : 'প্রণামীর উদ্দেশ্য'}
+                    </label>
+                    <select
+                      value={donationForm.purpose}
+                      onChange={(e) => setDonationForm({ ...donationForm, purpose: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none text-sm"
+                    >
+                      {purposePresets.map(p => (
+                        <option key={p} value={p}>{p}</option>
+                      ))}
+                    </select>
                   </div>
 
                   {/* Submit CTA */}
                   <div className="text-center pt-2">
                     <button
-                      type="submit"
-                      className="btn-shine w-full sm:w-auto bg-gradient-to-r from-orange-600 via-amber-600 to-orange-600 hover:from-orange-500 hover:to-amber-500 text-white font-extrabold px-10 py-4 rounded-full text-base sm:text-lg shadow-xl shadow-orange-500/30 transition-all hover:scale-[1.02] active:scale-95 border-2 border-yellow-300 cursor-pointer flex items-center justify-center gap-3 mx-auto"
+                      type="button"
+                      onClick={handleShowComingSoon}
+                      className="btn-shine w-full sm:w-auto bg-gradient-to-r from-orange-600 via-amber-600 to-orange-600 hover:from-orange-500 hover:to-amber-500 text-white font-extrabold px-8 sm:px-10 py-4 rounded-full text-base sm:text-lg shadow-xl shadow-orange-500/30 transition-all hover:scale-[1.02] active:scale-95 border-2 border-yellow-300 cursor-pointer flex items-center justify-center gap-2.5 mx-auto"
                     >
                       <i className="fas fa-lock text-sm"></i>
-                      <span>{lang === 'en' ? 'Proceed to Secure Payment (Pay Online)' : '🔒 সরাসরি সুরক্ষিত অনলাইন পেমেন্ট করুন'}</span>
+                      <span>{lang === 'en' ? 'Proceed to Secure Payment' : '🔒 সরাসরি সুরক্ষিত অনলাইন পেমেন্ট করুন'}</span>
+                      <span className="text-[11px] bg-yellow-400 text-amber-950 font-black px-2.5 py-0.5 rounded-full border border-yellow-200 uppercase tracking-wider ml-1 shadow-xs">
+                        {lang === 'en' ? 'Coming Soon' : 'শীঘ্রই আসছে'}
+                      </span>
                       <i className="fas fa-arrow-right text-xs"></i>
                     </button>
-                    <p className="text-xs text-gray-500 mt-3 flex items-center justify-center gap-1.5">
-                      <i className="fas fa-shield-alt text-emerald-600"></i>
-                      <span>{lang === 'en' ? 'Automated banking verification • No manual TrxID typing' : 'স্বয়ংক্রিয় ব্যাংকিং ভেরিফিকেশন • কোনো ম্যানুয়াল TrxID লেখার প্রয়োজন নেই'}</span>
+                    <p className="text-xs text-amber-800 bg-amber-50/80 border border-amber-200/60 rounded-full px-4 py-1.5 mt-3 inline-flex items-center justify-center gap-1.5 mx-auto">
+                      <i className="fas fa-tools text-amber-600"></i>
+                      <span>{lang === 'en' ? 'Online gateway under maintenance • Coming soon' : 'অনলাইন গেটওয়ে রক্ষণাবেক্ষণ চলছে • খুব শীঘ্রই চালু হচ্ছে'}</span>
                     </p>
                   </div>
                 </form>
@@ -8665,6 +8896,14 @@ const DonationPage = ({ donations, setDonations, donationReceipts, setDonationRe
           <p className="text-xl italic font-serif text-yellow-300">"{t('donationQuote', lang)}"</p>
         </div>
       </div>
+
+      {/* Sacred Payment Maintenance / Coming Soon Modal */}
+      <PaymentComingSoonModal
+        isOpen={isComingSoonOpen}
+        onClose={() => setIsComingSoonOpen(false)}
+        onGoToBank={() => setActiveTab('accounts')}
+        lang={lang}
+      />
 
       {/* Automated Payment Gateway Modal Component */}
       <PaymentGatewayModal
