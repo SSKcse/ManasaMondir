@@ -21,7 +21,9 @@ const MIME_TYPES = {
   '.mov': 'video/quicktime',
   '.mkv': 'video/x-matroska',
   '.m4v': 'video/mp4',
-  '.avi': 'video/x-msvideo'
+  '.avi': 'video/x-msvideo',
+  '.txt': 'text/plain; charset=utf-8',
+  '.xml': 'application/xml; charset=utf-8'
 };
 
 const server = http.createServer((req, res) => {
@@ -316,6 +318,7 @@ const server = http.createServer((req, res) => {
   }
 
   if (reqPath === '/' || reqPath === '') reqPath = '/index.html';
+  if (reqPath === '/robot.txt') reqPath = '/robots.txt';
 
   const filePath = path.join(__dirname, reqPath);
 
