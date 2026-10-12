@@ -1938,7 +1938,7 @@ const readVideoFile = async (file) => {
   return idbKey;
 };
 
-const MediaViewer = ({ url, isVideo, alt = "Media", className = "w-full h-full object-cover", controls = true, autoPlay = false, loop = false, fallbackSrc = 'images/events/event_4.jpg' }) => {
+const MediaViewer = ({ url, isVideo, alt = "Media", className = "w-full h-full object-cover", controls = true, autoPlay = false, loop = false, fallbackSrc = 'images/events/event_4.jpg', style = {} }) => {
   const cleanUrl = typeof url === 'string' ? url.replace(/^["']+|["']+$/g, '').trim() : (url || '');
   const [activeUrl, setActiveUrl] = useState(() => {
     if (!cleanUrl) return '';
@@ -1987,22 +1987,56 @@ const MediaViewer = ({ url, isVideo, alt = "Media", className = "w-full h-full o
       : (cleanUrl && !cleanUrl.startsWith('idb:') && !/^[A-Za-z]:[/\\]/.test(cleanUrl) ? cleanUrl : '');
     const ytEmbed = vidSrc ? getYouTubeEmbedUrl(vidSrc) : null;
     if (ytEmbed) {
+      const isShort = typeof vidSrc === 'string' && (vidSrc.includes('/shorts/') || vidSrc.includes('shorts/'));
+      const isContain = className && className.includes('object-contain');
+      if (isContain) {
+        return (
+          <div
+            className={`relative mx-auto flex items-center justify-center overflow-hidden rounded-xl shadow-2xl ${isShort ? 'aspect-[9/16]' : 'aspect-video'}`}
+            style={{
+              maxHeight: style?.maxHeight || '100%',
+              maxWidth: isShort ? 'min(90vw, calc(78vh * 9 / 16))' : 'min(94vw, calc(78vh * 16 / 9))',
+              width: isShort ? 'min(90vw, calc(78vh * 9 / 16))' : 'min(94vw, calc(78vh * 16 / 9))',
+              height: 'auto',
+              ...style
+            }}
+          >
+            <iframe
+              src={`${ytEmbed}?autoplay=${autoPlay ? 1 : 0}&loop=${loop ? 1 : 0}&rel=0`}
+              className="w-full h-full border-0 rounded-inherit block"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              title={alt}
+            />
+          </div>
+        );
+      }
       return (
         <iframe
           src={`${ytEmbed}?autoplay=${autoPlay ? 1 : 0}&loop=${loop ? 1 : 0}&rel=0`}
-          className="w-full h-full border-0 rounded-inherit"
+          className="w-full h-full border-0 rounded-inherit block"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
           title={alt}
+          style={style}
         />
       );
     }
     if (!vidSrc) {
       return (
-        <div className={`${className} bg-stone-900 flex items-center justify-center text-white/50 animate-pulse`}>
+        <div className={`${className} bg-stone-900 flex items-center justify-center text-white/50 animate-pulse`} style={style}>
           <i className="fas fa-video text-xl opacity-40"></i>
         </div>
       );
+    }
+    let videoClass = className || '';
+    const isContain = videoClass.includes('object-contain');
+    if (isContain) {
+      videoClass = videoClass.replace(/\bobject-cover\b/g, '').trim();
+      videoClass = videoClass.replace(/\bw-full\b/g, '').trim();
+      videoClass = videoClass.replace(/\bh-full\b/g, '').trim();
+      if (!videoClass.includes('object-contain')) videoClass += ' object-contain';
+      if (!videoClass.includes('w-auto')) videoClass += ' w-auto h-auto';
     }
     return (
       <video
@@ -2011,7 +2045,13 @@ const MediaViewer = ({ url, isVideo, alt = "Media", className = "w-full h-full o
         playsInline
         autoPlay={autoPlay}
         loop={loop}
-        className={`${className} bg-black`}
+        className={`${videoClass} bg-black`}
+        style={{
+          display: 'block',
+          maxWidth: '100%',
+          maxHeight: isContain ? (style?.maxHeight || 'calc(100vh - 120px)') : '100%',
+          ...style
+        }}
       />
     );
   }
@@ -2028,11 +2068,12 @@ const MediaViewer = ({ url, isVideo, alt = "Media", className = "w-full h-full o
           src={fallbackSrc || 'manasaprofile.jpg'}
           alt={alt}
           className={className}
+          style={style}
         />
       );
     }
     return (
-      <div className={`${className} bg-gray-200 flex items-center justify-center text-gray-400 animate-pulse`}>
+      <div className={`${className} bg-gray-200 flex items-center justify-center text-gray-400 animate-pulse`} style={style}>
         <i className="fas fa-image text-xl opacity-40"></i>
       </div>
     );
@@ -2043,6 +2084,7 @@ const MediaViewer = ({ url, isVideo, alt = "Media", className = "w-full h-full o
       src={imgSrc}
       alt={alt}
       className={className}
+      style={style}
       onError={(e) => {
         if (!e.target.dataset.fallback) {
           e.target.dataset.fallback = 'true';
@@ -4036,7 +4078,7 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
                       url={item.url}
                       isVideo={isVid}
                       alt={caption || `Gallery ${index + 1}`}
-                      className="w-full h-full object-cover"
+                      className={`w-full h-full ${isVid ? 'object-contain' : 'object-cover'}`}
                       controls={true}
                     />
                   </div>
@@ -4211,13 +4253,13 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
             </div>
 
             {/* Lightbox Main Media Display */}
-            <div className="relative w-full max-w-5xl flex-1 flex items-center justify-center min-h-0 my-2 px-2 sm:px-14">
-              <div className="w-full h-full max-h-[72vh] sm:max-h-[78vh] flex items-center justify-center rounded-xl overflow-hidden">
+            <div className="relative w-full max-w-7xl flex-1 flex items-center justify-center min-h-0 my-2 px-2 sm:px-14">
+              <div className="w-full h-full flex items-center justify-center min-h-0 overflow-visible p-1">
                 <MediaViewer
                   url={activeGallery[lightboxImg]?.url}
                   isVideo={activeGallery[lightboxImg]?.mediaType === 'video' || isVideoUrl(activeGallery[lightboxImg]?.url)}
                   alt={currentGalleryCaptions[lightboxImg] ? (lang === 'en' ? currentGalleryCaptions[lightboxImg].en : currentGalleryCaptions[lightboxImg].bn) : `Full view ${lightboxImg + 1}`}
-                  className="max-w-full max-h-[72vh] sm:max-h-[78vh] object-contain rounded-xl shadow-2xl"
+                  className="max-w-full max-h-[76vh] sm:max-h-[82vh] w-auto h-auto object-contain rounded-2xl shadow-2xl mx-auto block"
                   controls={true}
                   autoPlay={true}
                 />
@@ -6853,13 +6895,18 @@ const TestimonialsPage = ({ testimonials, navigateTo, lang }) => (
 // Event Card Component with Multi-Image Slider & Video Modal
 const EventCard = ({ event, showToast, lang }) => {
   const [activeImgIdx, setActiveImgIdx] = useState(0);
+  const [activeVidIdx, setActiveVidIdx] = useState(0);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
   const imagesList = (event.images && event.images.length > 0)
     ? event.images
     : (event.image ? [event.image] : []);
 
-  const hasVideo = !!event.video;
+  const videoList = (event.videos && event.videos.length > 0)
+    ? event.videos
+    : (event.video ? [event.video] : []);
+  const hasVideo = videoList.length > 0;
+  const currentVideo = videoList[activeVidIdx] || videoList[0] || event.video;
 
   return (
     <div className="bg-white rounded-3xl shadow-md border-2 border-orange-100/90 flex flex-col md:flex-row overflow-hidden card-hover-glow transition-all duration-300 group">
@@ -6929,14 +6976,14 @@ const EventCard = ({ event, showToast, lang }) => {
               className="absolute top-3 left-3 z-20 bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white text-xs px-3 py-1 rounded-full font-bold shadow-lg flex items-center gap-1.5 border border-white/30 cursor-pointer active:scale-95 transition-transform"
             >
               <i className="fas fa-play text-[10px]"></i>
-              <span>{lang === 'en' ? 'Watch Video' : 'ভিডিও দেখুন'}</span>
+              <span>{lang === 'en' ? (videoList.length > 1 ? `Watch Videos (${videoList.length})` : 'Watch Video') : (videoList.length > 1 ? `ভিডিও দেখুন (${toBengaliDigits(videoList.length)}টি)` : 'ভিডিও দেখুন')}</span>
             </button>
           )}
         </div>
       ) : hasVideo ? (
         <div className="md:w-5/12 h-64 md:h-auto relative overflow-hidden bg-black flex-shrink-0 flex items-center justify-center p-2">
           <MediaViewer
-            url={event.video}
+            url={currentVideo}
             isVideo={true}
             alt={event.title}
             className="w-full h-full object-cover rounded-xl"
@@ -6964,7 +7011,7 @@ const EventCard = ({ event, showToast, lang }) => {
             )}
             {hasVideo && (
               <span className="text-xs font-bold text-red-700 bg-red-50 border border-red-200 px-2.5 py-1 rounded-full flex items-center gap-1">
-                <i className="fas fa-video text-[10px]"></i> {lang === 'en' ? 'Video' : 'ভিডিও অন্তর্ভুক্ত'}
+                <i className="fas fa-video text-[10px]"></i> {videoList.length > 1 ? (lang === 'en' ? `${videoList.length} Videos` : `${toBengaliDigits(videoList.length)}টি ভিডিও`) : (lang === 'en' ? 'Video' : 'ভিডিও অন্তর্ভুক্ত')}
               </span>
             )}
           </div>
@@ -6979,7 +7026,7 @@ const EventCard = ({ event, showToast, lang }) => {
               onClick={() => setIsVideoModalOpen(true)}
               className="btn-shine bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white px-5 py-2.5 rounded-full font-bold text-xs sm:text-sm flex items-center gap-2 shadow-md hover:shadow-lg active:scale-95 transition-all cursor-pointer"
             >
-              <i className="fas fa-play-circle text-sm"></i> {lang === 'en' ? 'Watch Festival Video' : 'উৎসবের ভিডিও দেখুন'}
+              <i className="fas fa-play-circle text-sm"></i> {lang === 'en' ? (videoList.length > 1 ? `Watch Videos (${videoList.length})` : 'Watch Festival Video') : (videoList.length > 1 ? `উৎসবের ভিডিওসমূহ (${toBengaliDigits(videoList.length)}টি)` : 'উৎসবের ভিডিও দেখুন')}
             </button>
           ) : <div />}
 
@@ -6995,39 +7042,67 @@ const EventCard = ({ event, showToast, lang }) => {
       {/* Video Modal */}
       {hasVideo && isVideoModalOpen && typeof document !== 'undefined' && ReactDOM.createPortal(
         <div
-          className="fixed inset-0 z-[999999] flex items-center justify-center p-3 sm:p-6 bg-black/90 backdrop-blur-md"
+          className="fixed inset-0 z-[999999] flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/95 backdrop-blur-md"
           onClick={() => setIsVideoModalOpen(false)}
         >
           <div
-            className="relative w-full max-w-4xl bg-stone-950 rounded-2xl overflow-hidden border border-amber-500/40 shadow-2xl flex flex-col max-h-[90vh]"
+            className="relative w-auto max-w-5xl bg-stone-950 rounded-2xl border border-amber-500/40 shadow-2xl flex flex-col max-h-[96vh] mx-auto overflow-hidden"
             onClick={(e) => e.stopPropagation()}
+            style={{ width: 'min(96vw, 1080px)' }}
           >
             {/* Modal Header */}
-            <div className="p-4 bg-stone-900 border-b border-stone-800 flex items-center justify-between text-white">
-              <div className="flex items-center gap-2">
+            <div className="p-3 sm:p-4 bg-stone-900 border-b border-stone-800 flex items-center justify-between text-white gap-3 shrink-0">
+              <div className="flex items-center gap-2 min-w-0">
                 <i className="fas fa-video text-amber-400"></i>
                 <h4 className="font-bold font-serif text-sm sm:text-base text-amber-200 truncate">{event.title}</h4>
               </div>
               <button
                 onClick={() => setIsVideoModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-red-600/80 hover:bg-red-600 text-white flex items-center justify-center transition-colors cursor-pointer"
+                className="w-8 h-8 rounded-full bg-red-600/80 hover:bg-red-600 text-white flex items-center justify-center transition-colors cursor-pointer shrink-0"
                 title="Close"
               >
                 <i className="fas fa-times text-xs"></i>
               </button>
             </div>
 
-            {/* Video View */}
-            <div className="aspect-video w-full bg-black">
+            {/* Video View (Shapes dynamically to video dimensions so all video parts & player controls are visible) */}
+            <div className="flex-1 min-h-0 w-full flex items-center justify-center bg-black p-2 sm:p-3 overflow-visible">
               <MediaViewer
-                url={event.video}
+                url={currentVideo}
                 isVideo={true}
                 alt={event.title}
-                className="w-full h-full"
+                className="max-w-full w-auto h-auto object-contain rounded-xl shadow-2xl mx-auto block"
+                style={{
+                  maxHeight: videoList.length > 1 ? 'min(72vh, calc(90vh - 150px))' : 'min(78vh, calc(92vh - 90px))',
+                  maxWidth: '100%'
+                }}
                 controls={true}
                 autoPlay={true}
               />
             </div>
+
+            {/* Multiple Videos Selector if more than 1 video */}
+            {videoList.length > 1 && (
+              <div className="flex items-center gap-2 overflow-x-auto p-2.5 bg-stone-900/90 border-t border-stone-800 shrink-0">
+                <span className="text-xs text-amber-300 font-bold px-1 shrink-0">
+                  <i className="fas fa-film mr-1"></i>{lang === 'en' ? 'Videos:' : 'ভিডিওসমূহ:'}
+                </span>
+                {videoList.map((_, vIdx) => (
+                  <button
+                    key={vIdx}
+                    type="button"
+                    onClick={() => setActiveVidIdx(vIdx)}
+                    className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer shrink-0 ${
+                      vIdx === activeVidIdx
+                        ? 'bg-amber-500 text-stone-950 font-extrabold shadow-md'
+                        : 'bg-stone-800 hover:bg-stone-700 text-stone-300'
+                    }`}
+                  >
+                    <i className="fas fa-play text-[9px] mr-1"></i> {lang === 'en' ? `Video ${vIdx + 1}` : `ভিডিও ${toBengaliDigits(vIdx + 1)}`}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>,
         document.body
@@ -9102,11 +9177,14 @@ const AdminPanel = ({
   const [newMember, setNewMember] = useState({ name: '', role: '', phone: '', image: null });
   const [newTestimonial, setNewTestimonial] = useState({ name: '', designation: '', text: '', date: '' });
   const [newNotice, setNewNotice] = useState({ title: '', date: '', text: '' });
-  const [newEvent, setNewEvent] = useState({ title: '', date: '', description: '', image: null, images: [], video: '' });
+  const [newEvent, setNewEvent] = useState({ title: '', date: '', description: '', image: null, images: [], video: '', videos: [] });
+  const [eventVideoLinkInput, setEventVideoLinkInput] = useState('');
   const [newDonation, setNewDonation] = useState({ name: '', address: '', type: 'নগদ অর্থ', amount: '', date: '', is_hidden: false });
   const [newScholar, setNewScholar] = useState({ name: '', title: '', date: '', image: '', order_idx: 0 });
   const [newGalleryPhoto, setNewGalleryPhoto] = useState({ url: '', captionBn: '', captionEn: '', image: null, mediaType: 'image' });
   const [newGalleryBatch, setNewGalleryBatch] = useState([]);
+  const [newGalleryVideoBatch, setNewGalleryVideoBatch] = useState([]);
+  const [multiVideoLinksInput, setMultiVideoLinksInput] = useState('');
   const [galleryTabMode, setGalleryTabMode] = useState('image');
   const [editGalleryPhoto, setEditGalleryPhoto] = useState({ url: '', captionBn: '', captionEn: '', image: null, mediaType: 'image' });
 
@@ -9735,12 +9813,24 @@ const AdminPanel = ({
         ? newEvent.images
         : (primaryImage ? [primaryImage] : []);
 
-      let eventVideo = (newEvent.video || '').trim() || null;
+      let eventVideos = [];
+      if (newEvent.videos && Array.isArray(newEvent.videos)) {
+        eventVideos.push(...newEvent.videos);
+      }
+      if (newEvent.video && typeof newEvent.video === 'string') {
+        const splitUrls = newEvent.video.split(/[\r\n,]+/).map(s => s.trim()).filter(Boolean);
+        splitUrls.forEach(u => {
+          if (!eventVideos.includes(u)) eventVideos.push(u);
+        });
+      }
+      eventVideos = Array.from(new Set(eventVideos.filter(Boolean)));
+      let eventVideo = eventVideos[0] || null;
 
       if (allImages.length > 1 || eventVideo) {
         eventsMedia[targetId] = {
           images: allImages,
-          video: eventVideo
+          video: eventVideo,
+          videos: eventVideos
         };
       } else {
         delete eventsMedia[targetId];
@@ -9756,7 +9846,8 @@ const AdminPanel = ({
         ...tablePayload,
         id: targetId,
         images: allImages,
-        video: eventVideo
+        video: eventVideo,
+        videos: eventVideos
       };
 
       let updatedEvents;
@@ -9773,7 +9864,7 @@ const AdminPanel = ({
       setEvents(updatedEvents);
       try { localStorage.setItem('temple_events', JSON.stringify(updatedEvents)); } catch (e) {}
       broadcastUniversalSync();
-      setNewEvent({ title: '', date: '', description: '', image: null, images: [], video: '' });
+      setNewEvent({ title: '', date: '', description: '', image: null, images: [], video: '', videos: [] });
     } catch (err) {
       console.error("Save event error:", err);
       setErrorMsg("ইভেন্ট সংরক্ষণ করতে সমস্যা হয়েছে: " + (err.message || ''));
@@ -10648,20 +10739,79 @@ const AdminPanel = ({
   };
 
   const handleEventVideoFile = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
     setIsSaving(true);
-    showToast('ভিডিও ফাইল IndexedDB স্টোরেজে প্রসেস হচ্ছে... অনুগ্রহ করে অপেক্ষা করুন।');
+    showToast(files.length > 1 ? `মোট ${files.length}টি ভিডিও ফাইল IndexedDB স্টোরেজে প্রসেস হচ্ছে...` : 'ভিডিও ফাইল IndexedDB স্টোরেজে প্রসেস হচ্ছে... অনুগ্রহ করে অপেক্ষা করুন।');
     try {
-      const videoData = await readVideoFile(file);
-      setNewEvent(prev => ({ ...prev, video: videoData }));
-      showToast('ভিডিও ফাইল সফলভাবে প্রস্তুত ও যুক্ত হয়েছে (IndexedDB স্টোরেজ)!');
+      const processed = [];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (files.length > 1) {
+          showToast(`ভিডিও ${i + 1}/${files.length} (${file.name}) প্রসেস হচ্ছে...`);
+        }
+        try {
+          const videoData = await readVideoFile(file);
+          if (videoData) processed.push(videoData);
+        } catch (fileErr) {
+          console.warn(`ভিডিও রিড ত্রুটি (${file.name}):`, fileErr);
+        }
+      }
+      if (processed.length > 0) {
+        setNewEvent(prev => {
+          const existing = (prev.videos && prev.videos.length > 0)
+            ? prev.videos
+            : (prev.video ? [prev.video] : []);
+          const merged = [...existing, ...processed];
+          return {
+            ...prev,
+            video: merged[0] || '',
+            videos: merged
+          };
+        });
+        showToast(processed.length > 1 ? `মোট ${processed.length}টি ভিডিও সফলভাবে যুক্ত হয়েছে!` : 'ভিডিও ফাইল সফলভাবে প্রস্তুত ও যুক্ত হয়েছে (IndexedDB স্টোরেজ)!');
+      } else {
+        setErrorMsg('কোনো ভিডিও ফাইল প্রস্তুত করা যায়নি।');
+      }
     } catch (err) {
       setErrorMsg(err.message || 'ভিডিও আপলোড করতে সমস্যা হয়েছে।');
     } finally {
       setIsSaving(false);
       e.target.value = '';
     }
+  };
+
+  const handleAddEventVideoLink = () => {
+    if (!eventVideoLinkInput || !eventVideoLinkInput.trim()) return;
+    const links = eventVideoLinkInput.split(/[\r\n,]+/).map(s => s.trim()).filter(Boolean);
+    if (links.length === 0) return;
+    setNewEvent(prev => {
+      const existing = (prev.videos && prev.videos.length > 0)
+        ? prev.videos
+        : (prev.video ? [prev.video] : []);
+      const merged = [...existing, ...links];
+      return {
+        ...prev,
+        video: merged[0] || '',
+        videos: merged
+      };
+    });
+    setEventVideoLinkInput('');
+    showToast(`${links.length}টি ভিডিও লিংক যুক্ত হয়েছে!`);
+  };
+
+  const handleRemoveEventVideo = (idxToRemove) => {
+    setNewEvent(prev => {
+      const existing = (prev.videos && prev.videos.length > 0)
+        ? prev.videos
+        : (prev.video ? [prev.video] : []);
+      const filtered = existing.filter((_, idx) => idx !== idxToRemove);
+      return {
+        ...prev,
+        video: filtered[0] || '',
+        videos: filtered
+      };
+    });
   };
 
   // Gallery multi-files batch upload (IndexedDB Storage)
@@ -10727,6 +10877,81 @@ const AdminPanel = ({
     } finally {
       setIsSaving(false);
       e.target.value = '';
+    }
+  };
+
+  // Multiple Video Files Batch Upload
+  const handleGalleryMultiVideoFiles = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    setIsSaving(true);
+    showToast(`মোট ${files.length}টি ভিডিও ফাইল প্রসেস করা শুরু হচ্ছে...`);
+    try {
+      const processed = [];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        showToast(`ভিডিও ${i + 1}/${files.length} (${file.name}) সংরক্ষণ হচ্ছে...`);
+        try {
+          const videoData = await readVideoFile(file);
+          if (videoData) {
+            processed.push({
+              id: 'gal_vid_' + Date.now() + '_' + i + '_' + Math.random().toString(36).substring(2, 6),
+              url: videoData,
+              captionBn: `শ্রীশ্রী মা মনসা মন্দির ভিডিও দর্শন`,
+              captionEn: `Maa Manasa Temple Video Darshan`,
+              mediaType: 'video',
+              name: file.name
+            });
+          }
+        } catch (fileErr) {
+          console.warn(`ভিডিও রিড করতে সমস্যা (${file.name}):`, fileErr);
+        }
+      }
+      if (processed.length > 0) {
+        setNewGalleryVideoBatch(prev => [...prev, ...processed]);
+        showToast(`মোট ${processed.length}টি ভিডিও সফলভাবে তালিকায় যুক্ত হয়েছে!`);
+      } else {
+        setErrorMsg('কোনো ভিডিও ফাইল প্রস্তুত করা যায়নি।');
+      }
+    } catch (err) {
+      setErrorMsg('ভিডিও প্রসেসিংয়ে ত্রুটি: ' + (err.message || ''));
+    } finally {
+      setIsSaving(false);
+      e.target.value = '';
+    }
+  };
+
+  // Add Multiple Video Links (e.g. YouTube URLs, comma or newline separated)
+  const handleAddMultiVideoLinks = () => {
+    if (!multiVideoLinksInput || !multiVideoLinksInput.trim()) return;
+    const lines = multiVideoLinksInput.split(/[\r\n,]+/).map(s => s.trim()).filter(Boolean);
+    if (lines.length === 0) return;
+    const newItems = lines.map((linkUrl, i) => ({
+      id: 'gal_vid_' + Date.now() + '_' + i + '_' + Math.random().toString(36).substring(2, 6),
+      url: linkUrl,
+      captionBn: `শ্রীশ্রী মা মনসা মন্দির ভিডিও দর্শন`,
+      captionEn: `Maa Manasa Temple Video Darshan`,
+      mediaType: 'video'
+    }));
+    setNewGalleryVideoBatch(prev => [...prev, ...newItems]);
+    setMultiVideoLinksInput('');
+    showToast(`${newItems.length}টি ভিডিও লিংক তালিকায় যুক্ত হয়েছে!`);
+  };
+
+  // Save all videos in the batch
+  const handleSaveGalleryVideoBatch = async () => {
+    if (newGalleryVideoBatch.length === 0) return;
+    setIsSaving(true);
+    setErrorMsg('');
+    try {
+      const updated = [...(galleryItems || DEFAULT_GALLERY_ITEMS), ...newGalleryVideoBatch];
+      await handleSaveGalleryToCloud(updated);
+      setNewGalleryVideoBatch([]);
+      showToast(`মোট ${newGalleryVideoBatch.length}টি ভিডিও গ্যালারিতে সফলভাবে সংরক্ষিত হয়েছে!`);
+    } catch (err) {
+      setErrorMsg('গ্যালারিতে ভিডিও সংরক্ষণ করতে সমস্যা হয়েছে: ' + (err.message || ''));
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -11530,96 +11755,148 @@ const AdminPanel = ({
                   )}
                 </div>
 
-                {/* Video Upload & URL Section */}
-                <div className="p-4 sm:p-5 bg-white rounded-2xl border border-red-200 shadow-xs space-y-3">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                    <label className="text-sm font-bold text-red-950 flex items-center gap-2">
-                      <i className="fas fa-video text-red-600"></i> ইভেন্টের ভিডিও (ঐচ্ছিক - ফাইল আপলোড বা YouTube লিংক)
-                    </label>
-                    {newEvent.video && (
-                      <button
-                        type="button"
-                        onClick={() => setNewEvent(prev => ({ ...prev, video: '' }))}
-                        className="text-xs text-red-600 hover:text-red-800 font-bold"
-                      >
-                        <i className="fas fa-trash-alt mr-1"></i> ভিডিও মুছে ফেলুন
-                      </button>
-                    )}
-                  </div>
+                {/* Video Upload & URL Section (Multi-video support & responsive aspect ratio without button clipping) */}
+                <div className="p-4 sm:p-5 bg-white rounded-2xl border border-red-200 shadow-xs space-y-4">
+                  {(() => {
+                    const currentEventVideos = (newEvent.videos && newEvent.videos.length > 0)
+                      ? newEvent.videos
+                      : (newEvent.video ? [newEvent.video] : []);
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <span className="block text-xs font-bold text-gray-700 mb-1.5 flex items-center gap-1.5">
-                        <i className="fab fa-youtube text-red-600 text-sm"></i>
-                        ইউটিউব / অনলাইন ভিডিও লিংক (সুপারিশকৃত)
-                      </span>
-                      <input
-                        type="text"
-                        value={newEvent.video && newEvent.video.startsWith('data:video') ? '' : (newEvent.video || '')}
-                        onChange={e => setNewEvent(prev => ({ ...prev, video: e.target.value }))}
-                        placeholder="YouTube / Shorts লিংক দিন (e.g. https://youtu.be/...)"
-                        className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-red-500"
-                      />
-                      <span className="block text-[11px] text-gray-500 mt-1">
-                        💡 ফেসবুক, ইউটিউব বা যেকোনো অনলাইন ভিডিওর লিংক পেস্ট করলে তৎক্ষণাৎ চলবে।
-                      </span>
-                    </div>
+                    return (
+                      <>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b pb-2">
+                          <label className="text-sm font-bold text-red-950 flex items-center gap-2">
+                            <i className="fas fa-video text-red-600"></i> ইভেন্টের ভিডিও (একাধিক ভিডিও ফাইল বা YouTube লিংক সমর্থন)
+                          </label>
+                          {currentEventVideos.length > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => setNewEvent(prev => ({ ...prev, video: '', videos: [] }))}
+                              className="text-xs text-red-600 hover:text-red-800 font-bold flex items-center gap-1 cursor-pointer"
+                            >
+                              <i className="fas fa-trash-alt"></i> সব ভিডিও মুছে ফেলুন ({currentEventVideos.length}টি)
+                            </button>
+                          )}
+                        </div>
 
-                    <div>
-                      <span className="block text-xs font-bold text-gray-700 mb-1.5 flex items-center gap-1.5">
-                        <i className="fas fa-file-video text-orange-600 text-sm"></i>
-                        ডিভাইস থেকে ভিডিও ফাইল
-                      </span>
-                      <label className="cursor-pointer bg-red-50 hover:bg-red-100/70 border-2 border-dashed border-red-300 px-4 py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition-colors">
-                        <i className="fas fa-cloud-upload-alt text-red-600"></i>
-                        <span className="text-red-900 font-bold">ভিডিও ফাইল নির্বাচন করুন (.mp4, .webm)</span>
-                        <input
-                          type="file"
-                          accept="video/*"
-                          onChange={handleEventVideoFile}
-                          className="hidden"
-                        />
-                      </label>
-                      <span className="block text-[11px] text-gray-500 mt-1">
-                        ছোট ক্লিপ সরাসরি আপলোড হবে; ক্লাউড বাকেট যুক্ত থাকলে যেকোনো সাইজের ফাইল চলবে।
-                      </span>
-                    </div>
-                  </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                          {/* Multi-link Adder */}
+                          <div>
+                            <span className="block text-xs font-bold text-gray-700 mb-1.5 flex items-center gap-1.5">
+                              <i className="fab fa-youtube text-red-600 text-sm"></i>
+                              ইউটিউব / অনলাইন ভিডিও লিংক (এক বা একাধিক)
+                            </span>
+                            <div className="flex gap-2">
+                              <input
+                                type="text"
+                                value={eventVideoLinkInput}
+                                onChange={e => setEventVideoLinkInput(e.target.value)}
+                                onKeyDown={e => {
+                                  if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    handleAddEventVideoLink();
+                                  }
+                                }}
+                                placeholder="YouTube / Shorts লিংক দিন (e.g. https://youtu.be/...)"
+                                className="flex-grow px-3.5 py-2.5 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-red-500 focus:outline-none"
+                              />
+                              <button
+                                type="button"
+                                onClick={handleAddEventVideoLink}
+                                className="bg-red-600 hover:bg-red-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold shrink-0 shadow-sm transition-colors cursor-pointer flex items-center gap-1"
+                              >
+                                <i className="fas fa-plus"></i> যোগ
+                              </button>
+                            </div>
+                            <span className="block text-[11px] text-gray-500 mt-1">
+                              💡 একাধিক লিংক দিতে পারেন। কমা বা নতুন লাইন দিয়ে আলাদা করতে পারবেন।
+                            </span>
+                          </div>
 
-                  {newEvent.video && (
-                    <div className="pt-2">
-                      <div className="w-full max-w-sm aspect-video rounded-xl overflow-hidden border-2 border-red-300 bg-black shadow-sm relative group">
-                        <button
-                          type="button"
-                          onClick={() => setNewEvent(prev => ({ ...prev, video: '' }))}
-                          className="absolute top-2.5 right-2.5 z-30 w-8 h-8 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center shadow-lg transition-all active:scale-90 hover:scale-110 cursor-pointer border-2 border-white"
-                          title="ভিডিও সরান / মুছে ফেলুন"
-                          aria-label="ভিডিও মুছে ফেলুন"
-                        >
-                          <i className="fas fa-times text-sm"></i>
-                        </button>
-                        <MediaViewer
-                          url={newEvent.video}
-                          isVideo={true}
-                          alt="Video Preview"
-                          className="w-full h-full object-cover"
-                          controls={true}
-                        />
-                      </div>
-                      <div className="mt-1.5 flex items-center justify-between max-w-sm px-1">
-                        <span className="text-[11px] text-gray-500 font-medium flex items-center gap-1">
-                          <i className="fas fa-check-circle text-green-600 text-xs"></i> ভিডিও প্রাকদর্শন সক্রিয়
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => setNewEvent(prev => ({ ...prev, video: '' }))}
-                          className="text-xs text-red-600 hover:text-red-800 font-bold flex items-center gap-1 hover:underline cursor-pointer"
-                        >
-                          <i className="fas fa-times-circle"></i> ভিডিও মুছে ফেলুন
-                        </button>
-                      </div>
-                    </div>
-                  )}
+                          {/* Multi-file Upload */}
+                          <div>
+                            <span className="block text-xs font-bold text-gray-700 mb-1.5 flex items-center gap-1.5">
+                              <i className="fas fa-file-video text-orange-600 text-sm"></i>
+                              ডিভাইস থেকে এক বা একাধিক ভিডিও ফাইল
+                            </span>
+                            <label className="cursor-pointer bg-red-50 hover:bg-red-100/70 border-2 border-dashed border-red-300 px-4 py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition-colors">
+                              <i className="fas fa-cloud-upload-alt text-red-600"></i>
+                              <span className="text-red-900 font-bold">ভিডিও ফাইল নির্বাচন করুন (.mp4, .webm)</span>
+                              <input
+                                type="file"
+                                accept="video/*"
+                                multiple
+                                onChange={handleEventVideoFile}
+                                className="hidden"
+                              />
+                            </label>
+                            <span className="block text-[11px] text-gray-500 mt-1">
+                              💡 একসাথে একাধিক ভিডিও ফাইল নির্বাচন করতে পারবেন (IndexedDB স্টোরেজ)।
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Video Previews Grid - Shapes dynamically so controls & buttons are 100% visible */}
+                        {currentEventVideos.length > 0 && (
+                          <div className="pt-2 border-t border-gray-100">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
+                                <i className="fas fa-play-circle text-red-600"></i> নির্বাচিত ভিডিও প্রাকদর্শন ({currentEventVideos.length}টি)
+                              </span>
+                              <span className="text-[11px] text-green-700 font-medium bg-green-50 px-2 py-0.5 rounded-md border border-green-200">
+                                <i className="fas fa-check-circle mr-1"></i>ভিডিও প্লেয়ার ও সকল কন্ট্রোল বাটন সক্রিয়
+                              </span>
+                            </div>
+
+                            <div className={`grid gap-4 ${currentEventVideos.length === 1 ? 'grid-cols-1 max-w-lg mx-auto' : 'grid-cols-1 md:grid-cols-2'}`}>
+                              {currentEventVideos.map((vid, idx) => (
+                                <div
+                                  key={idx}
+                                  className="bg-stone-950 rounded-2xl border-2 border-red-300 shadow-md p-3 flex flex-col justify-between relative group"
+                                >
+                                  {/* Header Badge & Remove Button */}
+                                  <div className="w-full flex items-center justify-between mb-2 px-1">
+                                    <span className="text-xs font-bold text-amber-300 bg-red-950/80 border border-red-500/40 px-2.5 py-0.5 rounded-full flex items-center gap-1.5 shadow-xs">
+                                      <i className="fas fa-video text-red-400"></i> ভিডিও #{idx + 1}
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleRemoveEventVideo(idx)}
+                                      className="text-xs bg-red-600 hover:bg-red-700 text-white font-bold px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-sm transition-all cursor-pointer active:scale-95"
+                                      title="এই ভিডিওটি মুছে ফেলুন"
+                                    >
+                                      <i className="fas fa-trash-alt text-[11px]"></i> মুছে ফেলুন
+                                    </button>
+                                  </div>
+
+                                  {/* Adaptive Video Box - NO aspect-video restriction to avoid button clipping */}
+                                  <div className="w-full flex items-center justify-center min-h-[220px] max-h-[440px] rounded-xl bg-black p-1">
+                                    <MediaViewer
+                                      url={vid}
+                                      isVideo={true}
+                                      alt={`Event Video ${idx + 1}`}
+                                      className="max-h-[400px] max-w-full w-auto h-auto object-contain block mx-auto rounded-lg"
+                                      controls={true}
+                                    />
+                                  </div>
+
+                                  {/* Status bar */}
+                                  <div className="w-full mt-2 pt-2 border-t border-stone-800 flex items-center justify-between text-[11px] text-gray-400 px-1">
+                                    <span className="text-green-400 flex items-center gap-1 font-medium">
+                                      <i className="fas fa-play text-[10px]"></i> কন্ট্রোল বাটন সক্রিয়
+                                    </span>
+                                    <span className="text-stone-400 text-[10px] truncate max-w-[200px]" title={vid}>
+                                      {vid.startsWith('idb:') ? 'স্থানীয় IndexedDB ভিডিও' : vid}
+                                    </span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
 
                 <div>
@@ -11632,7 +11909,7 @@ const AdminPanel = ({
                     <i className={editingEventId ? "fas fa-save" : "fas fa-plus"}></i> {isSaving ? 'সেভ হচ্ছে...' : (editingEventId ? 'ইভেন্ট আপডেট করুন' : 'ইভেন্ট যুক্ত করুন')}
                   </button>
                   {editingEventId && (
-                    <button type="button" onClick={() => { setEditingEventId(null); setNewEvent({ title: '', date: '', description: '', image: null, images: [], video: '' }); }} className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-xl font-bold shadow-md">বাতিল</button>
+                    <button type="button" onClick={() => { setEditingEventId(null); setNewEvent({ title: '', date: '', description: '', image: null, images: [], video: '', videos: [] }); }} className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-xl font-bold shadow-md">বাতিল</button>
                   )}
                 </div>
               </form>
@@ -11644,6 +11921,7 @@ const AdminPanel = ({
               <div className="space-y-4">
                 {events.map(ev => {
                   const evImages = (ev.images && ev.images.length > 0) ? ev.images : (ev.image ? [ev.image] : []);
+                  const evVideos = (ev.videos && ev.videos.length > 0) ? ev.videos : (ev.video ? [ev.video] : []);
                   return (
                     <div key={ev.id} className="border border-gray-200 rounded-2xl p-5 bg-white hover:shadow-md transition-shadow flex flex-col md:flex-row justify-between items-start gap-4">
                       {evImages.length > 0 ? (
@@ -11654,13 +11932,13 @@ const AdminPanel = ({
                               📷 {evImages.length}
                             </span>
                           )}
-                          {ev.video && (
+                          {evVideos.length > 0 && (
                             <span className="absolute top-1 left-1 bg-red-600 text-white text-[9px] px-1.5 py-0.5 rounded font-bold">
-                              ▶ ভিডিও
+                              ▶ {evVideos.length > 1 ? `${evVideos.length}টি ভিডিও` : 'ভিডিও'}
                             </span>
                           )}
                         </div>
-                      ) : ev.video ? (
+                      ) : evVideos.length > 0 ? (
                         <div className="w-full md:w-36 h-28 bg-stone-900 rounded-xl flex items-center justify-center text-red-500 shrink-0">
                           <i className="fas fa-video text-2xl"></i>
                         </div>
@@ -11677,9 +11955,9 @@ const AdminPanel = ({
                               📷 {evImages.length}টি ছবি
                             </span>
                           )}
-                          {ev.video && (
+                          {evVideos.length > 0 && (
                             <span className="text-xs font-semibold text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded-md">
-                              🎥 ভিডিও আছে
+                              🎥 {evVideos.length > 1 ? `${evVideos.length}টি ভিডিও` : 'ভিডিও আছে'}
                             </span>
                           )}
                         </div>
@@ -11695,7 +11973,8 @@ const AdminPanel = ({
                               description: ev.description,
                               image: ev.image || (ev.images && ev.images[0]) || null,
                               images: ev.images || (ev.image ? [ev.image] : []),
-                              video: ev.video || ''
+                              video: (ev.videos && ev.videos[0]) || ev.video || '',
+                              videos: ev.videos || (ev.video ? [ev.video] : [])
                             });
                             setEditingEventId(ev.id);
                             window.scrollTo(0, 0);
@@ -13695,7 +13974,7 @@ const AdminPanel = ({
                       : 'border-transparent text-gray-500 hover:text-gray-700'
                   }`}
                 >
-                  <i className="fas fa-video"></i> ভিডিও আপলোড বা লিংক
+                  <i className="fas fa-video"></i> ভিডিও আপলোড (এক বা একাধিক)
                 </button>
               </div>
 
@@ -13855,106 +14134,246 @@ const AdminPanel = ({
 
               {/* Video Mode Form */}
               {galleryTabMode === 'video' && (
-                <div className="bg-red-50/50 p-6 rounded-2xl border border-red-200">
-                  <h4 className="text-base font-bold text-red-950 mb-3 flex items-center gap-2">
-                    <i className="fas fa-video text-red-600"></i> গ্যালারিতে ভিডিও যোগ করুন
-                  </h4>
-                  <form onSubmit={handleAddGalleryPhoto} className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-6">
+                  {/* Single Video Form */}
+                  <div className="bg-red-50/50 p-6 rounded-2xl border border-red-200">
+                    <h4 className="text-base font-bold text-red-950 mb-3 flex items-center gap-2">
+                      <i className="fas fa-plus-circle text-red-600"></i> একক ভিডিও যোগ করুন
+                    </h4>
+                    <form onSubmit={handleAddGalleryPhoto} className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-bold text-gray-700 mb-1">
+                            ভিডিও ফাইল আপলোড (.mp4, .webm, .mov - যেকোনো সাইজ, আনলিমিটেড)
+                          </label>
+                          <input
+                            type="file"
+                            accept="video/*"
+                            onChange={handleGalleryVideoFile}
+                            className="w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-red-100 file:text-red-700 hover:file:bg-red-200 cursor-pointer"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-gray-700 mb-1">
+                            অথবা YouTube / অনলাইন ভিডিও লিংক
+                          </label>
+                          <input
+                            type="text"
+                            value={newGalleryPhoto.url && newGalleryPhoto.url.startsWith('data:') ? '' : newGalleryPhoto.url}
+                            onChange={(e) => setNewGalleryPhoto({ ...newGalleryPhoto, url: e.target.value, mediaType: 'video' })}
+                            placeholder="উদা: https://youtu.be/... বা https://www.youtube.com/watch?v=..."
+                            className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-red-500 focus:outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Video Preview */}
+                      {(newGalleryPhoto.image || newGalleryPhoto.url) && (
+                        <div className="p-3 bg-white rounded-xl border border-red-200">
+                          <div className="w-full max-w-md min-h-[200px] max-h-[420px] rounded-xl bg-black mb-2 shadow-xs relative group flex items-center justify-center p-2 border border-red-300">
+                            <button
+                              type="button"
+                              onClick={() => setNewGalleryPhoto(prev => ({ ...prev, url: '', image: null }))}
+                              className="absolute top-2.5 right-2.5 z-30 w-8 h-8 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center shadow-lg transition-all active:scale-90 hover:scale-110 cursor-pointer border-2 border-white"
+                              title="ভিডিও সরান / মুছে ফেলুন"
+                              aria-label="ভিডিও মুছে ফেলুন"
+                            >
+                              <i className="fas fa-times text-sm"></i>
+                            </button>
+                            <MediaViewer
+                              url={newGalleryPhoto.image || newGalleryPhoto.url}
+                              isVideo={true}
+                              alt="Gallery Video Preview"
+                              className="max-h-[380px] max-w-full w-auto h-auto object-contain block mx-auto rounded-lg"
+                              controls={true}
+                            />
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-red-700 font-bold flex items-center gap-1">
+                              <i className="fas fa-check-circle text-green-600"></i> ভিডিও প্রাকদর্শন সক্রিয়
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setNewGalleryPhoto(prev => ({ ...prev, url: '', image: null }))}
+                              className="text-xs text-red-600 hover:text-red-800 font-bold flex items-center gap-1 hover:underline cursor-pointer"
+                            >
+                              <i className="fas fa-times-circle"></i> ভিডিও মুছে ফেলুন
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-bold text-gray-700 mb-1">বাংলা ক্যাপশন *</label>
+                          <input
+                            type="text"
+                            value={newGalleryPhoto.captionBn}
+                            onChange={(e) => setNewGalleryPhoto({ ...newGalleryPhoto, captionBn: e.target.value })}
+                            placeholder="উদা: মন্দিরের শ্রীশ্রী মা মনসা পূজার ভিডিও দর্শন"
+                            className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-red-500 focus:outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-gray-700 mb-1">English Caption (ঐচ্ছিক)</label>
+                          <input
+                            type="text"
+                            value={newGalleryPhoto.captionEn}
+                            onChange={(e) => setNewGalleryPhoto({ ...newGalleryPhoto, captionEn: e.target.value })}
+                            placeholder="e.g. Sacred Darshan Video of Maa Manasa"
+                            className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-red-500 focus:outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end">
+                        <button
+                          type="submit"
+                          disabled={isSaving}
+                          className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold px-6 py-2.5 rounded-xl transition-all shadow-md flex items-center gap-2 text-sm disabled:opacity-50 cursor-pointer"
+                        >
+                          {isSaving ? <><i className="fas fa-spinner fa-spin"></i> সংরক্ষণ হচ্ছে...</> : <><i className="fas fa-video"></i> গ্যালারিতে ভিডিও যোগ করুন</>}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+
+                  {/* Multiple Videos Batch Upload Section */}
+                  <div className="bg-amber-50/60 p-6 rounded-2xl border border-amber-300 space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                       <div>
-                        <label className="block text-xs font-bold text-gray-700 mb-1">
-                          ভিডিও ফাইল আপলোড (.mp4, .webm, .mov - যেকোনো সাইজ, আনলিমিটেড)
-                        </label>
+                        <h4 className="text-base font-bold text-amber-950 flex items-center gap-2">
+                          <i className="fas fa-layer-group text-red-600"></i> একসাথে একাধিক ভিডিও আপলোড (Multiple Video Upload)
+                        </h4>
+                        <p className="text-xs text-gray-600 mt-0.5">
+                          একসাথে একাধিক ভিডিও ফাইল নির্বাচন করুন অথবা একাধিক ভিডিও লিংক পেস্ট করুন, স্বয়ংক্রিয়ভাবে প্রস্তুত হয়ে গ্যালারিতে যুক্ত হবে।
+                        </p>
+                      </div>
+
+                      <label className="cursor-pointer bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all shrink-0 active:scale-95">
+                        <i className="fas fa-folder-open"></i> একাধিক ভিডিও ফাইল বাছুন
                         <input
                           type="file"
+                          multiple
                           accept="video/*"
-                          onChange={handleGalleryVideoFile}
-                          className="w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-red-100 file:text-red-700 hover:file:bg-red-200 cursor-pointer"
+                          onChange={handleGalleryMultiVideoFiles}
+                          className="hidden"
                         />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold text-gray-700 mb-1">
-                          অথবা YouTube / অনলাইন ভিডিও লিংক
-                        </label>
-                        <input
-                          type="text"
-                          value={newGalleryPhoto.url && newGalleryPhoto.url.startsWith('data:') ? '' : newGalleryPhoto.url}
-                          onChange={(e) => setNewGalleryPhoto({ ...newGalleryPhoto, url: e.target.value, mediaType: 'video' })}
-                          placeholder="উদা: https://youtu.be/... বা https://www.youtube.com/watch?v=..."
-                          className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-red-500 focus:outline-none"
+                      </label>
+                    </div>
+
+                    {/* Multiple Video Links Paste Box */}
+                    <div className="bg-white p-4 rounded-xl border border-amber-200 space-y-2">
+                      <label className="block text-xs font-bold text-gray-700">
+                        <i className="fab fa-youtube text-red-600 mr-1.5"></i> অথবা একসাথে একাধিক YouTube / অনলাইন ভিডিও লিংক পেস্ট করুন (প্রতি লাইনে বা কমা দিয়ে আলাদা করে):
+                      </label>
+                      <div className="flex flex-col sm:flex-row gap-2.5">
+                        <textarea
+                          rows={2}
+                          value={multiVideoLinksInput}
+                          onChange={(e) => setMultiVideoLinksInput(e.target.value)}
+                          placeholder="https://youtu.be/...&#10;https://www.youtube.com/watch?v=...&#10;https://youtu.be/..."
+                          className="w-full px-3 py-2 border rounded-xl text-xs font-mono focus:ring-2 focus:ring-red-500 focus:outline-none"
                         />
+                        <button
+                          type="button"
+                          onClick={handleAddMultiVideoLinks}
+                          disabled={!multiVideoLinksInput.trim()}
+                          className="bg-red-600 hover:bg-red-700 disabled:opacity-40 text-white font-bold px-5 py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 shrink-0 cursor-pointer transition-colors shadow-sm"
+                        >
+                          <i className="fas fa-plus"></i> লিংকগুলো তালিকায় যোগ করুন
+                        </button>
                       </div>
                     </div>
 
-                    {/* Video Preview */}
-                    {(newGalleryPhoto.image || newGalleryPhoto.url) && (
-                      <div className="p-3 bg-white rounded-xl border border-red-200">
-                        <div className="w-full max-w-sm aspect-video rounded-lg overflow-hidden bg-black mb-2 shadow-xs relative group">
-                          <button
-                            type="button"
-                            onClick={() => setNewGalleryPhoto(prev => ({ ...prev, url: '', image: null }))}
-                            className="absolute top-2.5 right-2.5 z-30 w-8 h-8 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center shadow-lg transition-all active:scale-90 hover:scale-110 cursor-pointer border-2 border-white"
-                            title="ভিডিও সরান / মুছে ফেলুন"
-                            aria-label="ভিডিও মুছে ফেলুন"
-                          >
-                            <i className="fas fa-times text-sm"></i>
-                          </button>
-                          <MediaViewer
-                            url={newGalleryPhoto.image || newGalleryPhoto.url}
-                            isVideo={true}
-                            alt="Gallery Video Preview"
-                            className="w-full h-full object-cover"
-                            controls={true}
-                          />
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-red-700 font-bold flex items-center gap-1">
-                            <i className="fas fa-check-circle text-green-600"></i> ভিডিও প্রাকদর্শন সক্রিয়
+                    {/* Batch Videos Preview Grid */}
+                    {newGalleryVideoBatch.length > 0 && (
+                      <div className="bg-white p-5 rounded-2xl border-2 border-red-300 space-y-4 shadow-sm">
+                        <div className="flex items-center justify-between pb-2 border-b">
+                          <span className="text-xs sm:text-sm font-bold text-red-900 flex items-center gap-2">
+                            <span className="w-6 h-6 rounded-full bg-red-100 text-red-700 flex items-center justify-center font-mono text-xs">
+                              {newGalleryVideoBatch.length}
+                            </span>
+                            নির্বাচিত ভিডিও সমূহ ({newGalleryVideoBatch.length} টি)
                           </span>
                           <button
                             type="button"
-                            onClick={() => setNewGalleryPhoto(prev => ({ ...prev, url: '', image: null }))}
-                            className="text-xs text-red-600 hover:text-red-800 font-bold flex items-center gap-1 hover:underline cursor-pointer"
+                            onClick={() => setNewGalleryVideoBatch([])}
+                            className="text-xs text-red-600 hover:text-red-800 font-bold flex items-center gap-1 cursor-pointer"
                           >
-                            <i className="fas fa-times-circle"></i> ভিডিও মুছে ফেলুন
+                            <i className="fas fa-trash-alt"></i> সব বাতিল করুন
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                          {newGalleryVideoBatch.map((batchItem, bIdx) => (
+                            <div key={batchItem.id || bIdx} className="p-3 bg-stone-50 rounded-xl border border-gray-200 relative group flex flex-col justify-between shadow-2xs">
+                              <button
+                                type="button"
+                                onClick={() => setNewGalleryVideoBatch(prev => prev.filter((_, idx) => idx !== bIdx))}
+                                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center text-xs shadow-md z-20 cursor-pointer transition-transform hover:scale-110"
+                                title="ভিডিওটি বাদ দিন"
+                              >
+                                <i className="fas fa-times"></i>
+                              </button>
+
+                              <div className="w-full aspect-video rounded-lg overflow-hidden bg-black mb-2.5 relative flex items-center justify-center">
+                                <MediaViewer
+                                  url={batchItem.url}
+                                  isVideo={true}
+                                  alt={`Video Batch ${bIdx + 1}`}
+                                  className="w-full h-full object-contain"
+                                  controls={false}
+                                />
+                                <span className="absolute bottom-1 left-1 bg-black/75 text-amber-300 text-[10px] px-1.5 py-0.5 rounded font-mono font-bold">
+                                  #{bIdx + 1}
+                                </span>
+                              </div>
+
+                              <div className="space-y-1.5">
+                                <input
+                                  type="text"
+                                  value={batchItem.captionBn}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    setNewGalleryVideoBatch(prev => prev.map((item, idx) => idx === bIdx ? { ...item, captionBn: val } : item));
+                                  }}
+                                  placeholder="বাংলা ক্যাপশন"
+                                  className="w-full px-2.5 py-1 text-xs border rounded-lg focus:ring-1 focus:ring-red-500"
+                                />
+                                <input
+                                  type="text"
+                                  value={batchItem.captionEn}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    setNewGalleryVideoBatch(prev => prev.map((item, idx) => idx === bIdx ? { ...item, captionEn: val } : item));
+                                  }}
+                                  placeholder="English Caption"
+                                  className="w-full px-2.5 py-1 text-xs border rounded-lg text-gray-600 focus:ring-1 focus:ring-red-500"
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Save Batch Button */}
+                        <div className="flex justify-end pt-3 border-t">
+                          <button
+                            type="button"
+                            onClick={handleSaveGalleryVideoBatch}
+                            disabled={isSaving}
+                            className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white px-7 py-3 rounded-xl font-bold text-sm flex items-center gap-2 shadow-lg disabled:opacity-50 cursor-pointer transition-all hover:shadow-xl"
+                          >
+                            {isSaving ? (
+                              <><i className="fas fa-spinner fa-spin"></i> ভিডিও সংরক্ষণ হচ্ছে...</>
+                            ) : (
+                              <><i className="fas fa-check-double"></i> গ্যালারিতে সব ({newGalleryVideoBatch.length} টি) ভিডিও সেভ করুন</>
+                            )}
                           </button>
                         </div>
                       </div>
                     )}
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-xs font-bold text-gray-700 mb-1">বাংলা ক্যাপশন *</label>
-                        <input
-                          type="text"
-                          value={newGalleryPhoto.captionBn}
-                          onChange={(e) => setNewGalleryPhoto({ ...newGalleryPhoto, captionBn: e.target.value })}
-                          placeholder="উদা: মন্দিরের শ্রীশ্রী মা মনসা পূজার ভিডিও দর্শন"
-                          className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-red-500 focus:outline-none"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold text-gray-700 mb-1">English Caption (ঐচ্ছিক)</label>
-                        <input
-                          type="text"
-                          value={newGalleryPhoto.captionEn}
-                          onChange={(e) => setNewGalleryPhoto({ ...newGalleryPhoto, captionEn: e.target.value })}
-                          placeholder="e.g. Sacred Darshan Video of Maa Manasa"
-                          className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-red-500 focus:outline-none"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="flex justify-end">
-                      <button
-                        type="submit"
-                        disabled={isSaving}
-                        className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold px-6 py-2.5 rounded-xl transition-all shadow-md flex items-center gap-2 text-sm disabled:opacity-50 cursor-pointer"
-                      >
-                        {isSaving ? <><i className="fas fa-spinner fa-spin"></i> সংরক্ষণ হচ্ছে...</> : <><i className="fas fa-video"></i> গ্যালারিতে ভিডিও যোগ করুন</>}
-                      </button>
-                    </div>
-                  </form>
+                  </div>
                 </div>
               )}
 

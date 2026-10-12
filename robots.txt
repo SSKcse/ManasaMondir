@@ -1,0 +1,44 @@
+# Robots.txt for Shree Shree Maa Manasa Mandir Goila
+# Website: https://manasamondirgoila.com/
+# Generated automatically by SEO Crawler
+
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /images/
+Allow: /uploads/
+Allow: /manifest.json
+Allow: /favicon.ico
+Allow: /sitemap.xml
+
+# Disallow private admin endpoints & payment queries from crawl indexation
+Disallow: /api/
+Disallow: /admin
+Disallow: /?view=admin
+Disallow: /*?payment_status=*
+Disallow: /*?tran_id=*
+
+# Search Engine Crawlers
+User-agent: Googlebot
+Allow: /
+Allow: /images/
+Allow: /uploads/
+
+User-agent: Googlebot-Image
+Allow: /images/
+Allow: /uploads/
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Yandex
+Allow: /
+
+# Canonical Sitemap URL
+Sitemap: https://manasamondirgoila.com/sitemap.xml
