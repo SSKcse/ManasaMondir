@@ -1,0 +1,24 @@
+{
+  "name": "manasa-mondir",
+  "version": "1.0.0",
+  "description": "Shree Shree Maa Manasa Mandir Goila Web Application",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "build": "npx esbuild app.jsx --minify --charset=utf8 --bundle=false --outfile=app.min.js",
+    "seo": "node seo-crawler.js",
+    "seo:ping": "node seo-crawler.js --ping"
+  },
+  "keywords": [
+    "manasa",
+    "mandir",
+    "temple",
+    "goila"
+  ],
+  "author": "Arpon Chakraborty",
+  "license": "ISC",
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}

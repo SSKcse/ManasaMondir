@@ -1,0 +1,2020 @@
+<!DOCTYPE html>
+<html lang="bn">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Primary Meta Tags for SEO -->
+  <title>শ্রী শ্রী মা মনসা মন্দির, গৈলা - ঐতিহাসিক পবিত্র তীর্থস্থান</title>
+  <meta name="title" content="শ্রী শ্রী মা মনসা মন্দির, গৈলা - ঐতিহাসিক পবিত্র তীর্থস্থান">
+  <meta name="description"
+    content="বরিশালের গৈলায় অবস্থিত মধ্যযুগের অন্যতম শ্রেষ্ঠ বাঙালি কবি বিজয় গুপ্তের প্রতিষ্ঠিত ঐতিহাসিক শ্রী শ্রী মা মনসা মন্দির। মনসামঙ্গল কাব্যের রচয়িতার পবিত্র জন্মভূমি।">
+  <meta name="keywords"
+    content="মনসা মন্দির, গৈলা, আগৈলঝাড়া, বরিশাল, কবি বিজয় গুপ্ত, পদ্মাপুরাণ, মনসামঙ্গল, হিন্দু মন্দির, Manasa Temple, Goila, Barishal, Hindu Temple Bangladesh">
+  <meta name="author" content="মনসা মন্দির পরিচালনা কমিটি">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="Bengali">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://manasamondirgoila.com/">
+  <meta property="og:title" content="শ্রী শ্রী মা মনসা মন্দির, গৈলা">
+  <meta property="og:description"
+    content="কবি বিজয় গুপ্তের প্রতিষ্ঠিত ঐতিহাসিক মন্দির। মায়ের আশীর্বাদে সবার জীবনে শান্তি ও সমৃদ্ধি নেমে আসুক।">
+  <meta property="og:image" content="header image.jpg">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://manasamondirgoila.com/">
+  <meta property="twitter:title" content="শ্রী শ্রী মা মনসা মন্দির, গৈলা">
+  <meta property="twitter:description"
+    content="কবি বিজয় গুপ্তের প্রতিষ্ঠিত ঐতিহাসিক মন্দির। মায়ের আশীর্বাদে সবার জীবনে শান্তি ও সমৃদ্ধি নেমে আসুক।">
+  <meta property="twitter:image" content="header image.jpg">
+
+  <!-- Tailwind CSS (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- FontAwesome Icons (CDN) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Quill Editor (CDN) for Rich Text Box -->
+  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+  <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+  <!-- React & ReactDOM (CDN) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+  <!-- Babel for compiling JSX in the browser -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      font-family: 'Hind Siliguri', sans-serif;
+    }
+
+    /* Modern CSS Marquee Animation */
+    .marquee-wrapper {
+      width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      box-sizing: border-box;
+    }
+
+    .marquee-text {
+      display: inline-block;
+      padding-left: 100%;
+      animation: marquee 25s linear infinite;
+    }
+
+    .marquee-text:hover {
+      animation-play-state: paused;
+    }
+
+    @keyframes marquee {
+      0% {
+        transform: translateX(0);
+      }
+
+      100% {
+        transform: translateX(-100%);
+      }
+    }
+
+    /* Custom Scrollbar for better UI */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #fff7ed;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #f97316;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #c2410c;
+    }
+
+    /* Animation for Toast Message */
+    @keyframes slideUp {
+      0% {
+        transform: translateY(100px);
+        opacity: 0;
+      }
+
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .toast-animate {
+      animation: slideUp 0.3s ease-out forwards;
+    }
+
+    /* Glowing Avatar Animation */
+    @keyframes spiritualGlow {
+      0% {
+        box-shadow: 0 0 15px rgba(250, 204, 21, 0.4);
+      }
+
+      50% {
+        box-shadow: 0 0 40px rgba(250, 204, 21, 0.9), 0 0 20px rgba(249, 115, 22, 0.8);
+      }
+
+      100% {
+        box-shadow: 0 0 15px rgba(250, 204, 21, 0.4);
+      }
+    }
+
+    .spiritual-avatar {
+      animation: spiritualGlow 3s infinite alternate;
+    }
+
+    /* Rich Text Editor Overrides */
+    .rich-text p {
+      margin-bottom: 0.5em;
+    }
+
+    .rich-text strong,
+    .rich-text b {
+      font-weight: bold;
+    }
+
+    .rich-text em,
+    .rich-text i {
+      font-style: italic;
+    }
+
+    .rich-text u {
+      text-decoration: underline;
+    }
+
+    .rich-text ul {
+      list-style-type: disc;
+      margin-left: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .rich-text ol {
+      list-style-type: decimal;
+      margin-left: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .rich-text a {
+      color: #2563eb;
+      text-decoration: underline;
+    }
+
+    .ql-editor {
+      font-family: inherit;
+      font-size: 14px;
+      min-height: 120px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // --- Supabase Configuration ---
+    const SUPABASE_URL = 'https://abdgizkkfyhewehfearj.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_MsM2-K03tGNU3G-WWZvYUA_lKu53oT9';
+
+    // Initialize Supabase Client
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // গ্যালারির ছবিগুলো
+    const galleryImages = [
+      'header image.jpg',
+      'gallary image.png',
+      'ma manasa mondir font.jpg',
+      'ma manasa mondir lake dighi view.jpg'
+    ];
+
+    // --- Rich Text Editor Component ---
+    const QuillEditor = ({ value, onChange, placeholder }) => {
+      const editorRef = useRef(null);
+      const quillRef = useRef(null);
+
+      useEffect(() => {
+        if (editorRef.current && !quillRef.current && window.Quill) {
+          quillRef.current = new window.Quill(editorRef.current, {
+            theme: 'snow',
+            placeholder: placeholder || 'এখানে বিস্তারিত লিখুন...',
+            modules: {
+              toolbar: [
+                ['bold', 'italic', 'underline'],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                ['link'],
+                ['clean']
+              ]
+            }
+          });
+          quillRef.current.on('text-change', () => {
+            onChange(quillRef.current.root.innerHTML);
+          });
+          if (value) {
+            quillRef.current.root.innerHTML = value;
+          }
+        }
+      }, []);
+
+      useEffect(() => {
+        if (quillRef.current && value !== quillRef.current.root.innerHTML) {
+          if (!value || value === '<p><br></p>') {
+            quillRef.current.root.innerHTML = '';
+          } else if (quillRef.current.root.innerHTML === '<p><br></p>' || quillRef.current.root.innerHTML === '') {
+            quillRef.current.root.innerHTML = value;
+          }
+        }
+      }, [value]);
+
+      return (
+        <div className="bg-white rounded-xl border border-gray-300 overflow-hidden">
+          <div ref={editorRef} />
+        </div>
+      );
+    };
+
+    // --- Helper Functions ---
+    const englishToBengaliNumber = (engStr) => {
+      if (!engStr) return '';
+      const benDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+      return engStr.toString().replace(/\d/g, d => benDigits[d]);
+    };
+
+    const formatDateToBengali = (dateStr) => {
+      if (!dateStr) return '';
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return englishToBengaliNumber(dateStr);
+      const months = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'];
+      const [y, m, d] = dateStr.split('-');
+      const day = englishToBengaliNumber(parseInt(d, 10));
+      const year = englishToBengaliNumber(y);
+      const month = months[parseInt(m, 10) - 1];
+      return `${day} ${month}, ${year}`;
+    };
+
+    const shareEvent = async (ev, showToast) => {
+      // Strip HTML for plain text sharing
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = ev.description;
+      const plainDescription = tempDiv.textContent || tempDiv.innerText || "";
+
+      const shareData = {
+        title: ev.title,
+        text: `${ev.title}\n\n${plainDescription}\n\nতারিখ: ${formatDateToBengali(ev.date)}\n\nবিস্তারিত জানতে ভিজিট করুন: `,
+        url: window.location.origin + window.location.pathname + '#event'
+      };
+
+      try {
+        if (navigator.share) {
+          await navigator.share(shareData);
+        } else {
+          await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
+          showToast('ইভেন্টের তথ্য কপি করা হয়েছে!');
+        }
+      } catch (err) {
+        console.log('Share canceled or failed', err);
+      }
+    };
+
+    // --- Reusable Back Button Component ---
+    const BackButton = ({ navigateTo }) => (
+      <button onClick={() => navigateTo('home')} className="mb-6 inline-flex items-center gap-2 text-orange-700 font-bold bg-orange-100/80 px-5 py-2 rounded-full hover:bg-orange-200 hover:text-orange-900 transition-colors shadow-sm border border-orange-200">
+        <i className="fas fa-arrow-left"></i> হোমে ফিরে যান
+      </button>
+    );
+
+    // --- Components Extracted to prevent Babel parsing issues ---
+    const Header = ({ navigateTo, isMenuOpen, setIsMenuOpen }) => (
+      <header className="bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-lg sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+          <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigateTo('home')}>
+            <div className="w-12 h-12 md:w-14 md:h-14 bg-white rounded-full flex items-center justify-center overflow-hidden border-2 border-yellow-400">
+              <img src="logo (1).jpg" alt="Logo" className="w-full h-full object-cover" />
+            </div>
+            <div>
+              <h1 className="text-xl md:text-2xl font-bold font-serif">শ্রী শ্রী মা মনসা মন্দির</h1>
+              <p className="text-xs text-yellow-200">গৈলা, আগৈলঝাড়া, বরিশাল</p>
+            </div>
+          </div>
+
+          <nav className="hidden lg:flex items-center gap-5 font-medium text-sm xl:text-base">
+            <button onClick={() => navigateTo('home')} className="hover:text-yellow-300 transition-colors">হোম</button>
+            <button onClick={() => navigateTo('history')} className="hover:text-yellow-300 transition-colors">ইতিহাস</button>
+            <button onClick={() => navigateTo('committee')} className="hover:text-yellow-300 transition-colors">কমিটি</button>
+            <button onClick={() => navigateTo('event')} className="hover:text-yellow-300 transition-colors">ইভেন্ট</button>
+            <button onClick={() => navigateTo('notice')} className="hover:text-yellow-300 transition-colors flex items-center gap-1"><i className="fas fa-bell"></i> নোটিশ</button>
+            <button onClick={() => navigateTo('testimonials')} className="hover:text-yellow-300 transition-colors">মতামত</button>
+            <button onClick={() => navigateTo('donation')} className="bg-yellow-500 text-orange-900 px-4 py-2 rounded-full font-bold hover:bg-yellow-400 transition-colors shadow-md flex items-center gap-1">
+              <i className="fas fa-heart"></i> প্রণামী
+            </button>
+          </nav>
+
+          <div className="flex items-center gap-3 lg:hidden">
+            <button onClick={() => navigateTo('donation')} className="bg-yellow-500 text-orange-900 p-2 rounded-full font-bold hover:bg-yellow-400 shadow-md">
+              <i className="fas fa-heart"></i>
+            </button>
+            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white p-2 text-2xl">
+              <i className={isMenuOpen ? "fas fa-times" : "fas fa-bars"}></i>
+            </button>
+          </div>
+        </div>
+
+        {isMenuOpen && (
+          <div className="lg:hidden bg-orange-700 absolute w-full left-0 top-full shadow-xl flex flex-col font-medium border-t border-orange-500 z-50">
+            <button onClick={() => navigateTo('home')} className="py-3 px-6 text-left border-b border-orange-600 hover:bg-orange-600">হোম</button>
+            <button onClick={() => navigateTo('history')} className="py-3 px-6 text-left border-b border-orange-600 hover:bg-orange-600">ইতিহাস</button>
+            <button onClick={() => navigateTo('committee')} className="py-3 px-6 text-left border-b border-orange-600 hover:bg-orange-600">কমিটি</button>
+            <button onClick={() => navigateTo('event')} className="py-3 px-6 text-left border-b border-orange-600 hover:bg-orange-600">ইভেন্ট</button>
+            <button onClick={() => navigateTo('notice')} className="py-3 px-6 text-left border-b border-orange-600 hover:bg-orange-600 flex items-center gap-2"><i className="fas fa-bell"></i> নোটিশ বোর্ড</button>
+            <button onClick={() => navigateTo('testimonials')} className="py-3 px-6 text-left border-b border-orange-600 hover:bg-orange-600">মতামত</button>
+            <button onClick={() => navigateTo('admin')} className="py-3 px-6 text-left bg-gray-800 text-gray-200 flex items-center gap-2">
+              <i className="fas fa-cog"></i> এডমিন প্যানেল
+            </button>
+          </div>
+        )}
+      </header>
+    );
+
+    const Footer = ({ navigateTo }) => (
+      <footer className="bg-gray-900 text-orange-100 pt-12 pb-6 border-t-4 border-orange-600">
+        <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+          <div>
+            <h3 className="text-2xl font-bold text-yellow-500 mb-4 flex items-center gap-2">
+              শ্রী শ্রী মা মনসা মন্দির
+            </h3>
+            <p className="mb-4 text-gray-400">কবি বিজয় গুপ্তের প্রতিষ্ঠিত ঐতিহাসিক মন্দির। মায়ের আশীর্বাদে সবার জীবনে শান্তি ও সমৃদ্ধি নেমে আসুক।</p>
+            <div className="flex gap-4">
+              <a href="https://www.facebook.com" target="_blank" rel="noreferrer" className="w-10 h-10 bg-orange-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors">
+                <i className="fab fa-facebook-f"></i>
+              </a>
+            </div>
+          </div>
+          <div>
+            <h4 className="text-lg font-bold text-white mb-4 border-b border-gray-700 pb-2">প্রয়োজনীয় লিংক</h4>
+            <ul className="space-y-2">
+              <li><button onClick={() => navigateTo('history')} className="hover:text-yellow-400 flex items-center gap-2"><i className="fas fa-chevron-right text-xs"></i> ইতিহাস</button></li>
+              <li><button onClick={() => navigateTo('committee')} className="hover:text-yellow-400 flex items-center gap-2"><i className="fas fa-chevron-right text-xs"></i> কমিটি</button></li>
+              <li><button onClick={() => navigateTo('notice')} className="hover:text-yellow-400 flex items-center gap-2"><i className="fas fa-chevron-right text-xs"></i> নোটিশ বোর্ড</button></li>
+              <li><button onClick={() => navigateTo('donation')} className="hover:text-yellow-400 flex items-center gap-2"><i className="fas fa-chevron-right text-xs"></i> প্রণামী দান করুন</button></li>
+              <li><button onClick={() => navigateTo('admin')} className="hover:text-yellow-400 flex items-center gap-2"><i className="fas fa-cog text-xs"></i> এডমিন লগইন</button></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="text-lg font-bold text-white mb-4 border-b border-gray-700 pb-2">যোগাযোগ</h4>
+            <ul className="space-y-3">
+              <li className="flex items-start gap-3"><i className="fas fa-map-marker-alt text-orange-500 mt-1"></i> <span>গৈলা, আগৈলঝাড়া, বরিশাল, বাংলাদেশ</span></li>
+              <li className="flex items-center gap-3"><i className="fas fa-phone text-orange-500"></i> <span>০১৭১৭৫০৩৬৫৭ (সভাপতি)</span></li>
+              <li className="flex items-center gap-3"><i className="fas fa-envelope text-orange-500"></i> <span>info@manasamondirgoila.com</span></li>
+            </ul>
+          </div>
+        </div>
+        <div className="text-center text-sm text-gray-500 border-t border-gray-800 pt-6">
+          <p>© {new Date().getFullYear()} মনসা মন্দির গৈলা। সর্বস্বত্ব সংরক্ষিত।</p>
+          <p className="mt-2">Site Developed by: <span className="text-orange-400">Arpon Chakraborty</span></p>
+        </div>
+      </footer>
+    );
+
+    const Home = ({ dbError, marqueeText, testimonials, featuredTestimonialIds, committeeMembers, events, notices, navigateTo, showToast }) => {
+      const [currentImg, setCurrentImg] = useState(0);
+      const [testIdx, setTestIdx] = useState(0);
+
+      const featuredTests = testimonials.filter(t => featuredTestimonialIds.includes(t.id));
+      const displayTests = featuredTests.length > 0 ? featuredTests : testimonials.slice(0, 3);
+
+      useEffect(() => {
+        const timer = setInterval(() => {
+          setCurrentImg((prev) => (prev + 1) % galleryImages.length);
+        }, 4000);
+        return () => clearInterval(timer);
+      }, []);
+
+      useEffect(() => {
+        if (displayTests.length <= 1) return;
+        const tTimer = setInterval(() => {
+          setTestIdx((prev) => (prev + 1) % displayTests.length);
+        }, 5000);
+        return () => clearInterval(tTimer);
+      }, [displayTests.length]);
+
+      const nextImg = () => setCurrentImg((prev) => (prev + 1) % galleryImages.length);
+      const prevImg = () => setCurrentImg((prev) => (prev === 0 ? galleryImages.length - 1 : prev - 1));
+
+      return (
+        <div className="bg-orange-50 min-h-screen">
+          {dbError && (
+            <div className="bg-red-600 text-white text-center py-2 text-sm font-bold shadow-md relative z-50">
+              ⚠ Database error fetching data.
+            </div>
+          )}
+
+          {/* CSS Marquee */}
+          <div className="bg-orange-800 text-yellow-200 py-2 border-b-2 border-yellow-500 marquee-wrapper shadow-inner">
+            <div className="marquee-text font-medium text-sm md:text-base">
+              {marqueeText}
+            </div>
+          </div>
+
+          {/* Hero Section */}
+          <section className="relative bg-orange-900 text-white overflow-hidden min-h-[550px] flex items-center pt-10">
+            <div className="absolute inset-0 z-0">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/60 z-10"></div>
+              <img src="ma manasa mondir goila.jpg" alt="Ma Manasa" className="w-full h-full object-cover" />
+            </div>
+
+            <div className="container mx-auto px-4 py-16 relative z-20 text-center flex flex-col items-center">
+
+              {/* Spiritual Profile Picture */}
+              <div className="w-56 h-56 md:w-56 md:h-56 mb-6 rounded-full p-1 spiritual-avatar bg-gradient-to-tr from-yellow-300 to-orange-500 relative">
+                <div className="absolute inset-0 rounded-full border-2 border-white/50 mix-blend-overlay"></div>
+                <img src="manasaprofile.jpg" alt="Ma Manasa Deity" className="w-full h-full object-cover rounded-full border-4 border-orange-900 shadow-inner bg-white" />
+              </div>
+
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-500 mb-6 drop-shadow-2xl font-serif tracking-wide">
+                শ্রী শ্রী মা মনসা মন্দির
+              </h1>
+              <p className="text-xl md:text-2xl text-orange-50 mb-10 max-w-3xl mx-auto drop-shadow-lg font-medium">
+                মনসামঙ্গল কাব্যের রচয়িতা কবি বিজয় গুপ্তের প্রতিষ্ঠিত পবিত্র তীর্থস্থান
+              </p>
+              <div className="flex flex-col sm:flex-row gap-5 justify-center">
+                <button onClick={() => navigateTo('history')} className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 text-white px-8 py-3.5 rounded-full font-bold transition-all shadow-[0_0_15px_rgba(234,88,12,0.5)] border border-orange-400 text-lg hover:-translate-y-1">
+                  ইতিহাস জানুন
+                </button>
+                <button onClick={() => navigateTo('donation')} className="bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-300 hover:to-yellow-500 text-orange-900 px-8 py-3.5 rounded-full font-bold transition-all shadow-[0_0_15px_rgba(234,179,8,0.5)] text-lg flex items-center justify-center gap-2 hover:-translate-y-1 border border-yellow-300">
+                  <i className="fas fa-heart text-red-600"></i> প্রণামী দিন
+                </button>
+              </div>
+            </div>
+
+            {/* Unique Straight Bottom Edge */}
+            <div className="absolute bottom-0 w-full flex flex-col z-20">
+              <div className="h-[2px] bg-yellow-300 w-full opacity-70"></div>
+              <div className="h-2 bg-yellow-500 w-full shadow-[0_-5px_15px_rgba(0,0,0,0.3)]"></div>
+              <div className="h-6 bg-orange-800 w-full relative flex items-center justify-center overflow-hidden border-b border-orange-950">
+                <div className="absolute inset-0 opacity-40 flex items-center" style={{ backgroundImage: 'radial-gradient(#fbbf24 2px, transparent 2px)', backgroundSize: '16px 16px', backgroundPosition: 'center' }}></div>
+              </div>
+            </div>
+          </section>
+
+          {/* Photo Gallery Section */}
+          <section className="py-16 container mx-auto px-4 mt-4">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl md:text-4xl font-bold text-orange-900 mb-4 font-serif">ফটো গ্যালারি</h2>
+              <div className="h-1.5 w-24 bg-yellow-500 mx-auto rounded-full"></div>
+            </div>
+
+            <div className="relative w-full max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-2xl aspect-video bg-gray-900 group border-4 border-white">
+              {galleryImages.map((img, index) => (
+                <div key={index} className={`absolute inset-0 w-full h-full transition-opacity duration-1000 flex items-center justify-center text-gray-400 bg-gray-800 ${index === currentImg ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}>
+                  <img src={img} alt={`Gallery ${index}`} className="w-full h-full object-cover" />
+                </div>
+              ))}
+
+              <button onClick={prevImg} className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-orange-600 text-white w-12 h-12 rounded-full opacity-0 group-hover:opacity-100 transition-all z-20 flex items-center justify-center">
+                <i className="fas fa-chevron-left"></i>
+              </button>
+              <button onClick={nextImg} className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-orange-600 text-white w-12 h-12 rounded-full opacity-0 group-hover:opacity-100 transition-all z-20 flex items-center justify-center">
+                <i className="fas fa-chevron-right"></i>
+              </button>
+
+              <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-3 z-20">
+                {galleryImages.map((_, i) => (
+                  <div key={i} onClick={() => setCurrentImg(i)} className={`w-3 h-3 rounded-full cursor-pointer transition-all shadow-md ${i === currentImg ? 'bg-yellow-400 scale-150' : 'bg-white/60 hover:bg-white'}`}></div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Famous Devotee Section */}
+          <section className="py-16 bg-white border-y border-orange-100 shadow-sm">
+            <div className="container mx-auto px-4">
+              <div className="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-3xl shadow-lg p-8 md:p-12 flex flex-col md:flex-row items-center gap-10 border border-orange-100 relative overflow-hidden">
+                <div className="absolute -right-20 -top-20 w-64 h-64 bg-orange-200 rounded-full opacity-40 blur-3xl"></div>
+                <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-yellow-200 rounded-full opacity-40 blur-2xl"></div>
+
+                <div className="w-full md:w-1/3 flex justify-center relative z-10">
+                  <div className="w-48 h-48 md:w-64 md:h-64 bg-white rounded-full flex items-center justify-center border-[6px] border-orange-300 shadow-xl overflow-hidden">
+                    <img
+                      src="kobi bijoy gupta.png"
+                      alt="Kobi Bijoy Gupta"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+
+                <div className="w-full md:w-2/3 relative z-10 text-center md:text-left">
+                  <h2 className="text-3xl font-bold text-orange-900 mb-4 border-b-2 border-yellow-500 inline-block pb-2">বিখ্যাত ভক্ত: কবি বিজয় গুপ্ত</h2>
+                  <p className="text-gray-700 text-lg leading-relaxed mb-8 text-justify">
+                    মধ্যযুগের অন্যতম শ্রেষ্ঠ বাঙালি কবি বিজয় গুপ্ত। তাঁর রচিত "পদ্মাপুরাণ" বা "মনসামঙ্গল" কাব্য বাংলা সাহিত্যের এক অমূল্য রত্ন। তিনি এই গৈলা গ্রামেই জন্মগ্রহণ করেন এবং স্বয়ং মা মনসার স্বপ্নাদিষ্ট হয়ে এই পবিত্র মন্দিরটি প্রতিষ্ঠা করেন। শতাব্দীর পর শতাব্দী ধরে অসংখ্য ভক্ত মায়ের কৃপা লাভের আশায় এখানে ছুটে আসেন।
+                  </p>
+                  <button onClick={() => navigateTo('history')} className="text-white bg-orange-600 px-8 py-3 rounded-full font-bold inline-flex items-center gap-2 hover:bg-orange-700 transition-colors shadow-md hover:shadow-lg">
+                    আরও জানুন <i className="fas fa-chevron-right text-sm"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Notice Board Overview Snippet */}
+          <section className="py-16 bg-gray-50 border-b border-gray-200 relative">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-blue-600"></div>
+            <div className="container mx-auto px-4 max-w-6xl">
+              <div className="flex flex-col md:flex-row gap-8 items-center">
+                <div className="md:w-1/3 text-center md:text-left">
+                  <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto md:mx-0 mb-4 text-2xl shadow-sm">
+                    <i className="fas fa-bullhorn"></i>
+                  </div>
+                  <h2 className="text-3xl font-bold text-gray-800 mb-2 font-serif">নোটিশ বোর্ড</h2>
+                  <div className="h-1 w-16 bg-blue-500 mx-auto md:mx-0 mb-4 rounded-full"></div>
+                  <p className="text-gray-600 mb-8 leading-relaxed">মন্দিরের গুরুত্বপূর্ণ সকল বিজ্ঞপ্তি ও আপডেট সম্পর্কে জানতে নোটিশ বোর্ড খেয়াল রাখুন।</p>
+                  <button onClick={() => navigateTo('notice')} className="bg-white border-2 border-blue-500 text-blue-600 font-bold px-6 py-2 rounded-full hover:bg-blue-50 transition-colors shadow-sm inline-flex items-center gap-2 mx-auto md:mx-0">
+                    সকল নোটিশ <i className="fas fa-arrow-right text-sm"></i>
+                  </button>
+                </div>
+                <div className="md:w-2/3 w-full">
+                  <div className="bg-white rounded-2xl shadow-lg border-l-[6px] border-blue-500 p-2 md:p-4">
+                    {notices.slice(0, 3).map((n, i) => (
+                      <div key={n.id} className={`p-4 md:p-5 ${i !== notices.slice(0, 3).length - 1 ? "border-b border-gray-100" : ""} hover:bg-gray-50 transition-colors rounded-lg`}>
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 gap-2">
+                          <h4 className="font-bold text-gray-800 text-lg leading-tight">{n.title}</h4>
+                          <span className="text-xs bg-blue-50 text-blue-600 border border-blue-100 px-2.5 py-1 rounded-md font-semibold whitespace-nowrap flex items-center gap-1 shadow-sm w-fit">
+                            <i className="fas fa-calendar-day"></i> {formatDateToBengali(n.date)}
+                          </span>
+                        </div>
+                        <div className="text-gray-600 text-sm line-clamp-2 mt-2 rich-text" dangerouslySetInnerHTML={{ __html: n.text }}></div>
+                      </div>
+                    ))}
+                    {notices.length === 0 && <p className="text-gray-500 p-6 text-center">কোনো নোটিশ নেই।</p>}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Testimonials Slider Overview Snippet */}
+          {displayTests.length > 0 && (
+            <section className="py-20 container mx-auto px-4 relative">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-bold text-orange-900 mb-4 font-serif">পুণ্যার্থীদের মতামত</h2>
+                <div className="h-1.5 w-24 bg-yellow-500 mx-auto rounded-full"></div>
+              </div>
+
+              <div className="max-w-4xl mx-auto bg-gradient-to-b from-white to-orange-50 rounded-3xl shadow-xl p-8 md:p-14 text-center border border-orange-100 relative overflow-hidden transition-all duration-500">
+                <i className="fas fa-quote-left text-6xl text-orange-200/50 absolute top-6 left-6 md:left-10"></i>
+                <i className="fas fa-quote-right text-6xl text-orange-200/50 absolute bottom-6 right-6 md:right-10"></i>
+
+                <div className="relative z-10 min-h-[160px] flex flex-col justify-center items-center">
+                  <div className="text-gray-800 italic text-xl md:text-2xl leading-relaxed mb-8 max-w-2xl rich-text" dangerouslySetInnerHTML={{ __html: displayTests[testIdx] ? displayTests[testIdx].text : '' }}>
+                  </div>
+                  {displayTests[testIdx] && (
+                    <div className="bg-white px-6 py-3 rounded-xl shadow-sm border border-orange-100 inline-block">
+                      <h4 className="font-bold text-orange-900 text-lg">{displayTests[testIdx].name}</h4>
+                      <p className="text-sm text-gray-500">{displayTests[testIdx].designation}</p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex justify-center gap-3 mt-10 relative z-10">
+                  {displayTests.map((_, i) => (
+                    <div key={i} onClick={() => setTestIdx(i)} className={`h-2.5 rounded-full cursor-pointer transition-all ${i === testIdx ? 'w-8 bg-orange-600' : 'w-2.5 bg-orange-300 hover:bg-orange-400'}`}></div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="text-center mt-12">
+                <button onClick={() => navigateTo('testimonials')} className="bg-white border-[3px] border-orange-500 text-orange-600 px-10 py-3 rounded-full font-bold hover:bg-orange-50 hover:text-orange-700 transition-all shadow-md hover:shadow-lg inline-flex items-center gap-2">
+                  বিস্তারিত পড়ুন <i className="fas fa-arrow-right"></i>
+                </button>
+              </div>
+            </section>
+          )}
+
+          {/* Committee Snippet */}
+          <section className="py-16 bg-gradient-to-b from-orange-100 to-white border-t border-orange-200">
+            <div className="container mx-auto px-4">
+              <div className="text-center mb-14">
+                <h2 className="text-3xl md:text-4xl font-bold text-orange-900 mb-4 font-serif">পরিচালনা পরিষদ </h2>
+                <div className="h-1.5 w-24 bg-yellow-500 mx-auto rounded-full"></div>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
+                {committeeMembers.slice(0, 8).map((member) => (
+                  <div key={member.id} className="bg-white rounded-2xl p-8 text-center shadow-lg border border-orange-100 hover:-translate-y-2 transition-transform duration-300">
+                    <div className="w-28 h-28 mx-auto bg-gradient-to-br from-orange-100 to-orange-200 rounded-full flex items-center justify-center mb-6 text-orange-500 border-4 border-white shadow-md overflow-hidden text-5xl">
+                      {member.image ? (
+                        <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <i className="fas fa-user text-orange-400"></i>
+                      )}
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-800 mb-1">{member.name}</h3>
+                    <p className="text-orange-600 font-bold mb-4 bg-orange-50 inline-block px-4 py-1 rounded-full text-sm">{member.role}</p>
+                    <p className="text-gray-500 flex items-center justify-center gap-2 font-medium bg-gray-50 py-2 rounded-lg border border-gray-100">
+                      <i className="fas fa-phone-alt text-green-600"></i> {englishToBengaliNumber(member.phone)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <div className="text-center mt-12">
+                <button onClick={() => navigateTo('committee')} className="bg-orange-600 text-white px-10 py-3.5 rounded-full font-bold hover:bg-orange-700 transition-all shadow-md hover:shadow-lg inline-flex items-center gap-2">
+                  সম্পূর্ণ কমিটি দেখুন <i className="fas fa-users"></i>
+                </button>
+              </div>
+            </div>
+          </section>
+
+          {/* Events Overview Snippet */}
+          {events.length > 0 && (
+            <section className="py-16 container mx-auto px-4 bg-white border-t border-gray-100">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-bold text-orange-900 mb-4 font-serif">সর্বশেষ ইভেন্টসমূহ</h2>
+                <div className="h-1.5 w-24 bg-yellow-500 mx-auto rounded-full"></div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                {events.slice(0, 3).map((event) => (
+                  <div key={event.id} className="bg-white rounded-2xl shadow-lg border border-gray-100 flex flex-col overflow-hidden hover:shadow-xl transition-shadow group">
+                    {event.image ? (
+                      <div className="h-48 w-full overflow-hidden relative">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent z-10"></div>
+                        <img src={event.image} alt={event.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        <span className="absolute bottom-3 left-4 z-20 text-white text-xs font-bold bg-orange-600/90 backdrop-blur-sm px-2.5 py-1 rounded-md shadow flex items-center gap-1 border border-orange-500/50">
+                          <i className="fas fa-calendar-alt"></i> {formatDateToBengali(event.date)}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="bg-gradient-to-br from-orange-400 to-orange-600 text-white p-6 flex flex-col justify-center items-center text-center h-40">
+                        <i className="fas fa-calendar-alt text-5xl mb-2 opacity-50 drop-shadow-md"></i>
+                        <span className="font-bold text-lg leading-tight">{formatDateToBengali(event.date)}</span>
+                      </div>
+                    )}
+
+                    <div className="p-6 flex flex-col flex-grow bg-orange-50/30">
+                      <h3 className="text-xl font-bold text-gray-800 mb-3 line-clamp-2">{event.title}</h3>
+                      <div className="text-gray-600 text-sm line-clamp-3 leading-relaxed flex-grow rich-text" dangerouslySetInnerHTML={{ __html: event.description }}></div>
+
+                      <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
+                        <button onClick={() => shareEvent(event, showToast)} className="text-gray-500 hover:text-blue-600 transition-colors flex items-center gap-1.5 text-sm font-medium">
+                          <i className="fas fa-share-alt"></i> শেয়ার
+                        </button>
+                        <button onClick={() => navigateTo('event')} className="text-orange-600 font-bold hover:text-orange-800 flex items-center gap-1 ml-auto group-hover:underline">
+                          বিস্তারিত <i className="fas fa-chevron-right text-xs transition-transform group-hover:translate-x-1"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="text-center mt-12">
+                <button onClick={() => navigateTo('event')} className="border-[3px] border-orange-500 text-orange-600 px-8 py-2.5 rounded-full font-bold hover:bg-orange-50 hover:text-orange-700 transition-all inline-flex items-center gap-2">
+                  সকল ইভেন্ট দেখুন <i className="fas fa-arrow-right"></i>
+                </button>
+              </div>
+            </section>
+          )}
+        </div>
+      );
+    };
+
+    // --- Sub Pages ---
+    const CommitteePage = ({ committeeMembers, navigateTo }) => (
+      <div className="bg-orange-50 min-h-screen py-12">
+        <div className="container mx-auto px-4">
+          <BackButton navigateTo={navigateTo} />
+          <div className="text-center mb-12">
+            <h1 className="text-3xl font-bold text-orange-900 mb-4 font-serif">কবি বিজয় গুপ্তের স্মৃতিরক্ষা, শ্রীশ্রী মা-মনসা মন্দির সংরক্ষণ ও উন্নয়ন কমিটি</h1>
+            <p className="text-orange-700">কমিটির মেয়াদ: ২৯-০৮-২০২৪ হইতে ২৮-০৮-২০২৬ পর্যন্ত</p>
+            <div className="h-1 w-24 bg-yellow-500 mx-auto rounded-full mt-4"></div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {committeeMembers.map((member) => (
+              <div key={member.id} className="bg-white rounded-xl overflow-hidden shadow-md border border-orange-100 flex flex-col items-center p-6 hover:shadow-xl transition-shadow">
+                <div className="w-28 h-28 bg-gradient-to-br from-orange-100 to-orange-200 rounded-full flex items-center justify-center border-4 border-white shadow-sm mb-4 text-orange-400 overflow-hidden text-5xl">
+                  {member.image ? (
+                    <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <i className="fas fa-user"></i>
+                  )}
+                </div>
+                <h3 className="text-lg font-bold text-gray-800 text-center">{member.name}</h3>
+                <p className="text-orange-600 font-medium text-sm text-center mb-4 bg-orange-50 px-3 py-1 rounded-full mt-2">{member.role}</p>
+                <div className="w-full mt-auto border-t border-gray-100 pt-4 flex justify-center items-center text-gray-600 gap-2 bg-gray-50 rounded-b-xl -mx-6 -mb-6 pb-4">
+                  <i className="fas fa-phone-alt text-green-600 mt-4"></i>
+                  <span className="text-sm font-medium mt-4">{englishToBengaliNumber(member.phone)}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+
+    const TestimonialsPage = ({ testimonials, navigateTo }) => (
+      <div className="bg-orange-50 min-h-screen py-12">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <BackButton navigateTo={navigateTo} />
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-orange-900 mb-4 font-serif">পুণ্যার্থীদের মতামত</h1>
+            <p className="text-orange-700">মন্দিরে আগত দর্শনার্থীদের অনুভূতি ও অভিজ্ঞতা</p>
+            <div className="h-1 w-24 bg-yellow-500 mx-auto rounded-full mt-4"></div>
+          </div>
+
+          <div className="space-y-6">
+            {testimonials.map((t) => (
+              <div key={t.id} className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-orange-100 flex flex-col md:flex-row gap-6 items-start relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-2 h-full bg-yellow-500"></div>
+                <div className="hidden md:flex flex-shrink-0 w-16 h-16 bg-orange-100 rounded-full items-center justify-center text-orange-400 text-2xl">
+                  <i className="fas fa-user"></i>
+                </div>
+                <div className="flex-grow">
+                  <i className="fas fa-quote-left text-orange-200 mb-2 text-3xl"></i>
+                  <div className="text-gray-700 text-lg leading-relaxed mb-4 rich-text" dangerouslySetInnerHTML={{ __html: t.text }}></div>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between border-t border-gray-50 pt-4 mt-2">
+                    <div>
+                      <h4 className="font-bold text-orange-900 text-lg">{t.name}</h4>
+                      <p className="text-sm text-gray-500">{t.designation}</p>
+                    </div>
+                    <div className="mt-2 sm:mt-0 text-sm text-gray-500 flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-md border border-gray-100">
+                      <i className="fas fa-calendar-day"></i> {formatDateToBengali(t.date)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+            {testimonials.length === 0 && (
+              <p className="text-center text-gray-500 p-10 bg-white rounded-xl shadow-sm">এখনো কোনো মতামত যোগ করা হয়নি।</p>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+
+    const EventsPage = ({ events, navigateTo, showToast }) => (
+      <div className="bg-orange-50 min-h-screen py-12">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <BackButton navigateTo={navigateTo} />
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-orange-900 mb-4 font-serif">মন্দিরের ইভেন্টসমূহ</h1>
+            <p className="text-orange-700">আগামী ও অতীত সকল কর্মসূচীর তালিকা</p>
+            <div className="h-1 w-24 bg-yellow-500 mx-auto rounded-full mt-4"></div>
+          </div>
+
+          <div className="space-y-8">
+            {events.map((event) => (
+              <div key={event.id} className="bg-white rounded-3xl shadow-md border border-orange-100 flex flex-col md:flex-row overflow-hidden hover:shadow-lg transition-shadow">
+                {event.image ? (
+                  <div className="md:w-1/3 h-64 md:h-auto relative overflow-hidden bg-gray-100 flex-shrink-0">
+                    <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
+                  </div>
+                ) : (
+                  <div className="bg-gradient-to-br from-orange-500 to-orange-700 text-white p-8 md:w-1/3 flex flex-col justify-center items-center text-center flex-shrink-0">
+                    <i className="fas fa-calendar-alt text-6xl mb-4 opacity-90 drop-shadow-md"></i>
+                    <span className="font-bold text-2xl">{formatDateToBengali(event.date)}</span>
+                  </div>
+                )}
+                <div className="p-6 md:p-8 flex flex-col justify-center w-full">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-sm font-semibold text-orange-600 bg-orange-100 border border-orange-200 px-3 py-1 rounded-md flex items-center gap-1.5 shadow-sm w-fit">
+                      <i className="fas fa-calendar-day"></i> {formatDateToBengali(event.date)}
+                    </span>
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-800 mb-4">{event.title}</h3>
+                  <div className="text-gray-700 leading-relaxed text-justify mb-4 rich-text" dangerouslySetInnerHTML={{ __html: event.description }}></div>
+
+                  <div className="mt-auto pt-4 border-t border-gray-100 flex justify-end">
+                    <button onClick={() => shareEvent(event, showToast)} className="text-blue-600 hover:text-white hover:bg-blue-600 bg-blue-50 border border-blue-200 px-4 py-2 rounded-lg transition-colors shadow-sm flex items-center gap-2 font-bold">
+                      <i className="fas fa-share-alt"></i> শেয়ার করুন
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+            {events.length === 0 && (
+              <p className="text-center text-gray-500 p-10 bg-white rounded-xl shadow-sm">এখনো কোনো ইভেন্ট যোগ করা হয়নি।</p>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+
+    const NoticeBoardPage = ({ notices, navigateTo }) => (
+      <div className="bg-orange-50 min-h-screen py-12">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <BackButton navigateTo={navigateTo} />
+          <div className="text-center mb-12">
+            <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-inner border border-blue-200">
+              <i className="fas fa-bell"></i>
+            </div>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4 font-serif">নোটিশ বোর্ড</h1>
+            <p className="text-gray-600">গুরুত্বপূর্ণ ঘোষণা ও বিজ্ঞপ্তি সমূহ</p>
+            <div className="h-1 w-24 bg-blue-600 mx-auto rounded-full mt-4"></div>
+          </div>
+
+          <div className="bg-white shadow-xl rounded-2xl p-6 md:p-10 border-t-8 border-blue-600">
+            {notices.map((notice, idx) => (
+              <div key={notice.id} className={`py-6 ${idx !== notices.length - 1 ? 'border-b border-gray-200' : ''}`}>
+                <div className="flex flex-col md:flex-row justify-between md:items-center mb-3">
+                  <h3 className="text-xl font-bold text-gray-800">{notice.title}</h3>
+                  <span className="text-sm font-semibold text-blue-600 bg-blue-50 border border-blue-100 px-3 py-1 rounded-full mt-2 md:mt-0 w-max flex items-center gap-1">
+                    <i className="fas fa-calendar-day text-xs"></i> {formatDateToBengali(notice.date)}
+                  </span>
+                </div>
+                <div className="text-gray-700 leading-relaxed rich-text" dangerouslySetInnerHTML={{ __html: notice.text }}></div>
+              </div>
+            ))}
+            {notices.length === 0 && (
+              <p className="text-center text-gray-500 py-6">এখনো কোনো নোটিশ যোগ করা হয়নি।</p>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+
+    const DonationPage = ({ donations, navigateTo }) => {
+      const publicDonations = donations ? donations.filter(d => !d.is_hidden) : [];
+      return (
+        <div className="bg-orange-50 min-h-screen py-12">
+          <div className="container mx-auto px-4 max-w-5xl">
+            <BackButton navigateTo={navigateTo} />
+            <div className="text-center mb-10">
+              <div className="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl shadow-inner border border-red-200">
+                <i className="fas fa-heart"></i>
+              </div>
+              <h1 className="text-4xl font-bold text-orange-900 mb-4 font-serif">মন্দিরের প্রণামী বা অনুদান</h1>
+              <p className="text-lg text-gray-700 max-w-2xl mx-auto">আপনার যেকোনো ধরণের অনুদান মন্দিরের সেবা, রক্ষণাবেক্ষণ ও ধর্মীয় কাজে সহায়তা করবে। আপনার অবদানের জন্য আমরা গভীরভাবে কৃতজ্ঞ।</p>
+              <p className="text-lg text-gray-700 max-w-2xl mx-auto">অনলাইনে অথবা সরাসরি অনুদান প্রদান করতে চাইলে অবশ্যই নির্বাহী কমিটিকে আগে অবহিত করবেন</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+              <div className="bg-white p-8 rounded-2xl shadow-lg border-t-[6px] border-orange-600">
+                <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2 border-b pb-4">
+                  <i className="fas fa-university text-orange-600"></i> ব্যাংক একাউন্ট বিস্তারিত
+                </h3>
+                <div className="space-y-4 text-gray-700 text-lg">
+                  <p><strong className="text-gray-900">একাউন্টের নাম:</strong> Manosha Mondhir</p>
+                  <p><strong className="text-gray-900">একাউন্ট নম্বর:</strong> 0311100066584</p>
+                  <p><strong className="text-gray-900">ব্যাংক:</strong> সোনালী ব্যাংক লিমিটেড</p>
+                  <p><strong className="text-gray-900">শাখা:</strong> 3111-গৈলা শাখা, বরিশাল</p>
+                  <p><strong className="text-gray-900">রাউটিং নম্বর:</strong> 200060790</p>
+                </div>
+              </div>
+
+              <div className="bg-white p-8 rounded-2xl shadow-lg border-t-[6px] border-yellow-500">
+                <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2 border-b pb-4">
+                  <i className="fas fa-mobile-alt text-yellow-600"></i> মোবাইল ব্যাংকিং
+                </h3>
+                <div className="space-y-6">
+                  <div className="flex items-center gap-5 bg-pink-50 p-5 rounded-xl border border-pink-200 shadow-sm flex-wrap sm:flex-nowrap">
+                    <div className="w-14 h-14 bg-pink-600 text-white font-bold rounded-xl flex items-center justify-center text-sm shadow-md shrink-0">bKash</div>
+                    <div className="flex-grow">
+                      <p className="text-2xl font-bold text-gray-800 mb-1">বিকাশ</p>
+                      <p className="text-sm text-gray-600 font-semibold mb-1">পার্সোনাল অ্যাকাউন্ট</p>
+                      <p className="text-sm text-gray-600 font-semibold mb-1">সেন্ড মানি করবেন</p>
+                      <p className="text-2xl font-bold text-gray-800 tracking-wider">01722428334</p>
+                    </div>
+                    {/* QR Code Section */}
+                    <div className="shrink-0 mt-3 sm:mt-0">
+                      <img src="bkash QR.jpg" alt="bKash QR Code" className="w-24 h-24 border-2 border-pink-300 rounded-lg shadow-sm bg-white p-1" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Donation List Section */}
+            <div className="bg-white rounded-3xl shadow-xl border border-orange-100 overflow-hidden mb-12">
+              <div className="bg-orange-100 p-6 border-b border-orange-200">
+                <h3 className="text-2xl font-bold text-orange-900 font-serif flex items-center justify-center gap-2">
+                  <i className="fas fa-hand-holding-heart text-orange-600"></i> আমাদের সম্মানিত দাতাগণ
+                </h3>
+              </div>
+              <div className="p-6">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-gray-50 text-gray-700 border-b-2 border-orange-200">
+                        <th className="p-4 font-bold text-base">নাম</th>
+                        <th className="p-4 font-bold text-base">ঠিকানা / পদবী</th>
+                        <th className="p-4 font-bold text-base">ধরণ</th>
+                        <th className="p-4 font-bold text-base text-right">পরিমাণ / বিবরণ</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {publicDonations.map((d, idx) => (
+                        <tr key={d.id} className="border-b border-gray-100 hover:bg-orange-50/50 transition-colors">
+                          <td className="p-4 font-bold text-gray-800">{d.name}</td>
+                          <td className="p-4 text-gray-600">{d.address || '-'}</td>
+                          <td className="p-4">
+                            <span className={`text-xs font-bold px-2.5 py-1 rounded-md border ${d.type === 'নগদ অর্থ' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-blue-50 text-blue-700 border-blue-200'}`}>
+                              {d.type}
+                            </span>
+                          </td>
+                          <td className="p-4 text-right font-semibold text-orange-700">{englishToBengaliNumber(d.amount)}</td>
+                        </tr>
+                      ))}
+                      {publicDonations.length === 0 && (
+                        <tr>
+                          <td colSpan="4" className="p-8 text-center text-gray-500">এখনো কোনো অনুদান তালিকাভুক্ত করা হয়নি।</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-r from-orange-800 to-orange-900 text-white p-8 rounded-2xl text-center shadow-xl border border-orange-700">
+              <p className="text-xl italic font-medium">"আপনার প্রদানকৃত অনুদানের সঠিক ব্যবহারে আমরা প্রতিজ্ঞাবদ্ধ। মা মনসা আপনার সহায় হোক।"</p>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    const HistoryPage = ({ navigateTo }) => (
+      <div className="bg-orange-50 min-h-screen py-12">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <BackButton navigateTo={navigateTo} />
+          <div className="bg-white p-8 md:p-14 rounded-3xl shadow-xl border border-orange-100">
+            <h1 className="text-4xl md:text-5xl font-bold text-orange-900 mb-8 text-center border-b-2 border-yellow-500 pb-4 font-serif">ইতিহাস ও ঐতিহ্য</h1>
+
+            <div className="text-gray-700 text-justify leading-loose text-lg space-y-6">
+              <p>
+                মধ্যযুগের অন্যতম শ্রেষ্ঠ বাঙালি কবি বিজয় গুপ্ত। তিনি বরিশাল জেলার আগৈলঝাড়া উপজেলার গৈলা (তকালীন ফুল্লশ্রী) গ্রামে জন্মগ্রহণ করেন। তাঁর রচিত "পদ্মাপুরাণ" বা "মনসামঙ্গল" কাব্য বাংলা সাহিত্যের এক অমূল্য সম্পদ।
+              </p>
+
+              <p>
+                কিংবদন্তি ও ইতিহাস অনুযায়ী, কবি বিজয় গুপ্ত স্বয়ং দেবী মনসার স্বপ্নাদিষ্ট হয়ে এই স্থানে মনসা মন্দির প্রতিষ্ঠা করেছিলেন। পঞ্চদশ শতাব্দীতে প্রতিষ্ঠিত এই মন্দিরটি শুধু একটি উপাসনালয় নয়, বরং বাঙালির প্রাচীন সংস্কৃতির এক জীবন্ত সাক্ষী।
+              </p>
+
+              <div className="bg-orange-50 p-8 rounded-2xl border-l-[6px] border-orange-500 my-10 shadow-sm">
+                <h3 className="text-2xl font-bold text-orange-900 mb-3 font-serif flex items-center gap-2"><i className="fas fa-om text-orange-500"></i> পদ্মাপুরাণ ও রয়ানী গান</h3>
+                <p className="text-gray-800 leading-relaxed">
+                  প্রতি বছর শ্রাবণ মাসে এই মন্দিরে বিশেষ উৎসবের আয়োজন করা হয়। তখন ঐতিহ্যবাহী 'রয়ানী গান' (মনসামঙ্গল কাব্যের গীত) পরিবেশিত হয়, যা দেশের বিভিন্ন প্রান্ত থেকে আগত ভক্ত ও গবেষকদের আকর্ষণ করে।
+                </p>
+              </div>
+
+              <p>
+                কালের বিবর্তনে মন্দিরটি বিভিন্ন সময়ে সংস্কার করা হলেও এর আদি পবিত্রতা ও আধ্যাত্মিক পরিবেশ আজও অম্লান। দেশ-বিদেশের অসংখ্য পুণ্যার্থী আপন মনোবাসনা পূর্ণ করার জন্য এখানে ছুটে আসেন এবং মায়ের চরণে প্রণামী অর্পণ করেন।
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+
+    // --- Admin Panel ---
+    const AdminPanel = ({
+      supabaseClient, dbError, navigateTo,
+      isAdminAuthenticated, setIsAdminAuthenticated,
+      marqueeText, setMarqueeText,
+      committeeMembers, setCommitteeMembers,
+      testimonials, setTestimonials,
+      events, setEvents,
+      notices, setNotices,
+      donations, setDonations,
+      featuredTestimonialIds, setFeaturedTestimonialIds,
+      showToast
+    }) => {
+      const [loginEmail, setLoginEmail] = useState('');
+      const [loginPass, setLoginPass] = useState('');
+      const [errorMsg, setErrorMsg] = useState('');
+      const [activeTab, setActiveTab] = useState('marquee');
+      const [isSaving, setIsSaving] = useState(false);
+
+      // Edit States
+      const [editingCommitteeId, setEditingCommitteeId] = useState(null);
+      const [editingTestimonialId, setEditingTestimonialId] = useState(null);
+      const [editingNoticeId, setEditingNoticeId] = useState(null);
+      const [editingEventId, setEditingEventId] = useState(null);
+      const [editingDonationId, setEditingDonationId] = useState(null);
+
+      // Form States
+      const [newMember, setNewMember] = useState({ name: '', role: '', phone: '', image: null });
+      const [newTestimonial, setNewTestimonial] = useState({ name: '', designation: '', text: '', date: '' });
+      const [newNotice, setNewNotice] = useState({ title: '', date: '', text: '' });
+      const [newEvent, setNewEvent] = useState({ title: '', date: '', description: '', image: null });
+      const [newDonation, setNewDonation] = useState({ name: '', address: '', type: 'নগদ অর্থ', amount: '', date: '', is_hidden: false });
+
+      const handleLogin = async (e) => {
+        e.preventDefault();
+        setIsSaving(true);
+        setErrorMsg('');
+
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+          email: loginEmail,
+          password: loginPass,
+        });
+
+        setIsSaving(false);
+
+        if (error) {
+          setErrorMsg('ইমেইল বা পাসওয়ার্ড সঠিক নয়!');
+        } else if (data.session) {
+          setIsAdminAuthenticated(true);
+        }
+      };
+
+      const handleLogout = async () => {
+        await supabaseClient.auth.signOut();
+        setIsAdminAuthenticated(false);
+        setLoginEmail('');
+        setLoginPass('');
+      };
+
+      const handleImageChange = (e, setFunc, stateVar) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setFunc({ ...stateVar, image: reader.result });
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+
+      // -- Marquee --
+      const handleMarqueeUpdate = async (e) => {
+        e.preventDefault();
+        setIsSaving(true);
+        try {
+          const { error } = await supabaseClient.from('settings').upsert({ id: 1, key: 'marquee', value: marqueeText });
+          if (error) throw error;
+          showToast('স্ক্রলিং টেক্সট আপডেট করা হয়েছে!');
+        } catch (err) {
+          setErrorMsg("আপডেট করতে সমস্যা হচ্ছে।");
+        } finally {
+          setIsSaving(false);
+        }
+      };
+
+      // -- Committee --
+      const handleSaveMember = async (e) => {
+        e.preventDefault();
+        if (!newMember.name || !newMember.role) return;
+        setIsSaving(true);
+
+        const memberData = {
+          name: newMember.name,
+          role: newMember.role,
+          phone: newMember.phone,
+          image: newMember.image
+        };
+
+        try {
+          if (editingCommitteeId) {
+            const { error } = await supabaseClient.from('committee').update(memberData).eq('id', editingCommitteeId);
+            if (error) throw error;
+
+            setCommitteeMembers(committeeMembers.map(m => m.id === editingCommitteeId ? { ...m, ...memberData } : m));
+            showToast('সদস্যের তথ্য আপডেট করা হয়েছে!');
+            setEditingCommitteeId(null);
+          } else {
+            memberData.order_idx = committeeMembers.length;
+            const { data, error } = await supabaseClient.from('committee').insert([memberData]).select();
+            if (error) throw error;
+            if (data) {
+              setCommitteeMembers([...committeeMembers, data[0]]);
+              showToast('নতুন সদস্য যুক্ত করা হয়েছে!');
+            }
+          }
+          setNewMember({ name: '', role: '', phone: '', image: null });
+        } catch (err) {
+          setErrorMsg("Error saving data.");
+        } finally {
+          setIsSaving(false);
+        }
+      };
+
+      const handleDeleteMember = async (id) => {
+        if (!confirm('আপনি কি নিশ্চিত যে এই সদস্যকে মুছে ফেলতে চান?')) return;
+        setIsSaving(true);
+        try {
+          const { error } = await supabaseClient.from('committee').delete().eq('id', id);
+          if (error) throw error;
+          setCommitteeMembers(committeeMembers.filter(m => m.id !== id));
+          showToast('সদস্য মুছে ফেলা হয়েছে!');
+        } catch (err) {
+          setErrorMsg("Error deleting.");
+        } finally {
+          setIsSaving(false);
+        }
+      };
+
+      const handleMoveCommittee = async (index, direction) => {
+        if (direction === 'up' && index === 0) return;
+        if (direction === 'down' && index === committeeMembers.length - 1) return;
+
+        const newMembers = [...committeeMembers];
+        const swapIndex = direction === 'up' ? index - 1 : index + 1;
+        const temp = newMembers[index];
+        newMembers[index] = newMembers[swapIndex];
+        newMembers[swapIndex] = temp;
+
+        const updatedMembers = newMembers.map((m, i) => ({ ...m, order_idx: i }));
+        setCommitteeMembers(updatedMembers);
+
+        setIsSaving(true);
+        try {
+          const updates = updatedMembers.map(m => ({
+            id: m.id, name: m.name, role: m.role, phone: m.phone, image: m.image, order_idx: m.order_idx
+          }));
+          await supabaseClient.from('committee').upsert(updates);
+          showToast('অর্ডার সেভ হয়েছে!');
+        } catch (e) {
+          setErrorMsg("Order save failed.");
+        }
+        setIsSaving(false);
+      };
+
+      // -- Testimonials --
+      const handleSaveTestimonial = async (e) => {
+        e.preventDefault();
+        setIsSaving(true);
+        try {
+          if (editingTestimonialId) {
+            const { error } = await supabaseClient.from('testimonials').update(newTestimonial).eq('id', editingTestimonialId);
+            if (error) throw error;
+
+            let updatedList = testimonials.map(t => t.id === editingTestimonialId ? { ...t, ...newTestimonial } : t);
+            updatedList.sort((a, b) => new Date(b.date) - new Date(a.date));
+            setTestimonials(updatedList);
+            showToast('মতামত আপডেট করা হয়েছে!');
+            setEditingTestimonialId(null);
+          } else {
+            const { data, error } = await supabaseClient.from('testimonials').insert([newTestimonial]).select();
+            if (error) throw error;
+            if (data) {
+              let updatedList = [data[0], ...testimonials];
+              updatedList.sort((a, b) => new Date(b.date) - new Date(a.date));
+              setTestimonials(updatedList);
+              showToast('নতুন মতামত যোগ করা হয়েছে!');
+            }
+          }
+          setNewTestimonial({ name: '', designation: '', text: '', date: '' });
+        } catch (err) {
+          setErrorMsg("Error saving testimonial.");
+        } finally {
+          setIsSaving(false);
+        }
+      };
+
+      const handleDeleteTestimonial = async (id) => {
+        if (!confirm('আপনি কি নিশ্চিত যে এই মতামত মুছে ফেলতে চান?')) return;
+        setIsSaving(true);
+        try {
+          const { error } = await supabaseClient.from('testimonials').delete().eq('id', id);
+          if (error) throw error;
+          setTestimonials(testimonials.filter(item => item.id !== id));
+
+          if (featuredTestimonialIds.includes(id)) {
+            const updatedIds = featuredTestimonialIds.filter(x => x !== id);
+            setFeaturedTestimonialIds(updatedIds);
+            const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'featured_test_ids').maybeSingle();
+            if (existing) await supabaseClient.from('settings').update({ value: JSON.stringify(updatedIds) }).eq('id', existing.id);
+          }
+
+          showToast('মতামত মুছে ফেলা হয়েছে!');
+        } catch (err) {
+          setErrorMsg("Error deleting testimonial.");
+        } finally {
+          setIsSaving(false);
+        }
+      };
+
+      const handleToggleFeaturedTestimonial = async (id) => {
+        setIsSaving(true);
+        try {
+          let updatedIds = [...featuredTestimonialIds];
+          if (updatedIds.includes(id)) {
+            updatedIds = updatedIds.filter(x => x !== id);
+          } else {
+            updatedIds.push(id);
+          }
+
+          const { data: existing } = await supabaseClient.from('settings').select('id').eq('key', 'featured_test_ids').maybeSingle();
+          if (existing) {
+            await supabaseClient.from('settings').update({ value: JSON.stringify(updatedIds) }).eq('id', existing.id);
+          } else {
+            await supabaseClient.from('settings').insert({ key: 'featured_test_ids', value: JSON.stringify(updatedIds) });
+          }
+
+          setFeaturedTestimonialIds(updatedIds);
+          showToast('হোমপেজ ফিচার্ড লিস্ট আপডেট হয়েছে!');
+        } catch (err) {
+          setErrorMsg("আপডেট করতে সমস্যা হচ্ছে।");
+        } finally {
+          setIsSaving(false);
+        }
+      };
+
+      // -- Notices --
+      const handleSaveNotice = async (e) => {
+        e.preventDefault();
+        setIsSaving(true);
+        try {
+          if (editingNoticeId) {
+            const { error } = await supabaseClient.from('notices').update(newNotice).eq('id', editingNoticeId);
+            if (error) throw error;
+
+            let updatedNotices = notices.map(n => n.id === editingNoticeId ? { ...n, ...newNotice } : n);
+            updatedNotices.sort((a, b) => new Date(b.date) - new Date(a.date));
+            setNotices(updatedNotices);
+            showToast('নোটিশ আপডেট করা হয়েছে!');
+            setEditingNoticeId(null);
+          } else {
+            const { data, error } = await supabaseClient.from('notices').insert([newNotice]).select();
+            if (error) throw error;
+            if (data) {
+              let updatedNotices = [data[0], ...notices];
+              updatedNotices.sort((a, b) => new Date(b.date) - new Date(a.date));
+              setNotices(updatedNotices);
+              showToast('নোটিশ যোগ করা হয়েছে!');
+            }
+          }
+          setNewNotice({ title: '', date: '', text: '' });
+        } catch (err) {
+          setErrorMsg("Error saving notice.");
+        } finally {
+          setIsSaving(false);
+        }
+      };
+
+      const handleDeleteNotice = async (id) => {
+        if (!confirm('নোটিশটি মুছে ফেলতে চান?')) return;
+        setIsSaving(true);
+        try {
+          const { error } = await supabaseClient.from('notices').delete().eq('id', id);
+          if (error) throw error;
+          setNotices(notices.filter(item => item.id !== id));
+          showToast('নোটিশ মুছে ফেলা হয়েছে!');
+        } catch (err) {
+          setErrorMsg("Error deleting notice.");
+        } finally {
+          setIsSaving(false);
+        }
+      };
+
+      // -- Events --
+      const handleSaveEvent = async (e) => {
+        e.preventDefault();
+        setIsSaving(true);
+        try {
+          if (editingEventId) {
+            const { error } = await supabaseClient.from('events').update(newEvent).eq('id', editingEventId);
+            if (error) throw error;
+
+            let updatedEvents = events.map(ev => ev.id === editingEventId ? { ...ev, ...newEvent } : ev);
+            updatedEvents.sort((a, b) => new Date(b.date) - new Date(a.date));
+            setEvents(updatedEvents);
+            showToast('ইভেন্ট আপডেট করা হয়েছে!');
+            setEditingEventId(null);
+          } else {
+            const { data, error } = await supabaseClient.from('events').insert([newEvent]).select();
+            if (error) throw error;
+            if (data) {
+              let updatedEvents = [data[0], ...events];
+              updatedEvents.sort((a, b) => new Date(b.date) - new Date(a.date));
+              setEvents(updatedEvents);
+              showToast('নতুন ইভেন্ট যোগ করা হয়েছে!');
+            }
+          }
+          setNewEvent({ title: '', date: '', description: '', image: null });
+        } catch (err) {
+          setErrorMsg("Error saving event. SQL Error? Did you run the ALTER TABLE command for event images?");
+        } finally {
+          setIsSaving(false);
+        }
+      };
+
+      const handleDeleteEvent = async (id) => {
+        if (!confirm('ইভেন্টটি মুছে ফেলতে চান?')) return;
+        setIsSaving(true);
+        try {
+          const { error } = await supabaseClient.from('events').delete().eq('id', id);
+          if (error) throw error;
+          setEvents(events.filter(item => item.id !== id));
+          showToast('ইভেন্ট মুছে ফেলা হয়েছে!');
+        } catch (err) {
+          setErrorMsg("Error deleting event.");
+        } finally {
+          setIsSaving(false);
+        }
+      };
+
+      // -- Donations --
+      const handleSaveDonation = async (e) => {
+        e.preventDefault();
+        setIsSaving(true);
+        try {
+          if (editingDonationId) {
+            const { error } = await supabaseClient.from('donations').update(newDonation).eq('id', editingDonationId);
+            if (error) throw error;
+
+            let updatedD = donations.map(d => d.id === editingDonationId ? { ...d, ...newDonation } : d);
+            updatedD.sort((a, b) => b.id - a.id);
+            setDonations(updatedD);
+            showToast('অনুদান আপডেট করা হয়েছে!');
+            setEditingDonationId(null);
+          } else {
+            const { data, error } = await supabaseClient.from('donations').insert([newDonation]).select();
+            if (error) throw error;
+            if (data) {
+              let updatedD = [data[0], ...donations];
+              updatedD.sort((a, b) => b.id - a.id);
+              setDonations(updatedD);
+              showToast('নতুন অনুদান যোগ করা হয়েছে!');
+            }
+          }
+          setNewDonation({ name: '', address: '', type: 'নগদ অর্থ', amount: '', date: '', is_hidden: false });
+        } catch (err) {
+          setErrorMsg("Error saving donation. Did you run the SQL to create donations table?");
+        } finally {
+          setIsSaving(false);
+        }
+      };
+
+      const handleDeleteDonation = async (id) => {
+        if (!confirm('অনুদানটি মুছে ফেলতে চান?')) return;
+        setIsSaving(true);
+        try {
+          const { error } = await supabaseClient.from('donations').delete().eq('id', id);
+          if (error) throw error;
+          setDonations(donations.filter(item => item.id !== id));
+          showToast('অনুদান মুছে ফেলা হয়েছে!');
+        } catch (err) {
+          setErrorMsg("Error deleting donation.");
+        } finally {
+          setIsSaving(false);
+        }
+      };
+
+      const handleToggleDonationVisibility = async (id, currentStatus) => {
+        setIsSaving(true);
+        try {
+          const { error } = await supabaseClient.from('donations').update({ is_hidden: !currentStatus }).eq('id', id);
+          if (error) throw error;
+          setDonations(donations.map(d => d.id === id ? { ...d, is_hidden: !currentStatus } : d));
+          showToast(currentStatus ? 'পাবলিক করা হয়েছে!' : 'হাইড করা হয়েছে!');
+        } catch (err) {
+          setErrorMsg("Error updating visibility.");
+        } finally {
+          setIsSaving(false);
+        }
+      };
+
+      if (!isAdminAuthenticated) {
+        return (
+          <div className="bg-gray-100 min-h-screen flex items-center justify-center px-4 relative">
+            <div className="absolute inset-0 bg-orange-900/10 z-0"></div>
+            <div className="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-md border-t-[8px] border-orange-600 relative z-10">
+              <div className="text-center mb-8">
+                <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4 border border-orange-200">
+                  <i className="fas fa-shield-alt text-orange-600 text-4xl"></i>
+                </div>
+                <h2 className="text-2xl font-bold text-gray-800">এডমিন প্যানেল</h2>
+                <p className="text-sm text-gray-500 mt-1">অ্যাক্সেস করতে লগইন করুন</p>
+              </div>
+              {errorMsg && <div className="bg-red-50 text-red-600 p-3 rounded mb-4 text-sm text-center border border-red-100 font-medium">{errorMsg}</div>}
+
+              <form onSubmit={handleLogin} className="space-y-5">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1">ইমেইল (Email)</label>
+                  <input
+                    type="email"
+                    value={loginEmail}
+                    onChange={(e) => setLoginEmail(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:outline-none bg-gray-50"
+                    placeholder="admin@example.com"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1">পাসওয়ার্ড (Password)</label>
+                  <input
+                    type="password"
+                    value={loginPass}
+                    onChange={(e) => setLoginPass(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:outline-none bg-gray-50"
+                    placeholder="******"
+                    required
+                  />
+                </div>
+                <button type="submit" disabled={isSaving} className="w-full bg-gradient-to-r from-orange-600 to-orange-500 text-white font-bold py-3 rounded-xl hover:from-orange-700 hover:to-orange-600 transition-all disabled:opacity-50 shadow-md">
+                  {isSaving ? <span className="flex items-center justify-center gap-2"><i className="fas fa-spinner fa-spin"></i> লগইন হচ্ছে...</span> : 'লগইন করুন'}
+                </button>
+              </form>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="bg-gray-50 min-h-screen pb-12 relative">
+
+          <div className="bg-gray-900 text-white py-4 px-6 flex justify-between items-center shadow-md sticky top-0 z-40 border-b-4 border-orange-500">
+            <h2 className="text-xl font-bold flex items-center gap-2"><i className="fas fa-user-shield text-orange-400"></i> ড্যাশবোর্ড (এডমিন)</h2>
+            <div className="flex gap-4 items-center">
+              <button onClick={() => navigateTo('home')} className="text-gray-300 hover:text-white font-medium text-sm flex items-center gap-1 transition-colors">
+                <i className="fas fa-home"></i> হোমপেজ
+              </button>
+              <button onClick={handleLogout} className="bg-red-600/20 text-red-400 px-4 py-1.5 rounded-lg flex items-center gap-2 hover:bg-red-600/40 hover:text-white font-medium text-sm transition-colors border border-red-500/30">
+                <i className="fas fa-sign-out-alt"></i> লগআউট
+              </button>
+            </div>
+          </div>
+
+          <div className="container mx-auto px-4 mt-8 flex flex-col md:flex-row gap-6">
+            <div className="w-full md:w-64 flex-shrink-0">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex flex-col sticky top-24">
+                <button onClick={() => setActiveTab('marquee')} className={`px-5 py-3.5 text-left font-bold text-sm border-b ${activeTab === 'marquee' ? 'bg-orange-50 text-orange-700 border-l-[5px] border-l-orange-600' : 'text-gray-600 hover:bg-gray-50 border-l-[5px] border-transparent'}`}>
+                  <i className="fas fa-text-width w-5"></i> স্ক্রলিং টেক্সট
+                </button>
+                <button onClick={() => setActiveTab('committee')} className={`px-5 py-3.5 text-left font-bold text-sm border-b ${activeTab === 'committee' ? 'bg-orange-50 text-orange-700 border-l-[5px] border-l-orange-600' : 'text-gray-600 hover:bg-gray-50 border-l-[5px] border-transparent'}`}>
+                  <i className="fas fa-users w-5"></i> কমিটি ম্যানেজমেন্ট
+                </button>
+                <button onClick={() => setActiveTab('testimonials')} className={`px-5 py-3.5 text-left font-bold text-sm border-b ${activeTab === 'testimonials' ? 'bg-orange-50 text-orange-700 border-l-[5px] border-l-orange-600' : 'text-gray-600 hover:bg-gray-50 border-l-[5px] border-transparent'}`}>
+                  <i className="fas fa-comments w-5"></i> মতামত ম্যানেজমেন্ট
+                </button>
+                <button onClick={() => setActiveTab('notices')} className={`px-5 py-3.5 text-left font-bold text-sm border-b ${activeTab === 'notices' ? 'bg-orange-50 text-orange-700 border-l-[5px] border-l-orange-600' : 'text-gray-600 hover:bg-gray-50 border-l-[5px] border-transparent'}`}>
+                  <i className="fas fa-bullhorn w-5"></i> নোটিশ বোর্ড
+                </button>
+                <button onClick={() => setActiveTab('events')} className={`px-5 py-3.5 text-left font-bold text-sm border-b ${activeTab === 'events' ? 'bg-orange-50 text-orange-700 border-l-[5px] border-l-orange-600' : 'text-gray-600 hover:bg-gray-50 border-l-[5px] border-transparent'}`}>
+                  <i className="fas fa-calendar-alt w-5"></i> ইভেন্ট ম্যানেজমেন্ট
+                </button>
+                <button onClick={() => setActiveTab('donations')} className={`px-5 py-3.5 text-left font-bold text-sm ${activeTab === 'donations' ? 'bg-orange-50 text-orange-700 border-l-[5px] border-l-orange-600' : 'text-gray-600 hover:bg-gray-50 border-l-[5px] border-transparent'}`}>
+                  <i className="fas fa-hand-holding-usd w-5"></i> অনুদান ম্যানেজমেন্ট
+                </button>
+              </div>
+              <div className="mt-6 p-5 bg-green-50 text-green-800 rounded-2xl text-sm border border-green-200 shadow-sm flex items-start gap-3">
+                <i className="fas fa-check-circle mt-1 text-green-600"></i>
+                <div>
+                  <p className="font-bold mb-1">সিস্টেম স্ট্যাটাস</p>
+                  {dbError ? <p className="text-red-600">Database Error!</p> : <p>Connected to Database</p>}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex-grow">
+              {errorMsg && (
+                <div className="mb-4 bg-red-100 border border-red-300 text-red-800 px-5 py-3 rounded-xl flex items-center gap-3 shadow-sm font-medium">
+                  <i className="fas fa-exclamation-circle text-lg"></i> {errorMsg}
+                </div>
+              )}
+
+              {activeTab === 'marquee' && (
+                <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+                  <h3 className="text-xl font-bold text-gray-800 mb-6 border-b pb-3 flex items-center gap-2"><i className="fas fa-pen text-orange-500"></i> হোমপেজের চলমান টেক্সট (Marquee)</h3>
+                  <form onSubmit={handleMarqueeUpdate}>
+                    <textarea
+                      value={marqueeText}
+                      onChange={(e) => setMarqueeText(e.target.value)}
+                      className="w-full px-5 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:outline-none mb-6 min-h-[120px] text-lg bg-gray-50"
+                    ></textarea>
+                    <button type="submit" disabled={isSaving} className="bg-orange-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-orange-700 disabled:opacity-50 shadow-md">
+                      <i className="fas fa-save mr-2"></i> {isSaving ? 'সংরক্ষণ করা হচ্ছে...' : 'সংরক্ষণ করুন'}
+                    </button>
+                  </form>
+                </div>
+              )}
+
+              {activeTab === 'committee' && (
+                <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+                  <h3 className="text-xl font-bold text-gray-800 mb-6 border-b pb-3 flex items-center gap-2"><i className="fas fa-user-plus text-orange-500"></i> {editingCommitteeId ? 'সদস্য আপডেট করুন' : 'নতুন সদস্য যোগ করুন'}</h3>
+                  <form onSubmit={handleSaveMember} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-10 bg-gray-50 p-6 rounded-2xl border border-gray-200 items-end shadow-inner">
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-1">নাম <span className="text-red-500">*</span></label>
+                      <input type="text" value={newMember.name} onChange={e => setNewMember({ ...newMember, name: e.target.value })} className="w-full px-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-orange-500" required placeholder="উদা: রহিম উদ্দীন" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-1">পদবী <span className="text-red-500">*</span></label>
+                      <input type="text" value={newMember.role} onChange={e => setNewMember({ ...newMember, role: e.target.value })} className="w-full px-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-orange-500" required placeholder="উদা: সদস্য" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-1">ফোন নম্বর</label>
+                      <input type="text" value={newMember.phone} onChange={e => setNewMember({ ...newMember, phone: e.target.value })} className="w-full px-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-orange-500" placeholder="উদা: ০১৭১..." />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-1">ছবি (আপলোড বা লিংক)</label>
+                      <div className="flex flex-col gap-2">
+                        <label className="flex-grow cursor-pointer bg-white border border-gray-300 px-4 py-2.5 rounded-xl text-sm hover:bg-gray-50 flex items-center justify-center gap-2 overflow-hidden shadow-sm">
+                          <i className="fas fa-upload text-gray-500"></i>
+                          <span className="text-gray-600 truncate font-medium">{(newMember.image && newMember.image.startsWith('data:')) ? 'ছবি আপলোড করা হয়েছে' : 'ডিভাইস থেকে আপলোড'}</span>
+                          <input type="file" accept="image/*" onChange={(e) => handleImageChange(e, setNewMember, newMember)} className="hidden" />
+                        </label>
+                        <input type="text" value={(!newMember.image || newMember.image.startsWith('data:')) ? '' : newMember.image} onChange={(e) => setNewMember({ ...newMember, image: e.target.value })} className="w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-orange-500" placeholder="অথবা ড্রাইভ লিংক দিন..." />
+                      </div>
+                      {newMember.image && (
+                        <img src={newMember.image} alt="Preview" className="w-16 h-16 object-cover rounded-lg border border-gray-300 shadow-sm mt-2" />
+                      )}
+                    </div>
+                    <div className="lg:col-span-4 mt-2 flex gap-3">
+                      <button type="submit" disabled={isSaving} className="w-full bg-green-600 text-white px-6 py-3 rounded-xl hover:bg-green-700 flex items-center justify-center gap-2 font-bold disabled:opacity-50 shadow-md">
+                        <i className={editingCommitteeId ? "fas fa-save" : "fas fa-plus"}></i> {isSaving ? 'সেভ হচ্ছে...' : (editingCommitteeId ? 'আপডেট করুন' : 'সদস্য যুক্ত করুন')}
+                      </button>
+                      {editingCommitteeId && (
+                        <button type="button" onClick={() => { setEditingCommitteeId(null); setNewMember({ name: '', role: '', phone: '', image: null }); }} className="bg-gray-500 text-white px-6 py-3 rounded-xl hover:bg-gray-600 font-bold shadow-md">বাতিল</button>
+                      )}
+                    </div>
+                  </form>
+
+                  <h3 className="text-xl font-bold text-gray-800 mb-4 border-b pb-3 flex items-center justify-between">
+                    <span><i className="fas fa-list text-orange-500 mr-2"></i> বর্তমান কমিটি লিস্ট</span>
+                    <span className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">{committeeMembers.length} জন</span>
+                  </h3>
+                  <div className="overflow-x-auto rounded-xl border border-gray-200">
+                    <table className="w-full text-left border-collapse bg-white">
+                      <thead>
+                        <tr className="bg-gray-100 text-gray-700 text-sm border-b">
+                          <th className="p-4 w-20 text-center">অর্ডার</th>
+                          <th className="p-4 w-16">ছবি</th>
+                          <th className="p-4 font-bold">নাম</th>
+                          <th className="p-4 font-bold">পদবী</th>
+                          <th className="p-4 text-center font-bold">অ্যাকশন</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {committeeMembers.map((m, idx) => (
+                          <tr key={m.id} className="border-b hover:bg-orange-50 transition-colors text-sm">
+                            <td className="p-2 border-r bg-gray-50 align-middle">
+                              <div className="flex flex-col items-center gap-2">
+                                <button type="button" onClick={() => handleMoveCommittee(idx, 'up')} disabled={idx === 0} className="text-gray-500 hover:text-orange-600 disabled:opacity-20 hover:bg-gray-200 w-6 h-6 rounded-full flex items-center justify-center transition-all"><i className="fas fa-chevron-up"></i></button>
+                                <button type="button" onClick={() => handleMoveCommittee(idx, 'down')} disabled={idx === committeeMembers.length - 1} className="text-gray-500 hover:text-orange-600 disabled:opacity-20 hover:bg-gray-200 w-6 h-6 rounded-full flex items-center justify-center transition-all"><i className="fas fa-chevron-down"></i></button>
+                              </div>
+                            </td>
+                            <td className="p-3">
+                              {m.image ? (
+                                <img src={m.image} alt={m.name} className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm" />
+                              ) : (
+                                <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-500 text-lg border-2 border-white shadow-sm">
+                                  <i className="fas fa-user"></i>
+                                </div>
+                              )}
+                            </td>
+                            <td className="p-4 font-bold text-gray-800 text-base">{m.name}</td>
+                            <td className="p-4 text-orange-600 font-semibold">{m.role}</td>
+                            <td className="p-4 text-center whitespace-nowrap">
+                              <button type="button" onClick={() => { setNewMember(m); setEditingCommitteeId(m.id); window.scrollTo(0, 0); }} className="text-blue-600 hover:text-white hover:bg-blue-600 bg-blue-50 border border-blue-200 p-2 rounded-lg mr-2 transition-colors" title="এডিট">
+                                <i className="fas fa-edit w-5"></i>
+                              </button>
+                              <button type="button" onClick={() => handleDeleteMember(m.id)} className="text-red-600 hover:text-white hover:bg-red-600 bg-red-50 border border-red-200 p-2 rounded-lg transition-colors" title="ডিলিট">
+                                <i className="fas fa-trash w-5"></i>
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'testimonials' && (
+                <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+                  <h3 className="text-xl font-bold text-gray-800 mb-6 border-b pb-3 flex items-center gap-2"><i className="fas fa-comment-dots text-orange-500"></i> {editingTestimonialId ? 'মতামত আপডেট করুন' : 'নতুন মতামত যোগ করুন'}</h3>
+                  <form onSubmit={handleSaveTestimonial} className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10 bg-gray-50 p-6 rounded-2xl border border-gray-200 items-end shadow-inner">
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-1">নাম <span className="text-red-500">*</span></label>
+                      <input type="text" value={newTestimonial.name} onChange={e => setNewTestimonial({ ...newTestimonial, name: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500" required placeholder="নাম লিখুন" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-1">পদবী/ঠিকানা</label>
+                      <input type="text" value={newTestimonial.designation} onChange={e => setNewTestimonial({ ...newTestimonial, designation: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500" placeholder="পদবী লিখুন" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-1">তারিখ</label>
+                      <input type="date" value={newTestimonial.date} onChange={e => setNewTestimonial({ ...newTestimonial, date: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm text-gray-700 focus:ring-2 focus:ring-orange-500" />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-bold text-gray-700 mb-1">মতামত <span className="text-red-500">*</span></label>
+                      <QuillEditor value={newTestimonial.text} onChange={val => setNewTestimonial({ ...newTestimonial, text: val })} placeholder="মতামত লিখুন..." />
+                    </div>
+                    <div className="md:col-span-2 mt-2 flex gap-3">
+                      <button type="submit" disabled={isSaving} className="w-full bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 flex items-center justify-center gap-2 font-bold disabled:opacity-50 shadow-md">
+                        <i className={editingTestimonialId ? "fas fa-save" : "fas fa-plus"}></i> {isSaving ? 'সেভ হচ্ছে...' : (editingTestimonialId ? 'আপডেট করুন' : 'মতামত যুক্ত করুন')}
+                      </button>
+                      {editingTestimonialId && (
+                        <button type="button" onClick={() => { setEditingTestimonialId(null); setNewTestimonial({ name: '', designation: '', text: '', date: '' }); }} className="bg-gray-500 text-white px-6 py-3 rounded-xl hover:bg-gray-600 font-bold shadow-md">বাতিল</button>
+                      )}
+                    </div>
+                  </form>
+
+                  <div className="flex justify-between items-center mb-6 border-b pb-3 mt-8">
+                    <h3 className="text-xl font-bold text-gray-800"><i className="fas fa-list text-orange-500 mr-2"></i> বর্তমান মতামতসমূহ</h3>
+                    <span className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full font-bold">Total: {testimonials.length}</span>
+                  </div>
+                  <div className="space-y-4">
+                    {testimonials.map(t => (
+                      <div key={t.id} className="border border-gray-200 rounded-2xl p-5 bg-white hover:shadow-md transition-shadow flex flex-col md:flex-row justify-between items-start gap-4">
+                        <div className="flex-grow">
+                          <p className="font-bold text-base text-gray-800 flex items-center gap-2">
+                            {t.name} <span className="text-gray-500 font-medium text-xs bg-gray-100 px-2 py-1 rounded">({formatDateToBengali(t.date)})</span>
+                            {featuredTestimonialIds.includes(t.id) && <span className="text-yellow-600 bg-yellow-50 border border-yellow-200 text-[10px] px-2 py-0.5 rounded-full"><i className="fas fa-star"></i> হোমপেজ</span>}
+                          </p>
+                          <p className="text-sm text-orange-600 mb-3 font-semibold">{t.designation}</p>
+                          <div className="text-gray-600 italic bg-gray-50 p-3 rounded-lg border-l-4 border-gray-300 rich-text" dangerouslySetInnerHTML={{ __html: t.text }}></div>
+                        </div>
+                        <div className="flex gap-2 self-end md:self-start bg-gray-50 p-2 rounded-xl border border-gray-100">
+                          <button type="button" onClick={() => handleToggleFeaturedTestimonial(t.id)} className={`p-2.5 rounded-lg transition-colors shadow-sm border ${featuredTestimonialIds.includes(t.id) ? 'bg-yellow-100 text-yellow-600 border-yellow-200 hover:bg-yellow-200' : 'bg-white text-gray-400 border-gray-200 hover:text-yellow-500'}`} title={featuredTestimonialIds.includes(t.id) ? "হোমপেজ থেকে সরান" : "হোমপেজে দেখান"}>
+                            <i className={featuredTestimonialIds.includes(t.id) ? "fas fa-star" : "far fa-star"}></i>
+                          </button>
+                          <button type="button" onClick={() => { setNewTestimonial(t); setEditingTestimonialId(t.id); window.scrollTo(0, 0); }} className="text-blue-600 hover:text-white hover:bg-blue-600 bg-white border border-blue-200 p-2.5 rounded-lg transition-colors shadow-sm" title="এডিট">
+                            <i className="fas fa-edit"></i>
+                          </button>
+                          <button type="button" onClick={() => handleDeleteTestimonial(t.id)} disabled={isSaving} className="text-red-600 hover:text-white hover:bg-red-600 bg-white border border-red-200 p-2.5 rounded-lg transition-colors shadow-sm disabled:opacity-50" title="ডিলিট">
+                            <i className="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'notices' && (
+                <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+                  <h3 className="text-xl font-bold text-gray-800 mb-6 border-b pb-3 flex items-center gap-2"><i className="fas fa-bullhorn text-orange-500"></i> {editingNoticeId ? 'নোটিশ আপডেট করুন' : 'নতুন নোটিশ যোগ করুন'}</h3>
+                  <form onSubmit={handleSaveNotice} className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10 bg-gray-50 p-6 rounded-2xl border border-gray-200 items-end shadow-inner">
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-1">শিরোনাম <span className="text-red-500">*</span></label>
+                      <input type="text" value={newNotice.title} onChange={e => setNewNotice({ ...newNotice, title: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500" required placeholder="উদা: নতুন কমিটি গঠন" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-1">তারিখ <span className="text-red-500">*</span></label>
+                      <input type="date" value={newNotice.date} onChange={e => setNewNotice({ ...newNotice, date: e.target.value })} required className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm text-gray-700 focus:ring-2 focus:ring-orange-500" />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-bold text-gray-700 mb-1">নোটিশের বিবরণ <span className="text-red-500">*</span></label>
+                      <QuillEditor value={newNotice.text} onChange={val => setNewNotice({ ...newNotice, text: val })} placeholder="বিস্তারিত লিখুন..." />
+                    </div>
+                    <div className="md:col-span-2 mt-2 flex gap-3">
+                      <button type="submit" disabled={isSaving} className="w-full bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 flex items-center justify-center gap-2 font-bold disabled:opacity-50 shadow-md">
+                        <i className={editingNoticeId ? "fas fa-save" : "fas fa-plus"}></i> {isSaving ? 'সেভ হচ্ছে...' : (editingNoticeId ? 'আপডেট করুন' : 'নোটিশ যুক্ত করুন')}
+                      </button>
+                      {editingNoticeId && (
+                        <button type="button" onClick={() => { setEditingNoticeId(null); setNewNotice({ title: '', date: '', text: '' }); }} className="bg-gray-500 text-white px-6 py-3 rounded-xl hover:bg-gray-600 font-bold shadow-md">বাতিল</button>
+                      )}
+                    </div>
+                  </form>
+
+                  <div className="flex justify-between items-center mb-6 border-b pb-3 mt-8">
+                    <h3 className="text-xl font-bold text-gray-800"><i className="fas fa-list text-orange-500 mr-2"></i> বর্তমান নোটিশসমূহ</h3>
+                    <span className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full font-bold">Total: {notices.length}</span>
+                  </div>
+                  <div className="space-y-4">
+                    {notices.map(n => (
+                      <div key={n.id} className="border border-gray-200 rounded-2xl p-5 bg-white hover:shadow-md transition-shadow flex flex-col md:flex-row justify-between items-start gap-4">
+                        <div className="flex-grow">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h3 className="font-bold text-lg text-gray-800">{n.title}</h3>
+                            <span className="text-xs font-semibold text-blue-600 bg-blue-50 border border-blue-100 px-2.5 py-1 rounded-md flex items-center gap-1">
+                              <i className="fas fa-calendar-day"></i> {formatDateToBengali(n.date)}
+                            </span>
+                          </div>
+                          <div className="text-gray-600 leading-relaxed bg-gray-50 p-3 rounded-lg border border-gray-100 rich-text" dangerouslySetInnerHTML={{ __html: n.text }}></div>
+                        </div>
+                        <div className="flex gap-2 self-end md:self-start bg-gray-50 p-2 rounded-xl border border-gray-100">
+                          <button type="button" onClick={() => { setNewNotice(n); setEditingNoticeId(n.id); window.scrollTo(0, 0); }} className="text-blue-600 hover:text-white hover:bg-blue-600 bg-white border border-blue-200 p-2.5 rounded-lg transition-colors shadow-sm" title="এডিট">
+                            <i className="fas fa-edit"></i>
+                          </button>
+                          <button type="button" onClick={() => handleDeleteNotice(n.id)} disabled={isSaving} className="text-red-600 hover:text-white hover:bg-red-600 bg-white border border-red-200 p-2.5 rounded-lg transition-colors shadow-sm disabled:opacity-50" title="ডিলিট">
+                            <i className="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    {notices.length === 0 && (
+                      <p className="text-center text-gray-500 p-10 bg-white rounded-xl shadow-sm border border-gray-100">এখনো কোনো নোটিশ যোগ করা হয়নি।</p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'events' && (
+                <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+                  <h3 className="text-xl font-bold text-gray-800 mb-6 border-b pb-3 flex items-center gap-2"><i className="fas fa-calendar-alt text-orange-500"></i> {editingEventId ? 'ইভেন্ট আপডেট করুন' : 'নতুন ইভেন্ট যোগ করুন'}</h3>
+                  <form onSubmit={handleSaveEvent} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-10 bg-gray-50 p-6 rounded-2xl border border-gray-200 items-end shadow-inner">
+                    <div className="lg:col-span-1">
+                      <label className="block text-sm font-bold text-gray-700 mb-1">ইভেন্টের শিরোনাম <span className="text-red-500">*</span></label>
+                      <input type="text" value={newEvent.title} onChange={e => setNewEvent({ ...newEvent, title: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500" required placeholder="উদা: বার্ষিক পূজা" />
+                    </div>
+                    <div className="lg:col-span-1">
+                      <label className="block text-sm font-bold text-gray-700 mb-1">তারিখ <span className="text-red-500">*</span></label>
+                      <input type="date" value={newEvent.date} onChange={e => setNewEvent({ ...newEvent, date: e.target.value })} required className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm text-gray-700 focus:ring-2 focus:ring-orange-500" />
+                    </div>
+                    <div className="lg:col-span-1">
+                      <label className="block text-sm font-bold text-gray-700 mb-1">ছবি (আপলোড বা লিংক)</label>
+                      <div className="flex flex-col gap-2">
+                        <label className="flex-grow cursor-pointer bg-white border border-gray-300 px-4 py-2.5 rounded-xl text-sm hover:bg-gray-50 flex items-center justify-center gap-2 overflow-hidden shadow-sm">
+                          <i className="fas fa-upload text-gray-500"></i>
+                          <span className="text-gray-600 truncate font-medium">{(newEvent.image && newEvent.image.startsWith('data:')) ? 'ছবি আপলোড করা হয়েছে' : 'ডিভাইস থেকে আপলোড'}</span>
+                          <input type="file" accept="image/*" onChange={(e) => handleImageChange(e, setNewEvent, newEvent)} className="hidden" />
+                        </label>
+                        <input type="text" value={(!newEvent.image || newEvent.image.startsWith('data:')) ? '' : newEvent.image} onChange={(e) => setNewEvent({ ...newEvent, image: e.target.value })} className="w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-orange-500" placeholder="অথবা গুগ্‌ল ড্রাইভ লিংক দিন..." />
+                      </div>
+                      {newEvent.image && (
+                        <img src={newEvent.image} alt="Preview" className="w-16 h-16 object-cover rounded-lg border border-gray-300 shadow-sm mt-2" />
+                      )}
+                    </div>
+                    <div className="md:col-span-2 lg:col-span-3">
+                      <label className="block text-sm font-bold text-gray-700 mb-1">ইভেন্টের বিস্তারিত <span className="text-red-500">*</span></label>
+                      <QuillEditor value={newEvent.description} onChange={val => setNewEvent({ ...newEvent, description: val })} placeholder="বিস্তারিত লিখুন..." />
+                    </div>
+                    <div className="md:col-span-2 lg:col-span-3 mt-2 flex gap-3">
+                      <button type="submit" disabled={isSaving} className="w-full bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 flex items-center justify-center gap-2 font-bold disabled:opacity-50 shadow-md">
+                        <i className={editingEventId ? "fas fa-save" : "fas fa-plus"}></i> {isSaving ? 'সেভ হচ্ছে...' : (editingEventId ? 'আপডেট করুন' : 'ইভেন্ট যুক্ত করুন')}
+                      </button>
+                      {editingEventId && (
+                        <button type="button" onClick={() => { setEditingEventId(null); setNewEvent({ title: '', date: '', description: '', image: null }); }} className="bg-gray-500 text-white px-6 py-3 rounded-xl hover:bg-gray-600 font-bold shadow-md">বাতিল</button>
+                      )}
+                    </div>
+                  </form>
+
+                  <div className="flex justify-between items-center mb-6 border-b pb-3 mt-8">
+                    <h3 className="text-xl font-bold text-gray-800"><i className="fas fa-list text-orange-500 mr-2"></i> বর্তমান ইভেন্টসমূহ</h3>
+                    <span className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full font-bold">Total: {events.length}</span>
+                  </div>
+                  <div className="space-y-4">
+                    {events.map(ev => (
+                      <div key={ev.id} className="border border-gray-200 rounded-2xl p-5 bg-white hover:shadow-md transition-shadow flex flex-col md:flex-row justify-between items-start gap-4">
+                        {ev.image && (
+                          <div className="w-full md:w-32 h-32 md:h-24 bg-gray-100 rounded-xl overflow-hidden shrink-0">
+                            <img src={ev.image} alt={ev.title} className="w-full h-full object-cover" />
+                          </div>
+                        )}
+                        <div className="flex-grow w-full">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h3 className="font-bold text-lg text-gray-800">{ev.title}</h3>
+                            <span className="text-xs font-semibold text-orange-700 bg-orange-100 border border-orange-200 px-2.5 py-1 rounded-md flex items-center gap-1">
+                              <i className="fas fa-calendar-alt"></i> {formatDateToBengali(ev.date)}
+                            </span>
+                          </div>
+                          <div className="text-gray-600 leading-relaxed bg-gray-50 p-3 rounded-lg border border-gray-100 rich-text" dangerouslySetInnerHTML={{ __html: ev.description }}></div>
+                        </div>
+                        <div className="flex gap-2 self-end md:self-start bg-gray-50 p-2 rounded-xl border border-gray-100 shrink-0">
+                          <button type="button" onClick={() => { setNewEvent(ev); setEditingEventId(ev.id); window.scrollTo(0, 0); }} className="text-blue-600 hover:text-white hover:bg-blue-600 bg-white border border-blue-200 p-2.5 rounded-lg transition-colors shadow-sm" title="এডিট">
+                            <i className="fas fa-edit"></i>
+                          </button>
+                          <button type="button" onClick={() => handleDeleteEvent(ev.id)} disabled={isSaving} className="text-red-600 hover:text-white hover:bg-red-600 bg-white border border-red-200 p-2.5 rounded-lg transition-colors shadow-sm disabled:opacity-50" title="ডিলিট">
+                            <i className="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    {events.length === 0 && (
+                      <p className="text-center text-gray-500 p-10 bg-white rounded-xl shadow-sm border border-gray-100">এখনো কোনো ইভেন্ট যোগ করা হয়নি।</p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'donations' && (
+                <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+                  <h3 className="text-xl font-bold text-gray-800 mb-6 border-b pb-3 flex items-center gap-2">
+                    <i className="fas fa-hand-holding-usd text-orange-500"></i> {editingDonationId ? 'অনুদান আপডেট করুন' : 'নতুন অনুদান যোগ করুন'}
+                  </h3>
+                  <form onSubmit={handleSaveDonation} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-10 bg-gray-50 p-6 rounded-2xl border border-gray-200 items-end shadow-inner">
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-1">দাতার নাম <span className="text-red-500">*</span></label>
+                      <input type="text" value={newDonation.name} onChange={e => setNewDonation({ ...newDonation, name: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500" required placeholder="নাম লিখুন" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-1">ঠিকানা বা পদবী</label>
+                      <input type="text" value={newDonation.address} onChange={e => setNewDonation({ ...newDonation, address: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500" placeholder="উদা: ঢাকা" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-1">অণুদানের ধরণ <span className="text-red-500">*</span></label>
+                      <select value={newDonation.type} onChange={e => setNewDonation({ ...newDonation, type: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500 bg-white">
+                        <option value="নগদ অর্থ">নগদ অর্থ</option>
+                        <option value="সরঞ্জাম/অন্যান্য">সরঞ্জাম/অন্যান্য</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-1">পরিমাণ / বিবরণ <span className="text-red-500">*</span></label>
+                      <input type="text" value={newDonation.amount} onChange={e => setNewDonation({ ...newDonation, amount: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500" required placeholder="উদা: ৫০০০ টাকা বা ১টি ফ্যান" />
+                    </div>
+                    <div className="lg:col-span-4 mt-2 flex gap-3">
+                      <button type="submit" disabled={isSaving} className="w-full bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 flex items-center justify-center gap-2 font-bold disabled:opacity-50 shadow-md">
+                        <i className={editingDonationId ? "fas fa-save" : "fas fa-plus"}></i> {isSaving ? 'সেভ হচ্ছে...' : (editingDonationId ? 'আপডেট করুন' : 'অনুদান যুক্ত করুন')}
+                      </button>
+                      {editingDonationId && (
+                        <button type="button" onClick={() => { setEditingDonationId(null); setNewDonation({ name: '', address: '', type: 'নগদ অর্থ', amount: '', date: '', is_hidden: false }); }} className="bg-gray-500 text-white px-6 py-3 rounded-xl hover:bg-gray-600 font-bold shadow-md">বাতিল</button>
+                      )}
+                    </div>
+                  </form>
+
+                  <div className="flex justify-between items-center mb-6 border-b pb-3 mt-8">
+                    <h3 className="text-xl font-bold text-gray-800"><i className="fas fa-list text-orange-500 mr-2"></i> বর্তমান দাতাদের তালিকা</h3>
+                    <span className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full font-bold">Total: {donations ? donations.length : 0}</span>
+                  </div>
+                  <div className="overflow-x-auto rounded-xl border border-gray-200">
+                    <table className="w-full text-left border-collapse bg-white">
+                      <thead>
+                        <tr className="bg-gray-100 text-gray-700 text-sm border-b">
+                          <th className="p-4 font-bold">নাম</th>
+                          <th className="p-4 font-bold">ঠিকানা/পদবী</th>
+                          <th className="p-4 font-bold">ধরণ</th>
+                          <th className="p-4 font-bold text-right">পরিমাণ/বিবরণ</th>
+                          <th className="p-4 text-center font-bold">অ্যাকশন</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {donations && donations.map(d => (
+                          <tr key={d.id} className={`border-b hover:bg-orange-50 transition-colors text-sm ${d.is_hidden ? 'opacity-60 bg-gray-50' : ''}`}>
+                            <td className="p-4 font-bold text-gray-800">
+                              {d.name}
+                              {d.is_hidden && <span className="ml-2 text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded border border-red-200 font-bold">Hidden</span>}
+                            </td>
+                            <td className="p-4 text-gray-600">{d.address || '-'}</td>
+                            <td className="p-4">
+                              <span className={`text-xs font-bold px-2 py-1 rounded border ${d.type === 'নগদ অর্থ' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-blue-50 text-blue-700 border-blue-200'}`}>
+                                {d.type}
+                              </span>
+                            </td>
+                            <td className="p-4 text-right font-semibold text-orange-600">{d.amount}</td>
+                            <td className="p-4 text-center whitespace-nowrap">
+                              <button type="button" onClick={() => handleToggleDonationVisibility(d.id, d.is_hidden)} className={`border p-2 rounded-lg mr-2 transition-colors ${d.is_hidden ? 'bg-gray-200 text-gray-600 hover:bg-gray-300' : 'bg-green-50 text-green-600 border-green-200 hover:bg-green-600 hover:text-white'}`} title={d.is_hidden ? "পাবলিক করুন" : "হাইড করুন"}>
+                                <i className={d.is_hidden ? "fas fa-eye-slash w-5" : "fas fa-eye w-5"}></i>
+                              </button>
+                              <button type="button" onClick={() => { setNewDonation(d); setEditingDonationId(d.id); window.scrollTo(0, 0); }} className="text-blue-600 hover:text-white hover:bg-blue-600 bg-blue-50 border border-blue-200 p-2 rounded-lg mr-2 transition-colors" title="এডিট">
+                                <i className="fas fa-edit w-5"></i>
+                              </button>
+                              <button type="button" onClick={() => handleDeleteDonation(d.id)} className="text-red-600 hover:text-white hover:bg-red-600 bg-red-50 border border-red-200 p-2 rounded-lg transition-colors" title="ডিলিট">
+                                <i className="fas fa-trash w-5"></i>
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                        {(!donations || donations.length === 0) && (
+                          <tr><td colSpan="5" className="text-center p-6 text-gray-500">কোনো ডেটা নেই।</td></tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    function App() {
+      const [currentPage, setCurrentPage] = useState(() => {
+        return window.location.hash.replace('#', '') || 'home';
+      });
+
+      const [isMenuOpen, setIsMenuOpen] = useState(false);
+      const [isLoading, setIsLoading] = useState(true);
+      const [dbError, setDbError] = useState(false);
+
+      const [marqueeText, setMarqueeText] = useState('মন্দিরে স্বাগতম ✦ মায়ের আশীর্বাদ আপনার সহায় হোক ✦ ঐশ্বরিক উপস্থিতি অনুভব করুন');
+      const [featuredTestimonialIds, setFeaturedTestimonialIds] = useState([]);
+      const [committeeMembers, setCommitteeMembers] = useState([]);
+      const [testimonials, setTestimonials] = useState([]);
+      const [events, setEvents] = useState([]);
+      const [notices, setNotices] = useState([]);
+      const [donations, setDonations] = useState([]);
+
+      const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+
+      // Global Toast State
+      const [toastMsg, setToastMsg] = useState('');
+
+      const showToast = (msg) => {
+        setToastMsg(msg);
+        setTimeout(() => setToastMsg(''), 3000);
+      };
+
+      useEffect(() => {
+        const handleHashChange = () => {
+          const hash = window.location.hash.replace('#', '') || 'home';
+          setCurrentPage(hash);
+        };
+        window.addEventListener('hashchange', handleHashChange);
+        return () => window.removeEventListener('hashchange', handleHashChange);
+      }, []);
+
+      useEffect(() => {
+        fetchData();
+        const checkSession = async () => {
+          const { data: { session } } = await supabaseClient.auth.getSession();
+          if (session) setIsAdminAuthenticated(true);
+        };
+        checkSession();
+      }, []);
+
+      const fetchData = async () => {
+        setIsLoading(true);
+        setDbError(false);
+        try {
+          const { data: settingsData } = await supabaseClient.from('settings').select('*');
+          if (settingsData) {
+            const mq = settingsData.find(s => s.key === 'marquee');
+            if (mq) setMarqueeText(mq.value);
+            const ft = settingsData.find(s => s.key === 'featured_test_ids');
+            if (ft && ft.value) {
+              try { setFeaturedTestimonialIds(JSON.parse(ft.value)); } catch (e) { }
+            }
+          }
+
+          const { data: committeeData } = await supabaseClient.from('committee').select('*').order('order_idx', { ascending: true }).order('id', { ascending: true });
+          if (committeeData) setCommitteeMembers(committeeData);
+
+          const { data: testimonialsData } = await supabaseClient.from('testimonials').select('*').order('date', { ascending: false }).order('id', { ascending: false });
+          if (testimonialsData) setTestimonials(testimonialsData);
+
+          const { data: eventsData } = await supabaseClient.from('events').select('*').order('date', { ascending: false }).order('id', { ascending: false });
+          if (eventsData) setEvents(eventsData);
+
+          const { data: noticesData } = await supabaseClient.from('notices').select('*').order('date', { ascending: false }).order('id', { ascending: false });
+          if (noticesData) setNotices(noticesData);
+
+          const { data: dData } = await supabaseClient.from('donations').select('*').order('id', { ascending: false });
+          if (dData) setDonations(dData);
+
+        } catch (error) {
+          console.error("Supabase Database Error:", error);
+          setDbError(true);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      const navigateTo = (page) => {
+        window.location.hash = page;
+        setIsMenuOpen(false);
+        window.scrollTo(0, 0);
+      };
+
+      const renderPage = () => {
+        switch (currentPage) {
+          case 'home': return <Home dbError={dbError} marqueeText={marqueeText} testimonials={testimonials} featuredTestimonialIds={featuredTestimonialIds} committeeMembers={committeeMembers} events={events} notices={notices} navigateTo={navigateTo} showToast={showToast} />;
+          case 'committee': return <CommitteePage committeeMembers={committeeMembers} navigateTo={navigateTo} />;
+          case 'testimonials': return <TestimonialsPage testimonials={testimonials} navigateTo={navigateTo} />;
+          case 'donation': return <DonationPage donations={donations} navigateTo={navigateTo} />;
+          case 'history': return <HistoryPage navigateTo={navigateTo} />;
+          case 'event': return <EventsPage events={events} navigateTo={navigateTo} showToast={showToast} />;
+          case 'notice': return <NoticeBoardPage notices={notices} navigateTo={navigateTo} />;
+          case 'admin': return <AdminPanel
+            supabaseClient={supabaseClient} dbError={dbError} navigateTo={navigateTo}
+            isAdminAuthenticated={isAdminAuthenticated} setIsAdminAuthenticated={setIsAdminAuthenticated}
+            marqueeText={marqueeText} setMarqueeText={setMarqueeText}
+            committeeMembers={committeeMembers} setCommitteeMembers={setCommitteeMembers}
+            testimonials={testimonials} setTestimonials={setTestimonials}
+            events={events} setEvents={setEvents} notices={notices} setNotices={setNotices}
+            donations={donations} setDonations={setDonations}
+            featuredTestimonialIds={featuredTestimonialIds} setFeaturedTestimonialIds={setFeaturedTestimonialIds}
+            showToast={showToast}
+          />;
+          default: return <Home dbError={dbError} marqueeText={marqueeText} testimonials={testimonials} featuredTestimonialIds={featuredTestimonialIds} committeeMembers={committeeMembers} events={events} notices={notices} navigateTo={navigateTo} showToast={showToast} />;
+        }
+      };
+
+      return (
+        <div className="font-sans text-gray-900 selection:bg-yellow-300 selection:text-orange-900 overflow-x-hidden relative">
+
+          {/* Global Toast Message */}
+          {toastMsg && (
+            <div className="fixed bottom-10 right-10 z-[100] bg-green-600 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 font-bold text-lg toast-animate border border-green-500">
+              <i className="fas fa-check-circle text-2xl"></i> {toastMsg}
+            </div>
+          )}
+
+          {currentPage !== 'admin' && <Header navigateTo={navigateTo} isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />}
+          <main className="min-h-screen bg-white">
+            {isLoading && currentPage === 'home' ? (
+              <div className="flex flex-col gap-4 items-center justify-center h-screen bg-orange-50">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-orange-600 drop-shadow-md"></div>
+                <p className="text-orange-800 font-bold tracking-widest animate-pulse">লোড হচ্ছে...</p>
+              </div>
+            ) : (
+              renderPage()
+            )}
+          </main>
+          {currentPage !== 'admin' && <Footer navigateTo={navigateTo} />}
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+
+</html>
