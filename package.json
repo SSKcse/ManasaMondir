@@ -18,7 +18,7 @@
   ],
   "author": "Arpon Chakraborty",
   "license": "ISC",
-  "devDependencies": {
+  "dependencies": {
     "esbuild": "^0.28.2"
   }
 }
