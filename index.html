@@ -99,6 +99,16 @@
 
 
     <!-- Tailwind CSS (CDN) -->
+    <script>
+        // Suppress Tailwind CDN production notice in console
+        (function() {
+            var origWarn = console.warn;
+            console.warn = function() {
+                if (arguments[0] && typeof arguments[0] === 'string' && arguments[0].indexOf('cdn.tailwindcss.com') !== -1) return;
+                origWarn.apply(console, arguments);
+            };
+        })();
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- FontAwesome Icons (CDN) -->
@@ -737,7 +747,7 @@
     <div id="root"></div>
 
     <!-- Pre-compiled Ultra-Fast Production JS (Zero Babel Delay, 120 FPS) -->
-    <script src="/app.min.js?v=80" defer></script>
+    <script src="/app.min.js?v=81" defer></script>
 </body>
 
 </html>
