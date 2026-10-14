@@ -3,12 +3,12 @@
   "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
     },
     {
-      "source": "/((?!.*\\.[\\w]+$).*)",
-      "destination": "/index.html"
+      "source": "/((?!api/|.*\\.[a-zA-Z0-9]+).*)",
+      "destination": "/"
     }
   ]
 }
