@@ -580,6 +580,49 @@ const DEFAULT_SCHOLARS = [
   }
 ];
 
+// Default Revered Priests, Sevayats & Purohits of Shree Shree Maa Manasa Mandir
+const DEFAULT_PUROHITS = [
+  {
+    id: 'purohit_1',
+    name: 'শ্রী মিলন চক্রবর্তী',
+    role: 'প্রধান পুরোহিত',
+    title: 'দৈনিক পূজা, ভোগ নিবেদন ও আরতি পরিচালক',
+    experience: '১৫+ বছর',
+    phone: '০১৭২২০০০০০০',
+    address: 'ঐতিহাসিক গৈলা ধাম, আগৈলঝাড়া, বরিশাল',
+    image: 'images/committee/member_13.jpg',
+    bio: 'পরম ভক্তিসহকারে সুদীর্ঘ ১৫ বছরের অধিক কাল ধরে মা মনসার চরণে নিত্য পূজা, দ্বিপ্রহরিক ভোগরাগ, শঙ্খধ্বনি ও সান্ধ্য আরতি নিবেদন করে আসছেন। বিশেষ তিথির চণ্ডীপাঠ ও মহা আরাধনায় অগ্রগণ্য।',
+    mantra: 'ওঁ হ্রীং ক্লীং ঐং শ্রীং মনসাদেবৈ নমঃ',
+    order_idx: 1
+  },
+  {
+    id: 'purohit_2',
+    name: 'শ্রী তরুণ ভট্টাচার্য',
+    role: 'সহকারী পুরোহিত',
+    title: 'নিত্য সেবা, মন্ত্রোচ্চারণ ও ভক্ত সংকল্প সেবক',
+    experience: '১০+ বছর',
+    phone: '০১৭৩০০০০০০০',
+    address: 'গৈলা, আগৈলঝাড়া, বরিশাল',
+    image: 'images/committee/member_10.jpg',
+    bio: 'মন্দিরের প্রত্যুষে মঙ্গল আরতি, ভক্তবৃন্দের মনস্কামনা সংকল্প পূজা এবং হোমযজ্ঞ বিধিমতে অত্যন্ত নিষ্ঠার সঙ্গে সম্পন্ন করে থাকেন।',
+    mantra: 'মা মনসার চরণে সকল ভক্তবৃন্দের মঙ্গল ও সমৃদ্ধি কাম্য।',
+    order_idx: 2
+  },
+  {
+    id: 'purohit_3',
+    name: 'শ্রী নিমাই চক্রবর্তী',
+    role: 'সেবাইত ও তর্পণ পুরোহিত',
+    title: 'বিশেষ তিথি পূজা, মানত ব্রত ও হোমযজ্ঞ সেবাইত',
+    experience: '১২+ বছর',
+    phone: '০১৭৪০০০০০০০',
+    address: 'গৈলা, আগৈলঝাড়া, বরিশাল',
+    image: 'images/committee/member_16.jpg',
+    bio: 'বাৎসরিক মনসা পূজা, রয়ানী মহোৎসব ও দূর-দূরান্ত থেকে আগত পুণ্যার্থীদের বিশেষ মানত পূজা এবং প্রসাদ বিতরণে নিবেদিতপ্রাণ সেবাইত।',
+    mantra: 'জয় মা মনসা — সকলের জীবন রোগ-শোক মুক্ত ও কল্যাণময় হোক।',
+    order_idx: 3
+  }
+];
+
 const toBengaliDigits = (num) => {
   const bnDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
   return String(num).replace(/[0-9]/g, (d) => bnDigits[d]);
@@ -2048,13 +2091,10 @@ const MediaViewer = ({ url, isVideo, alt = "Media", className = "w-full h-full o
       );
     }
     let videoClass = className || '';
-    const isContain = videoClass.includes('object-contain');
-    if (isContain) {
-      videoClass = videoClass.replace(/\bobject-cover\b/g, '').trim();
-      videoClass = videoClass.replace(/\bw-full\b/g, '').trim();
-      videoClass = videoClass.replace(/\bh-full\b/g, '').trim();
-      if (!videoClass.includes('object-contain')) videoClass += ' object-contain';
-      if (!videoClass.includes('w-auto')) videoClass += ' w-auto h-auto';
+    const isCover = videoClass.includes('object-cover');
+    const fitStyle = isCover ? 'cover' : 'contain';
+    if (!videoClass.includes('object-contain') && !isCover) {
+      videoClass += ' object-contain';
     }
     return (
       <video
@@ -2067,8 +2107,12 @@ const MediaViewer = ({ url, isVideo, alt = "Media", className = "w-full h-full o
         className={`${videoClass} bg-black`}
         style={{
           display: 'block',
+          width: '100%',
+          height: '100%',
           maxWidth: '100%',
           maxHeight: style?.maxHeight || '100%',
+          objectFit: fitStyle,
+          boxSizing: 'border-box',
           ...style
         }}
         onPlay={() => {
@@ -2318,7 +2362,7 @@ const I18N = {
     accountNameLabel: "একাউন্টের নাম:",
     accountNumberLabel: "একাউন্ট নম্বর:",
     bankLabel: "ব্যাংক:",
-    bankName: "সোনালী ব্যাংক লিমিটেড",
+    bankName: "সোনালী ব্যাংক পিএলসি.",
     branchLabel: " শাখা:",
     branchName: "3111-গৈলা শাখা, বরিশাল",
     routingNumberLabel: "রাউটিং নম্বর:",
@@ -2511,7 +2555,7 @@ const I18N = {
     accountNameLabel: "Account Name:",
     accountNumberLabel: "Account Number:",
     bankLabel: "Bank:",
-    bankName: "Sonali Bank Limited",
+    bankName: "Sonali Bank PLC",
     branchLabel: "Branch:",
     branchName: "3111 - Goila Branch, Barishal",
     routingNumberLabel: "Routing Number:",
@@ -2560,6 +2604,20 @@ const I18N = {
 
     historyChap6Title: "6. Modern Renaissance, One-Ton Brass Deity & Present Temple Architecture",
     historyChap6Text: "While the ancient shrine endured numerous natural calamities over the centuries, the devotion of local and global devotees, organized under the 'Poet Bijoy Gupta Memorial, Shree Shree Maa Manasa Mandir Preservation & Development Committee', has restored and elevated the sanctum to majestic splendor. In 2005, a magnificent one-ton (1,000 kg) solid brass deity of Shree Shree Maa Manasa was consecrated in the inner sanctum. In 2013, a modern three-storey marble temple structure, expansive Natmandir (prayer hall), and pilgrim lodge were inaugurated beside the ancient Dighi. Today, it stands both as a living divine shrine and an eternal cultural monument to Bengali heritage.",
+
+    // Booking & Royani & Panjika Additions
+    booking: "Puja Booking",
+    bookingTitle: "Online Puja & Sankalpa Booking",
+    bookingSubtitle: "Offer sacred vows, daily bhog, and special puja sankalpa at the lotus feet of Shree Shree Maa Manasa Devi",
+    royani: "Royani Songs",
+    royaniTitle: "Traditional Royani Songs & Padmapuran",
+    royaniSubtitle: "Immortal epic creation of medieval Mahakavi Bijoy Gupta and 530+ years musical tradition of Goila Manasa Mandir",
+    panjika: "Panjika & Tithi",
+    panjikaTitle: "Auspicious Panjika & Festival Schedule",
+    daysUnit: "Days",
+    hoursUnit: "Hours",
+    minsUnit: "Mins",
+    secsUnit: "Secs",
 
     // Footer
     annualFestivalTarget: "Annual Grand Festival & Manasa Puja",
@@ -2615,7 +2673,11 @@ const ROLE_MAP = {
   'সহ-প্রচার সম্পাদক': { bn: 'সহ-প্রচার সম্পাদক', en: 'Assistant Publicity Secretary' },
   'সমাজ কল্যাণ সম্পাদক': { bn: 'সমাজ কল্যাণ সম্পাদক', en: 'Social Welfare Secretary' },
   'উপদেষ্টা': { bn: 'উপদেষ্টা', en: 'Advisor' },
-  'সদস্য': { bn: 'সদস্য', en: 'Executive Member' }
+  'সদস্য': { bn: 'সদস্য', en: 'Executive Member' },
+  'প্রধান পুরোহিত': { bn: 'প্রধান পুরোহিত', en: 'Head Priest' },
+  'সহকারী পুরোহিত': { bn: 'সহকারী পুরোহিত', en: 'Assistant Priest' },
+  'সেবাইত': { bn: 'সেবাইত', en: 'Sacred Sevayat' },
+  'পুরোহিত': { bn: 'পুরোহিত', en: 'Priest' }
 };
 
 const translateRole = (role, lang = 'bn') => {
@@ -2863,7 +2925,45 @@ const formatNumber = (val, lang = 'bn') => {
     return englishToBengaliNumber(str);
   }
   const bnToEng = { '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4', '৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9' };
-  return str.replace(/[০-৯]/g, d => bnToEng[d]);
+  let res = str.replace(/[০-৯]/g, d => bnToEng[d]);
+  res = res
+    .replace(/২০\s*লক্ষেরও\s*বেশি\s*টাকা|20\s*লক্ষেরও\s*বেশি\s*টাকা/g, 'Over 20 Lakh BDT')
+    .replace(/লক্ষেরও\s*বেশি\s*টাকা|লক্ষের\s*বেশি\s*টাকা/g, 'Lakhs+ BDT')
+    .replace(/লক্ষ\s*টাকা/g, ' Lakh BDT')
+    .replace(/লক্ষ/g, ' Lakh')
+    .replace(/কোটি\s*টাকা/g, ' Crore BDT')
+    .replace(/কোটি/g, ' Crore')
+    .replace(/হাজার\s*টাকা/g, ' Thousand BDT')
+    .replace(/হাজার/g, ' Thousand')
+    .replace(/টাকা/g, ' BDT')
+    .replace(/মনসা\s*মন্দির\s*ওয়েবসাইট/g, 'Manasa Mandir Website');
+  return res.trim();
+};
+
+const translateDonorAddress = (addr, lang = 'bn') => {
+  if (!addr) return '-';
+  if (lang === 'bn') return addr;
+  let res = addr;
+  const map = [
+    [/কমিটির সচিব/g, 'Committee Secretary'],
+    [/কমিটি সচিব/g, 'Committee Secretary'],
+    [/কানাডা প্রবাসী/g, 'Expatriate (Canada)'],
+    [/প্রবাসী/g, 'Expatriate'],
+    [/অর্থোপেডিক বিশেষজ্ঞ,\s*ঢাকা/g, 'Orthopedic Specialist, Dhaka'],
+    [/অর্থোপেডিক বিশেষজ্ঞ/g, 'Orthopedic Specialist'],
+    [/বিশেষজ্ঞ/g, 'Specialist'],
+    [/অনলাইন ভক্ত/g, 'Online Devotee'],
+    [/অনলাইন/g, 'Online'],
+    [/ঢাকা/g, 'Dhaka'],
+    [/বরিশাল/g, 'Barishal'],
+    [/গৈলা/g, 'Goila'],
+    [/আগৈলঝাড়া/g, 'Agailjhara'],
+    [/গোত্র:\s*/g, 'Gotra: ']
+  ];
+  for (const [re, rep] of map) {
+    res = res.replace(re, rep);
+  }
+  return res;
 };
 
 const formatDate = (dateStr, lang = 'bn') => {
@@ -3369,23 +3469,41 @@ const Header = ({ navigateTo, isMenuOpen, setIsMenuOpen, lang, setLang, isMusicP
       </div>
 
       {/* Desktop Navigation with Matching Harmony */}
-      <nav className="hidden lg:flex items-center gap-4 xl:gap-5 font-medium text-xs xl:text-sm">
-        <button onClick={() => navigateTo('home')} className="hover:text-yellow-300 transition-colors cursor-pointer">{t('home', lang)}</button>
-        <button onClick={() => navigateTo('history')} className="hover:text-yellow-300 transition-colors cursor-pointer">{t('history', lang)}</button>
-        <button onClick={() => navigateTo('booking')} className="hover:text-yellow-300 transition-colors cursor-pointer flex items-center gap-1.5"><i className="fas fa-hands-praying text-yellow-300 text-xs"></i> {t('booking', lang)}</button>
-        <button onClick={() => navigateTo('committee')} className="hover:text-yellow-300 transition-colors cursor-pointer">{t('committee', lang)}</button>
-        <button onClick={() => navigateTo('event')} className="hover:text-yellow-300 transition-colors cursor-pointer">{t('events', lang)}</button>
-        <button onClick={() => navigateTo('notice')} className="hover:text-yellow-300 transition-colors flex items-center gap-1.5 cursor-pointer">
-          <i className="fas fa-bell text-yellow-300 text-xs animate-bounce"></i> {t('notice', lang)}
+      <nav className="hidden lg:flex items-center gap-2.5 xl:gap-4 font-medium text-xs xl:text-sm whitespace-nowrap">
+        <button onClick={() => navigateTo('home')} className="hover:text-yellow-300 transition-colors cursor-pointer whitespace-nowrap">{t('home', lang)}</button>
+        <button onClick={() => navigateTo('history')} className="hover:text-yellow-300 transition-colors cursor-pointer whitespace-nowrap">{t('history', lang)}</button>
+        <button onClick={() => navigateTo('booking')} className="hover:text-yellow-300 transition-colors cursor-pointer flex items-center gap-1 whitespace-nowrap">
+          <i className="fas fa-hands-praying text-yellow-300 text-xs shrink-0"></i>
+          <span>{t('booking', lang)}</span>
         </button>
-        <button onClick={() => navigateTo('testimonials')} className="hover:text-yellow-300 transition-colors cursor-pointer">{t('testimonials', lang)}</button>
+        <button onClick={() => navigateTo('committee')} className="hover:text-yellow-300 transition-colors cursor-pointer whitespace-nowrap">{t('committee', lang)}</button>
+        <button
+          onClick={() => {
+            navigateTo('home');
+            setTimeout(() => {
+              const el = document.getElementById('purohits-section');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+          }}
+          className="hover:text-yellow-300 transition-colors cursor-pointer flex items-center gap-1 whitespace-nowrap"
+        >
+          <i className="fas fa-om text-yellow-300 text-xs shrink-0"></i>
+          <span>{lang === 'en' ? 'Priests' : 'পুরোহিতবৃন্দ'}</span>
+        </button>
+        <button onClick={() => navigateTo('event')} className="hover:text-yellow-300 transition-colors cursor-pointer whitespace-nowrap">{t('events', lang)}</button>
+        <button onClick={() => navigateTo('notice')} className="hover:text-yellow-300 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
+          <i className="fas fa-bell text-yellow-300 text-xs animate-bounce shrink-0"></i>
+          <span>{t('notice', lang)}</span>
+        </button>
+        <button onClick={() => navigateTo('testimonials')} className="hover:text-yellow-300 transition-colors cursor-pointer whitespace-nowrap">{t('testimonials', lang)}</button>
 
-        {/* Primary CTA Button: Pronami (Matching Gradient & Shine) */}
+        {/* Primary CTA Button: Pronami (Matching Gradient, Shine & Slim Profile) */}
         <button
           onClick={() => navigateTo('donation')}
-          className="btn-shine bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-300 text-orange-950 px-4 py-2 rounded-full font-extrabold transition-all shadow-md hover:shadow-yellow-500/50 flex items-center gap-1.5 active:scale-95 border border-yellow-200 cursor-pointer text-xs xl:text-sm"
+          className="btn-shine bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-300 text-orange-950 px-3 xl:px-3.5 py-1.5 rounded-full font-bold transition-all shadow-md hover:shadow-yellow-500/40 flex items-center gap-1.5 active:scale-95 border border-yellow-200 cursor-pointer text-xs xl:text-sm whitespace-nowrap shrink-0"
         >
-          <i className="fas fa-heart text-red-600 animate-pulse text-xs"></i> {t('donation', lang)}
+          <i className="fas fa-heart text-red-600 animate-pulse text-[11px] shrink-0"></i>
+          <span>{lang === 'en' ? 'Pronami' : t('donation', lang)}</span>
         </button>
 
         {/* Unified Matching Utility Capsule: Music + Language */}
@@ -3417,7 +3535,7 @@ const Header = ({ navigateTo, isMenuOpen, setIsMenuOpen, lang, setLang, isMusicP
         <div className="lg:hidden bg-stone-950 text-white fixed w-full left-0 top-[60px] sm:top-[68px] shadow-2xl flex flex-col font-medium border-t-2 border-orange-500 border-b-4 border-amber-500 z-50 max-h-[85vh] overflow-y-auto">
           <div className="p-3 bg-stone-900 border-b border-stone-800 flex justify-between items-center gap-2 sticky top-0 z-10 backdrop-blur-md">
             <span className="text-xs text-yellow-300 uppercase tracking-wider font-bold flex items-center gap-1.5">
-              <i className="fas fa-sliders-h text-xs"></i> Controls / নিয়ন্ত্রণ
+              <i className="fas fa-sliders-h text-xs"></i> {lang === 'en' ? 'CONTROLS' : 'নিয়ন্ত্রণ'}
             </span>
             <div className="flex items-center gap-2.5">
               <HeaderControls isMusicPlaying={isMusicPlaying} toggleMusic={toggleMusic} lang={lang} setLang={setLang} isCompact={true} />
@@ -3440,6 +3558,19 @@ const Header = ({ navigateTo, isMenuOpen, setIsMenuOpen, lang, setLang, isMusicP
           <button onClick={() => navigateTo('travel')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3 text-white"><i className="fas fa-route text-yellow-400 w-5"></i> {t('travel', lang)}</button>
           <button onClick={() => navigateTo('mantras')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3 text-white"><i className="fas fa-om text-yellow-400 w-5"></i> {t('mantras', lang)}</button>
           <button onClick={() => navigateTo('committee')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3 text-white"><i className="fas fa-users text-yellow-400 w-5"></i> {t('committee', lang)}</button>
+          <button
+            onClick={() => {
+              setIsMenuOpen(false);
+              navigateTo('home');
+              setTimeout(() => {
+                const el = document.getElementById('purohits-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }, 100);
+            }}
+            className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3 text-white"
+          >
+            <i className="fas fa-om text-yellow-400 w-5"></i> {lang === 'en' ? 'Priests & Purohits' : 'পূজারী ও পুরোহিতবৃন্দ'}
+          </button>
           <button onClick={() => navigateTo('event')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3 text-white"><i className="fas fa-calendar-alt text-yellow-400 w-5"></i> {t('events', lang)}</button>
           <button onClick={() => navigateTo('notice')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3 text-white"><i className="fas fa-bell text-yellow-400 w-5"></i> {t('noticeBoard', lang)}</button>
           <button onClick={() => navigateTo('testimonials')} className="py-3 px-6 text-left border-b border-stone-800/80 bg-stone-950 hover:bg-stone-900 transition-colors flex items-center gap-3 text-white"><i className="fas fa-comments text-yellow-400 w-5"></i> {t('testimonials', lang)}</button>
@@ -3665,6 +3796,233 @@ const getLiveStatus = (timings, lang = 'bn') => {
   }
 };
 
+// --- Revered Priests & Sevayats Section (মন্দিরের পূজারী ও পুরোহিতবৃন্দ) ---
+const PurohitsSection = ({ purohits, lang = 'bn', navigateTo }) => {
+  const [selectedPurohitModal, setSelectedPurohitModal] = useState(null);
+  const activePurohits = (purohits && purohits.length > 0) ? purohits : DEFAULT_PUROHITS;
+
+  return (
+    <section id="purohits-section" className="py-20 bg-gradient-to-b from-amber-50/70 via-orange-50/40 to-stone-50 border-t-2 border-amber-200/80 relative overflow-hidden">
+      {/* Sacred background ambient glow */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-amber-300/15 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20"></div>
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-orange-400/10 rounded-full blur-3xl pointer-events-none -ml-20 -mb-20"></div>
+
+      <div className="container mx-auto px-4 max-w-6xl relative z-10">
+        <SectionHeader
+          tag={lang === 'en' ? 'Sacred Seva & Devotion' : 'পূজা ও সেবা পরম্পরা'}
+          title={lang === 'en' ? 'Revered Priests & Sevayats' : 'মন্দিরের পূজারী ও পুরোহিতবৃন্দ'}
+          subtitle={lang === 'en' ? 'Dedicated priests carrying forward sacred Vedic rituals, daily pujas, and darshan seva with utmost devotion.' : 'শ্রী শ্রী মা মনসা মন্দিরে আবহমানকাল ধরে শাস্ত্রীয় আচার, নিষ্ঠা ও ভক্তিসহকারে নিত্য পূজা, আরতি ও সেবায় নিবেদিত পূজনীয় পুরোহিতমণ্ডলী।'}
+          icon="fa-om"
+          className="text-center mb-14"
+        />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto">
+          {activePurohits.map((purohit, idx) => {
+            return (
+              <div
+                key={purohit.id || idx}
+                className="bg-white rounded-3xl p-6 shadow-md hover:shadow-2xl border-2 border-amber-200/80 hover:border-amber-400 transition-all duration-300 hover:-translate-y-2 flex flex-col justify-between group relative overflow-hidden card-hover-glow"
+              >
+                {/* Auspicious Top Gradient Strip */}
+                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-red-600 via-amber-500 to-yellow-400"></div>
+
+                <div>
+                  {/* Photo Frame with Sacred Arch and Glow */}
+                  <div className="relative w-36 h-36 sm:w-40 sm:h-40 mx-auto rounded-full p-1 bg-gradient-to-tr from-amber-500 via-yellow-400 to-red-500 shadow-xl group-hover:scale-105 transition-transform duration-300 mb-5">
+                    <div className="w-full h-full rounded-full overflow-hidden bg-stone-900 border-2 border-white relative">
+                      <MediaViewer
+                        url={purohit.image}
+                        alt={purohit.name}
+                        fallbackSrc="images/committee/member_13.jpg"
+                        className="w-full h-full object-cover object-top"
+                        controls={false}
+                      />
+                    </div>
+
+                    {/* Floating Role Badge */}
+                    <div className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap z-10">
+                      <span className="bg-gradient-to-r from-red-700 to-amber-700 text-yellow-200 border border-yellow-400/60 text-[11px] sm:text-xs font-bold px-3.5 py-1 rounded-full shadow-md flex items-center gap-1.5">
+                        <i className="fas fa-om text-[10px] text-yellow-300"></i>
+                        {purohit.role || 'পুরোহিত'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Purohit Details */}
+                  <div className="text-center pt-2">
+                    <h3 className="font-bold text-gray-900 font-serif text-lg sm:text-xl leading-tight group-hover:text-amber-700 transition-colors">
+                      {purohit.name}
+                    </h3>
+                    <p className="text-xs sm:text-sm font-medium text-amber-900/80 mt-1 min-h-[1.5rem] line-clamp-1">
+                      {purohit.title || 'নিত্য সেবা ও আরতি পরিচালক'}
+                    </p>
+
+                    {/* Meta info tags */}
+                    <div className="flex flex-wrap items-center justify-center gap-2 mt-3 text-xs">
+                      {purohit.experience && (
+                        <span className="bg-amber-50 text-amber-900 border border-amber-200/80 px-2.5 py-1 rounded-full font-semibold flex items-center gap-1">
+                          <i className="fas fa-history text-amber-600 text-[11px]"></i>
+                          <span>{lang === 'en' ? `Seva: ${purohit.experience}` : `সেবা কালঃ ${purohit.experience}`}</span>
+                        </span>
+                      )}
+                      {purohit.address && (
+                        <span className="bg-stone-50 text-stone-700 border border-stone-200 px-2.5 py-1 rounded-full font-medium flex items-center gap-1 text-[11px]">
+                          <i className="fas fa-map-marker-alt text-red-500 text-[10px]"></i>
+                          <span className="truncate max-w-[140px]">{purohit.address}</span>
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Short Bio preview */}
+                    {purohit.bio && (
+                      <p className="mt-3.5 text-xs text-gray-600 leading-relaxed text-justify line-clamp-2 bg-amber-50/40 p-2.5 rounded-xl border border-amber-100/60 italic">
+                        "{purohit.bio}"
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="mt-5 pt-3.5 border-t border-amber-100 flex items-center gap-2">
+                  {purohit.phone ? (
+                    <a
+                      href={`tel:${(purohit.phone || '').replace(/\s+/g, '')}`}
+                      className="btn-shine flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm hover:shadow transition-all"
+                      title="সরাসরি কল করুন"
+                    >
+                      <i className="fas fa-phone-alt text-[10px]"></i>
+                      <span className="bengali-num">{formatPhoneNumber(purohit.phone, lang)}</span>
+                    </a>
+                  ) : null}
+
+                  <button
+                    type="button"
+                    onClick={() => setSelectedPurohitModal(purohit)}
+                    className="btn-shine bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 py-2 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                    title="বিস্তারিত দেখুন"
+                  >
+                    <i className="fas fa-info-circle text-amber-700 text-xs"></i>
+                    <span>{lang === 'en' ? 'Details' : 'বিস্তারিত'}</span>
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Sacred Purohit Details Modal */}
+      {selectedPurohitModal && (
+        <div
+          className="fixed inset-0 z-[999999] flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm"
+          onClick={() => setSelectedPurohitModal(null)}
+        >
+          <div
+            className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border-4 border-amber-300 relative text-left max-h-[92vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setSelectedPurohitModal(null)}
+              className="absolute top-4 right-4 w-9 h-9 rounded-full bg-stone-100 hover:bg-red-50 text-gray-500 hover:text-red-600 flex items-center justify-center transition-colors cursor-pointer border border-gray-200"
+            >
+              <i className="fas fa-times text-sm"></i>
+            </button>
+
+            {/* Modal Header & Avatar */}
+            <div className="flex flex-col items-center text-center mb-5">
+              <div className="w-32 h-32 rounded-full p-1 bg-gradient-to-tr from-amber-500 via-yellow-400 to-red-500 shadow-xl mb-4">
+                <div className="w-full h-full rounded-full overflow-hidden bg-stone-900 border-2 border-white">
+                  <MediaViewer
+                    url={selectedPurohitModal.image}
+                    alt={selectedPurohitModal.name}
+                    fallbackSrc="images/committee/member_13.jpg"
+                    className="w-full h-full object-cover object-top"
+                    controls={false}
+                  />
+                </div>
+              </div>
+
+              <span className="bg-gradient-to-r from-red-700 to-amber-700 text-yellow-200 border border-yellow-400/60 text-xs font-bold px-4 py-1 rounded-full shadow-sm mb-2">
+                <i className="fas fa-om text-xs mr-1 text-yellow-300"></i>
+                {selectedPurohitModal.role || 'পুরোহিত'}
+              </span>
+
+              <h3 className="text-2xl font-bold font-serif text-gray-900">
+                {selectedPurohitModal.name}
+              </h3>
+
+              {selectedPurohitModal.title && (
+                <p className="text-sm font-semibold text-amber-800 mt-1">
+                  {selectedPurohitModal.title}
+                </p>
+              )}
+            </div>
+
+            {/* Info Badges */}
+            <div className="grid grid-cols-2 gap-3 mb-5">
+              <div className="bg-amber-50/70 border border-amber-200 p-3 rounded-2xl text-center">
+                <span className="text-[11px] text-gray-500 block mb-0.5">সেবাকার্য কাল</span>
+                <span className="font-bold text-sm text-amber-900">{selectedPurohitModal.experience || 'দীক্ষিত সেবাইত'}</span>
+              </div>
+              <div className="bg-orange-50/70 border border-orange-200 p-3 rounded-2xl text-center">
+                <span className="text-[11px] text-gray-500 block mb-0.5">ঠিকানা / ধাম</span>
+                <span className="font-bold text-sm text-orange-950 truncate block">{selectedPurohitModal.address || 'গৈলা, বরিশাল'}</span>
+              </div>
+            </div>
+
+            {/* Bio / Seva Description */}
+            {selectedPurohitModal.bio && (
+              <div className="mb-5 bg-stone-50 border border-stone-200 p-4 rounded-2xl">
+                <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                  <i className="fas fa-hands-praying text-amber-600"></i> সেবা পরিচিতি ও বিশেষত্ব
+                </h4>
+                <p className="text-sm text-gray-700 leading-relaxed text-justify">
+                  {selectedPurohitModal.bio}
+                </p>
+              </div>
+            )}
+
+            {/* Mantra / Sacred quote */}
+            {selectedPurohitModal.mantra && (
+              <div className="mb-6 bg-gradient-to-r from-red-50 to-amber-50 border border-amber-200 p-3.5 rounded-2xl text-center">
+                <span className="text-xs text-amber-900 font-serif italic font-semibold">
+                  "{selectedPurohitModal.mantra}"
+                </span>
+              </div>
+            )}
+
+            {/* Action Call & Booking */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              {selectedPurohitModal.phone && (
+                <a
+                  href={`tel:${(selectedPurohitModal.phone || '').replace(/\s+/g, '')}`}
+                  className="btn-shine flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-2xl flex items-center justify-center gap-2 shadow-md transition-all text-sm text-center"
+                >
+                  <i className="fas fa-phone-alt"></i>
+                  <span>সরাসরি যোগাযোগ: {selectedPurohitModal.phone}</span>
+                </a>
+              )}
+              {typeof navigateTo === 'function' && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedPurohitModal(null);
+                    navigateTo('booking');
+                  }}
+                  className="btn-shine bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-bold py-3 px-4 rounded-2xl flex items-center justify-center gap-2 shadow-md transition-all text-sm cursor-pointer"
+                >
+                  <i className="fas fa-hands-praying"></i>
+                  <span>পূজা বুকিং করুন</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+};
+
 // --- Revered Scholars & Personalities Memorial Section (চিরস্মরণীয় গুণীজন) ---
 const ScholarsSection = ({ scholars, lang = 'bn' }) => {
   const [selectedScholarModal, setSelectedScholarModal] = useState(null);
@@ -3835,7 +4193,7 @@ const ScholarsSection = ({ scholars, lang = 'bn' }) => {
 };
 
 // --- Home Component ---
-const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTestimonialIds, committeeMembers, events, notices, timings, travelInfo, mantras, galleryItems, scholars, navigateTo, showToast, lang, openComplainModal }) => {
+const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTestimonialIds, committeeMembers, purohits, events, notices, timings, travelInfo, mantras, galleryItems, scholars, navigateTo, showToast, lang, openComplainModal }) => {
   const [currentImg, setCurrentImg] = useState(0);
   const [lightboxImg, setLightboxImg] = useState(null);
   const [testIdx, setTestIdx] = useState(0);
@@ -4804,6 +5162,9 @@ const Home = ({ dbError, marqueeText, marqueeTextEn, testimonials, featuredTesti
           </div>
         </section>
       )}
+
+      {/* Revered Priests, Sevayats & Purohits Section (মন্দিরের পূজারী ও পুরোহিতবৃন্দ) */}
+      <PurohitsSection purohits={purohits} lang={lang} navigateTo={navigateTo} />
 
       {/* Committee Snippet */}
       <section className="py-16 bg-gradient-to-b from-orange-100 to-white border-t border-orange-200">
@@ -7021,12 +7382,13 @@ const EventCard = ({ event, showToast, lang }) => {
           )}
         </div>
       ) : hasVideo ? (
-        <div className="md:w-5/12 h-64 md:h-auto relative overflow-hidden bg-black flex-shrink-0 flex items-center justify-center p-2">
+        <div className="md:w-5/12 h-64 md:h-auto min-h-[240px] md:min-h-[280px] max-h-[460px] relative overflow-hidden bg-black flex-shrink-0 flex items-center justify-center p-2 rounded-2xl" data-video-container="true" style={{ isolation: 'isolate', contain: 'paint' }}>
           <MediaViewer
             url={currentVideo}
             isVideo={true}
             alt={event.title}
-            className="w-full h-full object-cover rounded-xl"
+            className="w-full h-full object-contain rounded-xl"
+            style={{ maxHeight: '100%', maxWidth: '100%', width: '100%', height: '100%' }}
             controls={true}
           />
         </div>
@@ -8075,14 +8437,191 @@ const PaymentGatewayModal = ({
   );
 };
 
-const DonationPage = ({ donations, setDonations, donationReceipts, setDonationReceipts, paymentGatewayConfig, setPaymentGatewayConfig, supabaseClient, navigateTo, showToast, lang, defaultTab = 'online' }) => {
-  const [activeTab, setActiveTab] = useState(defaultTab || 'online'); // 'online' | 'accounts' | 'receipts'
+const SacredDevoteeReceiptCard = ({ receipt, lang, onReset, showNewDonationBtn = false, showToast }) => {
+  if (!receipt) return null;
+  const copyDetails = () => {
+    const txt = 'শ্রী শ্রী মা মনসা মন্দির, গৈলা - স্মারক প্রণামী রশিদ\nরশিদ নং: ' + receipt.receiptNo + '\nদাতার নাম: ' + receipt.name + '\nগোত্র: ' + (receipt.gotra || 'অনুল্লিখিত') + '\nমোবাইল: ' + (receipt.phone || '-') + '\nপরিমাণ: ৳ ' + receipt.amount + ' /- (' + (receipt.amountWords || amountInBengaliWords(receipt.amount)) + ')\nমাধ্যম: ' + receipt.method + '\nTrxID: ' + (receipt.trxId || '-') + '\nউদ্দেশ্য: ' + (receipt.purpose || 'সাধারণ প্রণামী ও সেবা') + '\nতারিখ: ' + (receipt.date || '-') + '\nসত্যায়িত: শ্রী শ্রী মা মনসা মন্দির তহবিল';
+    if (navigator.clipboard) navigator.clipboard.writeText(txt);
+    if (showToast) showToast(lang === 'en' ? 'Receipt details copied!' : 'রশিদ বিবরণ কপি হয়েছে!');
+  };
+
+  return (
+    <div className="bg-white rounded-3xl shadow-2xl border-4 border-amber-600 outline outline-2 outline-amber-400 -outline-offset-8 p-6 sm:p-10 relative overflow-hidden print-sacred-card">
+      <div className="absolute top-0 left-0 right-0 h-3 bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700"></div>
+
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0 opacity-15">
+        <div className="w-64 h-64 sm:w-88 sm:h-88 rounded-full border-4 border-dashed border-amber-600 flex items-center justify-center">
+          <span className="font-serif text-[180px] sm:text-[230px] font-black text-amber-700 leading-none">ॐ</span>
+        </div>
+      </div>
+
+      <div className="relative z-10">
+        <div className="text-center pb-6 border-b-2 border-dashed border-amber-300">
+          <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-amber-50 to-orange-100 border-2 border-amber-600 flex items-center justify-center text-amber-800 text-3xl font-serif font-black shadow-md mb-2">
+            ॐ
+          </div>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold font-serif text-amber-950 tracking-tight">
+            {lang === 'en' ? 'Shree Shree Maa Manasa Mandir, Goila' : 'শ্রী শ্রী মা মনসা মন্দির, গৈলা'}
+          </h2>
+          <p className="text-xs sm:text-sm text-amber-900 font-bold mt-1">
+            {lang === 'en' ? 'Historic Sacred Temple Established 1494 AD (1416 Shakabda)' : 'মহাকবি বিজয় গুপ্ত প্রতিষ্ঠিত ঐতিহাসিক মহাপবিত্র তীর্থস্থান • স্থাপিত: ১৪৯৪ খ্রিষ্টাব্দ (১৪১৬ শকাব্দ)'}
+          </p>
+          <p className="text-[11px] sm:text-xs text-gray-600 font-medium mt-0.5">
+            {lang === 'en' ? 'Goila, Agailjhara, Barishal, Bangladesh • Mobile: 01727075254, 01712940716' : 'গৈলা, আগৈলঝাড়া, বরিশাল, বাংলাদেশ • মোবাইল: ০১৭২৭০৭৫২৫৪, ০১৭১২৯৪০৭১৬'}
+          </p>
+          <div className="my-2">
+            <span className="inline-block px-4 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-xs sm:text-sm font-serif font-bold shadow-2xs">
+              ওঁ হ্রীং শ্রীং ক্লীং ঐং মনসাদেব্যৈ নমঃ
+            </span>
+          </div>
+          <div>
+            <span className="inline-block bg-gradient-to-r from-amber-600 via-orange-600 to-amber-600 text-white font-extrabold text-xs sm:text-sm px-6 py-1.5 rounded-full shadow-sm tracking-wide">
+              ✦ {lang === 'en' ? 'OFFICIAL DONATION RECEIPT' : 'পবিত্র স্মারক প্রণামী রশিদ (OFFICIAL DONATION RECEIPT)'} ✦
+            </span>
+          </div>
+        </div>
+
+        <div className="py-6 space-y-4 text-gray-800 text-sm sm:text-base">
+          <div className="flex flex-wrap justify-between items-center bg-orange-50/80 p-3.5 rounded-2xl border border-orange-200">
+            <div>
+              <span className="text-xs text-gray-500 block font-semibold">{lang === 'en' ? 'Receipt Serial No:' : 'রশিদ স্মারক নং:'}</span>
+              <span className="font-mono font-bold text-amber-900 text-lg sm:text-xl tracking-wider">{receipt.receiptNo}</span>
+            </div>
+            <div className="text-right mt-2 sm:mt-0">
+              <span className="text-xs text-gray-500 block font-semibold">{lang === 'en' ? 'Date & Time Stamp:' : 'তারিখ ও সময় (Time Stamp):'}</span>
+              <span className="font-bold text-amber-950 block text-xs sm:text-sm">
+                {lang === 'en'
+                  ? formatReceiptDateTimeEn(receipt.timestamp || receipt.date)
+                  : formatReceiptDateTimeBn(receipt.timestamp || receipt.date)}
+              </span>
+              <span className="text-[10px] font-mono text-gray-500 block">
+                {receipt.timestamp ? new Date(receipt.timestamp).toISOString().replace('T', ' ').substring(0, 19) + ' UTC' : ''}
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-100">
+              <span className="block text-xs text-gray-500 font-semibold">{lang === 'en' ? 'Donor / Devotee Name' : 'দাতার নাম'}</span>
+              <span className="font-bold text-gray-900 text-base">{receipt.name}</span>
+            </div>
+            <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-100">
+              <span className="block text-xs text-gray-500 font-semibold">{lang === 'en' ? 'Gotra (Lineage)' : 'গোত্র'}</span>
+              <span className="font-bold text-gray-900 text-base">{receipt.gotra || (lang === 'en' ? 'Not Mentioned' : 'অনুল্লিখিত')}</span>
+            </div>
+            <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-100">
+              <span className="block text-xs text-gray-500 font-semibold">{lang === 'en' ? 'Payment Method' : 'প্রদানের মাধ্যম'}</span>
+              <span className="font-bold text-orange-900">{receipt.method}</span>
+            </div>
+            <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-100">
+              <span className="block text-xs text-gray-500 font-semibold">{lang === 'en' ? 'Verified TrxID' : 'ভেরিফাইড ট্রানজেকশন আইডি (TrxID)'}</span>
+              <span className="font-mono font-bold text-emerald-800">{receipt.trxId || '-'}</span>
+            </div>
+          </div>
+
+          <div className="p-5 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300">
+            <div className="flex flex-wrap justify-between items-center mb-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-800">{lang === 'en' ? 'Donated Amount' : 'গৃহীত প্রণামীর পরিমাণ'}</span>
+              <span className="text-2xl sm:text-3xl font-extrabold text-amber-900 font-mono">৳ {formatNumber(receipt.amount, lang)} /-</span>
+            </div>
+            <div className="text-sm font-serif font-bold text-gray-800 border-t border-amber-200/80 pt-2">
+              <span className="text-xs text-gray-500 font-sans font-semibold mr-1">{lang === 'en' ? 'In Words:' : 'কথায়:'}</span>
+              {receipt.amountWords || amountInBengaliWords(receipt.amount)}
+            </div>
+          </div>
+
+          <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-200 flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-2.5 text-emerald-800 font-bold text-xs sm:text-sm">
+              <i className="fas fa-check-circle text-emerald-600 text-lg"></i>
+              <span>{lang === 'en' ? 'Verified & Acknowledged in Sacred Temple Fund' : 'শ্রী শ্রী মা মনসা মন্দির পুণ্য তহবিলে গৃহীত ও সত্যায়িত'}</span>
+            </div>
+            <span className="text-[11px] font-mono text-emerald-700 bg-emerald-100/70 px-2.5 py-1 rounded-md border border-emerald-300">
+              AUTH-GATEWAY-VERIFIED
+            </span>
+          </div>
+
+          {/* Official Stamp & Signatures */}
+          <div className="pt-6 border-t-2 border-dashed border-amber-300 flex flex-col sm:flex-row items-center justify-between gap-6 my-4">
+            <div className="text-center sm:text-left order-2 sm:order-1">
+              <div className="h-8"></div>
+              <div className="border-t-2 border-dashed border-gray-400 pt-1 text-xs text-gray-700 font-semibold leading-snug">
+                {receipt.issuedBy || (lang === 'en' ? 'Online Devotee Seva' : 'অনলাইন ভক্ত সেবা')}<br />
+                <strong className="text-gray-900">{lang === 'en' ? 'Collector Signature' : 'আদায়কারীর স্বাক্ষর'}</strong>
+              </div>
+            </div>
+
+            {/* Authentic Red Circular Seal */}
+            <div className="order-1 sm:order-2 flex flex-col items-center justify-center w-28 h-28 rounded-full border-2 border-dashed border-red-600 outline outline-1 outline-red-600 -outline-offset-4 text-red-600 p-2 text-center bg-red-50/60 -rotate-6 shadow-sm select-none">
+              <span className="text-[10px] font-extrabold tracking-wider">★ মন্দির কার্যালয় ★</span>
+              <span className="text-base font-black my-0.5 text-red-700 font-serif">সত্যায়িত</span>
+              <span className="text-[9px] font-bold">গৈলা, বরিশাল</span>
+            </div>
+
+            <div className="text-center sm:text-right order-3">
+              <div className="h-8"></div>
+              <div className="border-t-2 border-dashed border-gray-400 pt-1 text-xs text-gray-700 font-semibold leading-snug">
+                {lang === 'en' ? 'General Secretary / President' : 'সাধারণ সম্পাদক / সভাপতি'}<br />
+                <strong className="text-gray-900">{lang === 'en' ? 'Temple Managing Committee' : 'মন্দির পরিচালনা কমিটি'}</strong>
+              </div>
+            </div>
+          </div>
+
+          <p className="text-center text-xs sm:text-sm text-gray-600 italic font-serif pt-2 border-t border-gray-100">
+            "{lang === 'en' ? 'May Devi Manasa bless your family with eternal health, prosperity, and peace.' : 'দেবী মনসার অপার কৃপায় আপনার ও আপনার পরিবারে রোগমুক্তি, ধনধান্য ও শান্তি বর্ষিত হোক।'}"
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-center gap-3 pt-6 border-t border-gray-200 no-print">
+          <button
+            onClick={() => printReceiptDirectly(receipt, lang)}
+            className="btn-shine bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-bold px-6 py-2.5 rounded-full shadow-md flex items-center gap-2 active:scale-95 cursor-pointer text-sm"
+          >
+            <i className="fas fa-print"></i>
+            {lang === 'en' ? 'Print / Download Receipt' : 'প্রণামী রশিদ প্রিন্ট / PDF সংরক্ষণ'}
+          </button>
+          <button
+            onClick={copyDetails}
+            className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold px-6 py-2.5 rounded-full border border-gray-300 flex items-center gap-2 active:scale-95 cursor-pointer text-sm"
+          >
+            <i className="fas fa-copy"></i>
+            {lang === 'en' ? 'Copy Details' : 'বিবরণ কপি করুন'}
+          </button>
+          {showNewDonationBtn && onReset && (
+            <button
+              onClick={onReset}
+              className="bg-orange-50 hover:bg-orange-100 text-orange-800 font-bold px-6 py-2.5 rounded-full border border-orange-300 flex items-center gap-2 active:scale-95 cursor-pointer text-sm"
+            >
+              <i className="fas fa-redo"></i>
+              {lang === 'en' ? 'New Donation' : 'নতুন প্রণামী প্রদান'}
+            </button>
+          )}
+          {onReset && !showNewDonationBtn && (
+            <button
+              onClick={onReset}
+              className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-5 py-2.5 rounded-full border border-gray-300 flex items-center gap-2 active:scale-95 cursor-pointer text-sm"
+            >
+              <i className="fas fa-times"></i>
+              {lang === 'en' ? 'Close Preview' : 'প্রিভিউ বন্ধ করুন'}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const DonationPage = ({ donations, setDonations, donationReceipts, setDonationReceipts, paymentGatewayConfig, setPaymentGatewayConfig, supabaseClient, navigateTo, showToast, lang, defaultTab = 'qr' }) => {
+  const [activeTab, setActiveTab] = useState(defaultTab === 'receipts' ? 'receipts' : 'qr');
   const [isGatewayOpen, setIsGatewayOpen] = useState(false);
   const [isComingSoonOpen, setIsComingSoonOpen] = useState(false);
+  const [isBanglaQRModalOpen, setIsBanglaQRModalOpen] = useState(false);
+  const [qrModalZoom, setQrModalZoom] = useState(1);
+  const [isSubmittingQR, setIsSubmittingQR] = useState(false);
   const [pendingPayment, setPendingPayment] = useState(null);
+  const [selectedArchiveReceipt, setSelectedArchiveReceipt] = useState(null);
 
   useEffect(() => {
-    if (defaultTab) setActiveTab(defaultTab);
+    if (defaultTab) setActiveTab(defaultTab === 'receipts' ? 'receipts' : 'qr');
   }, [defaultTab]);
 
   const [donationForm, setDonationForm] = useState({
@@ -8091,6 +8630,8 @@ const DonationPage = ({ donations, setDonations, donationReceipts, setDonationRe
     email: '',
     gotra: '',
     amount: '500',
+    method: 'বিকাশ (Bangla QR)',
+    trxId: '',
     purpose: 'সাধারণ প্রণামী ও সেবা',
     date: new Date().toISOString().split('T')[0]
   });
@@ -8136,7 +8677,7 @@ const DonationPage = ({ donations, setDonations, donationReceipts, setDonationRe
         };
 
         handlePaymentSuccess(verified);
-        setActiveTab('online');
+        setActiveTab('qr');
         if (showToast) showToast('পবিত্র প্রণামী সফলভাবে গৃহীত হয়েছে! জয় মা মনসা!');
         window.history.replaceState({}, document.title, window.location.pathname);
       } else if (paymentStatus === 'cancelled' || paymentStatus === 'failed') {
@@ -8174,22 +8715,11 @@ const DonationPage = ({ donations, setDonations, donationReceipts, setDonationRe
     if (showToast) showToast(label + ' ' + t('copiedToast', lang));
   };
 
-  const handleShowComingSoon = (e) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    setIsComingSoonOpen(true);
-    if (showToast) {
-      showToast(lang === 'en' ? 'Online payment gateway is under maintenance. Coming Soon!' : 'অনলাইন পেমেন্ট গেটওয়ে রক্ষণাবেক্ষণ চলছে। খুব শীঘ্রই আসছে!');
-    }
-  };
-
-  const handleStartPayment = (e) => {
+  const handleBanglaQRSubmit = async (e) => {
     e.preventDefault();
     const amt = parseFloat(donationForm.amount);
     if (!donationForm.name.trim()) {
-      if (showToast) showToast(lang === 'en' ? 'Please enter Donor Full Name' : 'অনুগ্রহ করে দাতার পূর্ণ নাম লিখুন');
+      if (showToast) showToast(lang === 'en' ? 'Please enter Devotee / Donor Full Name' : 'অনুগ্রহ করে শ্রদ্ধেয় ভক্ত / দাতার পূর্ণ নাম লিখুন');
       return;
     }
     const cleanPhone = (donationForm.phone || '').replace(/\D/g, '');
@@ -8201,17 +8731,40 @@ const DonationPage = ({ donations, setDonations, donationReceipts, setDonationRe
       if (showToast) showToast(lang === 'en' ? 'Minimum donation is 10 BDT' : 'প্রণামীর সর্বনিম্ন পরিমাণ ১০ টাকা');
       return;
     }
+    const cleanTrx = (donationForm.trxId || '').trim();
+    if (!cleanTrx) {
+      if (showToast) showToast(lang === 'en' ? 'Please enter Transaction ID (TrxID)' : 'অনুগ্রহ করে পেমেন্টের ট্রানজেকশন আইডি (TrxID) লিখুন');
+      return;
+    }
 
-    setPendingPayment({
-      amount: amt,
-      devoteeName: donationForm.name.trim(),
-      phone: donationForm.phone.trim(),
-      email: (donationForm.email || '').trim(),
-      gotra: donationForm.gotra.trim(),
-      purpose: donationForm.purpose,
-      type: 'donation'
-    });
-    setIsGatewayOpen(true);
+    setIsSubmittingQR(true);
+    try {
+      const now = new Date();
+      const verified = {
+        receiptNo: 'MMG-REC-' + Math.floor(100000 + Math.random() * 900000),
+        name: donationForm.name.trim(),
+        phone: donationForm.phone.trim(),
+        gotra: donationForm.gotra.trim() || 'অনুল্লিখিত',
+        amount: amt,
+        amountWords: amountInBengaliWords(amt),
+        method: donationForm.method || 'বাংলা কিউআর (Bangla QR)',
+        trxId: cleanTrx.toUpperCase(),
+        orderRef: 'BQR-' + Date.now().toString(36).toUpperCase(),
+        purpose: donationForm.purpose || 'সাধারণ প্রণামী ও সেবা',
+        status: 'VERIFIED_PAID',
+        verificationType: 'OFFICIAL_BANGLA_QR',
+        date: now.toISOString().split('T')[0],
+        timestamp: now.toISOString(),
+        formattedTime: now.toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+      };
+
+      await handlePaymentSuccess(verified);
+      setSelectedArchiveReceipt(verified);
+      setActiveTab('receipts');
+      window.scrollTo({ top: 160, behavior: 'smooth' });
+    } finally {
+      setIsSubmittingQR(false);
+    }
   };
 
   const handlePaymentSuccess = async (verifiedPayment) => {
@@ -8265,6 +8818,8 @@ const DonationPage = ({ donations, setDonations, donationReceipts, setDonationRe
       email: '',
       gotra: '',
       amount: '500',
+      method: 'বিকাশ (Bangla QR)',
+      trxId: '',
       purpose: 'সাধারণ প্রণামী ও সেবা',
       date: new Date().toISOString().split('T')[0]
     });
@@ -8284,6 +8839,7 @@ const DonationPage = ({ donations, setDonations, donationReceipts, setDonationRe
     : (donationReceipts || []).slice(0, 8);
 
   const publicDonations = donations ? donations.filter(d => !d.is_hidden) : [];
+  const activeReceiptForDisplay = selectedArchiveReceipt || generatedReceipt || null;
 
   return (
     <div className="bg-orange-50 min-h-screen py-12 anim-fade-up">
@@ -8302,440 +8858,327 @@ const DonationPage = ({ donations, setDonations, donationReceipts, setDonationRe
           <p className="text-yellow-200/90 text-xs sm:text-sm max-w-2xl mx-auto mt-1 font-medium">{t('donationDesc2', lang)}</p>
         </div>
 
-        {/* Tab Switcher */}
-        <div className="flex justify-center flex-wrap gap-2.5 mb-10 no-print">
-          <button
-            onClick={() => { setActiveTab('online'); setGeneratedReceipt(null); }}
-            className={'px-6 py-2.5 rounded-full text-sm font-bold transition-all active:scale-95 flex items-center gap-2 cursor-pointer ' + (activeTab === 'online' ? 'bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-lg shadow-orange-500/30 border-2 border-yellow-300' : 'bg-white text-gray-700 hover:bg-orange-100 border border-orange-200')}
-          >
-            <i className="fas fa-credit-card text-xs"></i>
-            {lang === 'en' ? 'Direct Online Donation' : 'সরাসরি অনলাইন প্রণামী'}
-          </button>
-          <button
-            onClick={() => setActiveTab('accounts')}
-            className={'px-6 py-2.5 rounded-full text-sm font-bold transition-all active:scale-95 flex items-center gap-2 cursor-pointer ' + (activeTab === 'accounts' ? 'bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-lg shadow-orange-500/30' : 'bg-white text-gray-700 hover:bg-orange-100 border border-orange-200')}
-          >
-            <i className="fas fa-university text-xs"></i>
-            {lang === 'en' ? 'Bank & Direct Channels' : 'ব্যাংক ও সরাসরি তথ্য'}
-          </button>
-          <button
-            onClick={() => setActiveTab('receipts')}
-            className={'px-6 py-2.5 rounded-full text-sm font-bold transition-all active:scale-95 flex items-center gap-2 cursor-pointer ' + (activeTab === 'receipts' ? 'bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-lg shadow-orange-500/30' : 'bg-white text-gray-700 hover:bg-orange-100 border border-orange-200')}
-          >
-            <i className="fas fa-file-invoice text-xs"></i>
-            {lang === 'en' ? 'Verified Receipts' : 'রশিদ সংগ্রহ ও অনুসন্ধান'}
-          </button>
-        </div>
-
-        {/* TAB 1: DIRECT ONLINE DONATION */}
-        {activeTab === 'online' && (
-          <div className="mb-12">
-            {generatedReceipt ? (
-              /* Generated Official Sacred Devotee Memorial Receipt */
-              <div className="bg-white rounded-3xl shadow-2xl border-4 border-amber-600 outline outline-2 outline-amber-400 -outline-offset-8 p-6 sm:p-10 relative overflow-hidden print-sacred-card anim-fade-up">
-                <div className="absolute top-0 left-0 right-0 h-3 bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700"></div>
-
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0 opacity-15">
-                  <div className="w-64 h-64 sm:w-88 sm:h-88 rounded-full border-4 border-dashed border-amber-600 flex items-center justify-center">
-                    <span className="font-serif text-[180px] sm:text-[230px] font-black text-amber-700 leading-none">ॐ</span>
-                  </div>
-                </div>
-
-                <div className="relative z-10">
-                  <div className="text-center pb-6 border-b-2 border-dashed border-amber-300">
-                    <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-amber-50 to-orange-100 border-2 border-amber-600 flex items-center justify-center text-amber-800 text-3xl font-serif font-black shadow-md mb-2">
-                      ॐ
-                    </div>
-                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold font-serif text-amber-950 tracking-tight">
-                      {lang === 'en' ? 'Shree Shree Maa Manasa Mandir, Goila' : 'শ্রী শ্রী মা মনসা মন্দির, গৈলা'}
-                    </h2>
-                    <p className="text-xs sm:text-sm text-amber-900 font-bold mt-1">
-                      {lang === 'en' ? 'Historic Sacred Temple Established 1494 AD (1416 Shakabda)' : 'মহাকবি বিজয় গুপ্ত প্রতিষ্ঠিত ঐতিহাসিক মহাপবিত্র তীর্থস্থান • স্থাপিত: ১৪৯৪ খ্রিষ্টাব্দ (১৪১৬ শকাব্দ)'}
-                    </p>
-                    <p className="text-[11px] sm:text-xs text-gray-600 font-medium mt-0.5">
-                      {lang === 'en' ? 'Goila, Agailjhara, Barishal, Bangladesh • Mobile: 01727075254, 01712940716' : 'গৈলা, আগৈলঝাড়া, বরিশাল, বাংলাদেশ • মোবাইল: ০১৭২৭০৭৫২৫৪, ০১৭১২৯৪০৭১৬'}
-                    </p>
-                    <div className="my-2">
-                      <span className="inline-block px-4 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-xs sm:text-sm font-serif font-bold shadow-2xs">
-                        ওঁ হ্রীং শ্রীং ক্লীং ঐং মনসাদেব্যৈ নমঃ
-                      </span>
-                    </div>
-                    <div>
-                      <span className="inline-block bg-gradient-to-r from-amber-600 via-orange-600 to-amber-600 text-white font-extrabold text-xs sm:text-sm px-6 py-1.5 rounded-full shadow-sm tracking-wide">
-                        ✦ {lang === 'en' ? 'OFFICIAL DONATION RECEIPT' : 'পবিত্র স্মারক প্রণামী রশিদ (OFFICIAL DONATION RECEIPT)'} ✦
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="py-6 space-y-4 text-gray-800 text-sm sm:text-base">
-                    <div className="flex flex-wrap justify-between items-center bg-orange-50/80 p-3.5 rounded-2xl border border-orange-200">
-                      <div>
-                        <span className="text-xs text-gray-500 block font-semibold">{lang === 'en' ? 'Receipt Serial No:' : 'রশিদ স্মারক নং:'}</span>
-                        <span className="font-mono font-bold text-amber-900 text-lg sm:text-xl tracking-wider">{generatedReceipt.receiptNo}</span>
-                      </div>
-                      <div className="text-right mt-2 sm:mt-0">
-                        <span className="text-xs text-gray-500 block font-semibold">{lang === 'en' ? 'Date & Time Stamp:' : 'তারিখ ও সময় (Time Stamp):'}</span>
-                        <span className="font-bold text-amber-950 block text-xs sm:text-sm">
-                          {lang === 'en'
-                            ? formatReceiptDateTimeEn(generatedReceipt.timestamp || generatedReceipt.date)
-                            : formatReceiptDateTimeBn(generatedReceipt.timestamp || generatedReceipt.date)}
-                        </span>
-                        <span className="text-[10px] font-mono text-gray-500 block">
-                          {generatedReceipt.timestamp ? new Date(generatedReceipt.timestamp).toISOString().replace('T', ' ').substring(0, 19) + ' UTC' : ''}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-100">
-                        <span className="block text-xs text-gray-500 font-semibold">{lang === 'en' ? 'Donor / Devotee Name' : 'দাতার নাম'}</span>
-                        <span className="font-bold text-gray-900 text-base">{generatedReceipt.name}</span>
-                      </div>
-                      <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-100">
-                        <span className="block text-xs text-gray-500 font-semibold">{lang === 'en' ? 'Gotra (Lineage)' : 'গোত্র'}</span>
-                        <span className="font-bold text-gray-900 text-base">{generatedReceipt.gotra || (lang === 'en' ? 'Not Mentioned' : 'অনুল্লিখিত')}</span>
-                      </div>
-                      <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-100">
-                        <span className="block text-xs text-gray-500 font-semibold">{lang === 'en' ? 'Payment Method' : 'প্রদানের মাধ্যম'}</span>
-                        <span className="font-bold text-orange-900">{generatedReceipt.method}</span>
-                      </div>
-                      <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-100">
-                        <span className="block text-xs text-gray-500 font-semibold">{lang === 'en' ? 'Verified TrxID' : 'ভেরিফাইড ট্রানজেকশন আইডি (TrxID)'}</span>
-                        <span className="font-mono font-bold text-emerald-800">{generatedReceipt.trxId}</span>
-                      </div>
-                    </div>
-
-                    <div className="p-5 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300">
-                      <div className="flex flex-wrap justify-between items-center mb-2">
-                        <span className="text-xs font-bold uppercase tracking-wider text-amber-800">{lang === 'en' ? 'Donated Amount' : 'গৃহীত প্রণামীর পরিমাণ'}</span>
-                        <span className="text-2xl sm:text-3xl font-extrabold text-amber-900 font-mono">৳ {formatNumber(generatedReceipt.amount, lang)} /-</span>
-                      </div>
-                      <div className="text-sm font-serif font-bold text-gray-800 border-t border-amber-200/80 pt-2">
-                        <span className="text-xs text-gray-500 font-sans font-semibold mr-1">{lang === 'en' ? 'In Words:' : 'কথায়:'}</span>
-                        {generatedReceipt.amountWords}
-                      </div>
-                    </div>
-
-                    <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-200 flex items-center justify-between flex-wrap gap-3">
-                      <div className="flex items-center gap-2.5 text-emerald-800 font-bold text-xs sm:text-sm">
-                        <i className="fas fa-check-circle text-emerald-600 text-lg"></i>
-                        <span>{lang === 'en' ? 'Verified & Acknowledged in Sacred Temple Fund' : 'শ্রী শ্রী মা মনসা মন্দির পুণ্য তহবিলে গৃহীত ও সত্যায়িত'}</span>
-                      </div>
-                      <span className="text-[11px] font-mono text-emerald-700 bg-emerald-100/70 px-2.5 py-1 rounded-md border border-emerald-300">
-                        AUTH-GATEWAY-VERIFIED
-                      </span>
-                    </div>
-
-                    {/* Official Stamp & Signatures */}
-                    <div className="pt-6 border-t-2 border-dashed border-amber-300 flex flex-col sm:flex-row items-center justify-between gap-6 my-4">
-                      <div className="text-center sm:text-left order-2 sm:order-1">
-                        <div className="h-8"></div>
-                        <div className="border-t-2 border-dashed border-gray-400 pt-1 text-xs text-gray-700 font-semibold leading-snug">
-                          {generatedReceipt.issuedBy || (lang === 'en' ? 'Online Devotee Seva' : 'অনলাইন ভক্ত সেবা')}<br />
-                          <strong className="text-gray-900">{lang === 'en' ? 'Collector Signature' : 'আদায়কারীর স্বাক্ষর'}</strong>
-                        </div>
-                      </div>
-
-                      {/* Authentic Red Circular Seal */}
-                      <div className="order-1 sm:order-2 flex flex-col items-center justify-center w-28 h-28 rounded-full border-2 border-dashed border-red-600 outline outline-1 outline-red-600 -outline-offset-4 text-red-600 p-2 text-center bg-red-50/60 -rotate-6 shadow-sm select-none">
-                        <span className="text-[10px] font-extrabold tracking-wider">★ মন্দির কার্যালয় ★</span>
-                        <span className="text-base font-black my-0.5 text-red-700 font-serif">সত্যায়িত</span>
-                        <span className="text-[9px] font-bold">গৈলা, বরিশাল</span>
-                      </div>
-
-                      <div className="text-center sm:text-right order-3">
-                        <div className="h-8"></div>
-                        <div className="border-t-2 border-dashed border-gray-400 pt-1 text-xs text-gray-700 font-semibold leading-snug">
-                          {lang === 'en' ? 'General Secretary / President' : 'সাধারণ সম্পাদক / সভাপতি'}<br />
-                          <strong className="text-gray-900">{lang === 'en' ? 'Temple Managing Committee' : 'মন্দির পরিচালনা কমিটি'}</strong>
-                        </div>
-                      </div>
-                    </div>
-
-                    <p className="text-center text-xs sm:text-sm text-gray-600 italic font-serif pt-2 border-t border-gray-100">
-                      "{lang === 'en' ? 'May Devi Manasa bless your family with eternal health, prosperity, and peace.' : 'দেবী মনসার অপার কৃপায় আপনার ও আপনার পরিবারে রোগমুক্তি, ধনধান্য ও শান্তি বর্ষিত হোক।'}"
-                    </p>
-                  </div>
-
-                  <div className="flex flex-wrap items-center justify-center gap-3 pt-6 border-t border-gray-200 no-print">
-                    <button
-                      onClick={() => printReceiptDirectly(generatedReceipt, lang)}
-                      className="btn-shine bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-bold px-6 py-2.5 rounded-full shadow-md flex items-center gap-2 active:scale-95 cursor-pointer text-sm"
-                    >
-                      <i className="fas fa-print"></i>
-                      {lang === 'en' ? 'Print / Download Receipt' : 'প্রণামী রশিদ প্রিন্ট / PDF সংরক্ষণ'}
-                    </button>
-                    <button
-                      onClick={copyReceiptDetails}
-                      className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold px-6 py-2.5 rounded-full border border-gray-300 flex items-center gap-2 active:scale-95 cursor-pointer text-sm"
-                    >
-                      <i className="fas fa-copy"></i>
-                      {lang === 'en' ? 'Copy Details' : 'বিবরণ কপি করুন'}
-                    </button>
-                    <button
-                      onClick={() => setGeneratedReceipt(null)}
-                      className="bg-orange-50 hover:bg-orange-100 text-orange-800 font-bold px-6 py-2.5 rounded-full border border-orange-300 flex items-center gap-2 active:scale-95 cursor-pointer text-sm"
-                    >
-                      <i className="fas fa-redo"></i>
-                      {lang === 'en' ? 'New Donation' : 'নতুন প্রণামী প্রদান'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              /* Direct Online Payment Form */
-              <div className="bg-white rounded-3xl p-6 sm:p-10 shadow-xl border-2 border-orange-200 relative overflow-hidden">
-                <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-orange-500 via-amber-400 to-red-500"></div>
-
-                <div className="text-center mb-8">
-                  <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 mb-2 border border-amber-300">
-                    <i className="fas fa-shield-alt text-amber-600"></i>
-                    {lang === 'en' ? '100% Automated Scam-Proof Payment' : '১০০% স্বয়ংক্রিয় ও জালিয়াতিমুক্ত গেটওয়ে'}
-                  </span>
-                  <h3 className="text-2xl sm:text-3xl font-bold font-serif text-gray-900">
-                    {lang === 'en' ? 'Online Sacred Donation & Pranami' : 'অনলাইন ভক্তিসেবা ও প্রণামী প্রদান'}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-gray-600 mt-1 max-w-lg mx-auto">
-                    {lang === 'en'
-                      ? 'Pay directly via bKash, Nagad, Rocket, or Bank Card. No manual TrxID required — instant verified receipt generated automatically.'
-                      : 'বিকাশ, নগদ, রকেট অথবা কার্ডের মাধ্যমে সরাসরি নিরাপদ পেমেন্ট করুন। পেমেন্ট সম্পূর্ণ হওয়ামাত্রই স্বয়ংক্রিয় অফিসিয়াল স্মারক রশিদ ডাউনলোড করতে পারবেন।'}
-                  </p>
-                </div>
-
-                {/* Maintenance Notice Banner */}
-                <div className="max-w-2xl mx-auto mb-6 p-4 rounded-2xl bg-gradient-to-r from-amber-50 via-orange-50 to-yellow-50 border-2 border-amber-300/80 text-amber-950 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
-                  <div className="flex items-center gap-3 text-left">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center text-base shrink-0 shadow-sm shadow-orange-500/20">
-                      <i className="fas fa-tools"></i>
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-xs sm:text-sm text-gray-900 font-serif">
-                          {lang === 'en' ? 'Online Payment Gateway Under Maintenance' : 'অনলাইন পেমেন্ট গেটওয়ে রক্ষণাবেক্ষণ চলছে'}
-                        </span>
-                        <span className="bg-yellow-400 text-amber-950 font-black text-[10px] px-2 py-0.5 rounded-full uppercase shadow-2xs">
-                          {lang === 'en' ? 'Coming Soon' : 'শীঘ্রই আসছে'}
-                        </span>
-                      </div>
-                      <p className="text-[11px] sm:text-xs text-gray-600 mt-0.5">
-                        {lang === 'en'
-                          ? 'Security upgrades in progress. Please use Bank Accounts tab for direct donations.'
-                          : 'নিরাপদ গেটওয়ে আপগ্রেডের কাজ চলছে। বিকল্প হিসেবে সরাসরি ব্যাংক অ্যাকাউন্টে প্রণামী প্রদান করা যাবে।'}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab('accounts')}
-                    className="shrink-0 bg-white hover:bg-orange-600 hover:text-white text-orange-700 font-bold px-3.5 py-1.5 rounded-xl text-xs border border-orange-300 shadow-xs transition-all active:scale-95 cursor-pointer flex items-center gap-1.5"
-                  >
-                    <i className="fas fa-university text-[11px]"></i>
-                    <span>{lang === 'en' ? 'Bank Details' : 'ব্যাংক তথ্য'}</span>
-                  </button>
-                </div>
-
-                <form onSubmit={handleShowComingSoon} className="space-y-6 max-w-2xl mx-auto">
-                  {/* Amount Selector */}
-                  <div>
-                    <label className="block text-sm font-bold text-gray-800 mb-2">
-                      {lang === 'en' ? 'Select Donation Amount (BDT) *' : 'প্রণামীর পরিমাণ নির্ধারণ করুন (টাকা) *'}
-                    </label>
-                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-3">
-                      {quickAmounts.map(amt => (
-                        <button
-                          key={amt}
-                          type="button"
-                          onClick={() => setDonationForm({ ...donationForm, amount: amt })}
-                          className={'py-2.5 rounded-xl font-bold font-mono text-sm border-2 transition-all active:scale-95 cursor-pointer ' + (donationForm.amount === amt ? 'bg-gradient-to-r from-orange-600 to-amber-600 text-white border-amber-500 shadow-sm' : 'bg-orange-50/50 hover:bg-orange-100 text-gray-800 border-orange-200')}
-                        >
-                          ৳ {toBengaliDigits(amt)}
-                        </button>
-                      ))}
-                    </div>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 font-bold">
-                        ৳
-                      </div>
-                      <input
-                        type="number"
-                        required
-                        min="10"
-                        placeholder="অন্যান্য যেকোনো পরিমাণ লিখুন..."
-                        value={donationForm.amount}
-                        onChange={(e) => setDonationForm({ ...donationForm, amount: e.target.value })}
-                        className="w-full pl-9 pr-4 py-3 rounded-xl border border-gray-300 font-mono font-bold text-lg text-amber-950 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-bold text-gray-800 mb-1">
-                        {lang === 'en' ? 'Donor Full Name *' : 'দাতার পূর্ণ নাম *'}
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        placeholder={lang === 'en' ? 'e.g. Subrata Roy' : 'যেমন: শান্তনু দাস'}
-                        value={donationForm.name}
-                        onChange={(e) => setDonationForm({ ...donationForm, name: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-bold text-gray-800 mb-1">
-                        {lang === 'en' ? 'Mobile Number (11 digits) *' : 'মোবাইল নম্বর (১১ ডিজিট) *'}
-                      </label>
-                      <input
-                        type="tel"
-                        required
-                        placeholder="01XXXXXXXXX"
-                        value={donationForm.phone}
-                        onChange={(e) => setDonationForm({ ...donationForm, phone: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none text-sm font-mono"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-bold text-gray-800 mb-1">
-                        {lang === 'en' ? 'Email Address (Optional)' : 'ইমেইল ঠিকানা (ঐচ্ছিক)'}
-                      </label>
-                      <input
-                        type="email"
-                        placeholder={lang === 'en' ? 'e.g. name@example.com' : 'যেমন: name@example.com'}
-                        value={donationForm.email || ''}
-                        onChange={(e) => setDonationForm({ ...donationForm, email: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none text-sm font-sans"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-bold text-gray-800 mb-1">
-                        {lang === 'en' ? 'Gotra (Optional)' : 'গোত্র (ঐচ্ছিক)'}
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="যেমন: ভরদ্বাজ / কাশ্যপ"
-                        value={donationForm.gotra}
-                        onChange={(e) => setDonationForm({ ...donationForm, gotra: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none text-sm"
-                      />
-                      <div className="flex flex-wrap gap-1 mt-1.5">
-                        {gotraPresets.slice(0, 4).map(g => (
-                          <button
-                            key={g}
-                            type="button"
-                            onClick={() => setDonationForm({ ...donationForm, gotra: g })}
-                            className="text-[10px] bg-gray-100 hover:bg-amber-100 text-gray-700 px-2 py-0.5 rounded-full border border-gray-200"
-                          >
-                            {g}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-bold text-gray-800 mb-1">
-                      {lang === 'en' ? 'Donation Purpose' : 'প্রণামীর উদ্দেশ্য'}
-                    </label>
-                    <select
-                      value={donationForm.purpose}
-                      onChange={(e) => setDonationForm({ ...donationForm, purpose: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none text-sm"
-                    >
-                      {purposePresets.map(p => (
-                        <option key={p} value={p}>{p}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Submit CTA */}
-                  <div className="text-center pt-2">
-                    <button
-                      type="button"
-                      onClick={handleShowComingSoon}
-                      className="btn-shine w-full sm:w-auto bg-gradient-to-r from-orange-600 via-amber-600 to-orange-600 hover:from-orange-500 hover:to-amber-500 text-white font-extrabold px-8 sm:px-10 py-4 rounded-full text-base sm:text-lg shadow-xl shadow-orange-500/30 transition-all hover:scale-[1.02] active:scale-95 border-2 border-yellow-300 cursor-pointer flex items-center justify-center gap-2.5 mx-auto"
-                    >
-                      <i className="fas fa-lock text-sm"></i>
-                      <span>{lang === 'en' ? 'Proceed to Secure Payment' : '🔒 সরাসরি সুরক্ষিত অনলাইন পেমেন্ট করুন'}</span>
-                      <span className="text-[11px] bg-yellow-400 text-amber-950 font-black px-2.5 py-0.5 rounded-full border border-yellow-200 uppercase tracking-wider ml-1 shadow-xs">
-                        {lang === 'en' ? 'Coming Soon' : 'শীঘ্রই আসছে'}
-                      </span>
-                      <i className="fas fa-arrow-right text-xs"></i>
-                    </button>
-                    <p className="text-xs text-amber-800 bg-amber-50/80 border border-amber-200/60 rounded-full px-4 py-1.5 mt-3 inline-flex items-center justify-center gap-1.5 mx-auto">
-                      <i className="fas fa-tools text-amber-600"></i>
-                      <span>{lang === 'en' ? 'Online gateway under maintenance • Coming soon' : 'অনলাইন গেটওয়ে রক্ষণাবেক্ষণ চলছে • খুব শীঘ্রই চালু হচ্ছে'}</span>
-                    </p>
-                  </div>
-                </form>
-              </div>
-            )}
+        {/* Generated Official Sacred Devotee Memorial Receipt (Instant View, Print & Download) */}
+        {generatedReceipt && activeTab === 'qr' && (
+          <div className="mb-12 anim-fade-up">
+            <SacredDevoteeReceiptCard
+              receipt={generatedReceipt}
+              lang={lang}
+              onReset={() => setGeneratedReceipt(null)}
+              showNewDonationBtn={true}
+              showToast={showToast}
+            />
           </div>
         )}
 
-        {/* TAB 2: BANK & DIRECT ACCOUNTS */}
-        {activeTab === 'accounts' && (
-          <div className="space-y-12 mb-12 anim-fade-up">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="bg-white p-8 rounded-3xl shadow-lg border-2 border-orange-100 card-hover-glow relative overflow-hidden">
-                <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-orange-500 to-amber-500"></div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2 border-b pb-4">
-                  <i className="fas fa-university text-orange-600"></i> {t('bankDetailsTitle', lang)}
-                </h3>
-                <div className="space-y-4 text-gray-700 text-base md:text-lg">
-                  <div className="flex justify-between items-center py-1 border-b border-gray-100">
-                    <span><strong className="text-gray-900">{t('accountNameLabel', lang)}</strong> Manosha Mondhir</span>
-                  </div>
-                  <div className="flex justify-between items-center py-1 border-b border-gray-100 gap-2">
-                    <span className="truncate"><strong className="text-gray-900">{t('accountNumberLabel', lang)}</strong> <span className="font-mono font-bold text-orange-900">0311100066584</span></span>
-                    <button onClick={() => copyToClipboard('0311100066584', t('accountNumberLabel', lang))} className="shrink-0 bg-orange-100 hover:bg-orange-200 text-orange-800 text-xs font-bold px-3 py-1.5 rounded-lg transition-all active:scale-95 flex items-center gap-1 cursor-pointer">
-                      <i className="fas fa-copy"></i> {t('copyBtn', lang)}
-                    </button>
-                  </div>
-                  <div className="flex justify-between items-center py-1 border-b border-gray-100">
-                    <span><strong className="text-gray-900">{t('bankLabel', lang)}</strong> {t('bankName', lang)}</span>
-                  </div>
-                  <div className="flex justify-between items-center py-1 border-b border-gray-100">
-                    <span><strong className="text-gray-900">{t('branchLabel', lang)}</strong> {t('branchName', lang)}</span>
-                  </div>
-                  <div className="flex justify-between items-center py-1 gap-2">
-                    <span className="truncate"><strong className="text-gray-900">{t('routingNumberLabel', lang)}</strong> <span className="font-mono font-bold text-orange-900">200060790</span></span>
-                    <button onClick={() => copyToClipboard('200060790', t('routingNumberLabel', lang))} className="shrink-0 bg-orange-100 hover:bg-orange-200 text-orange-800 text-xs font-bold px-3 py-1.5 rounded-lg transition-all active:scale-95 flex items-center gap-1 cursor-pointer">
-                      <i className="fas fa-copy"></i> {t('copyBtn', lang)}
-                    </button>
+        {/* Tab Switcher */}
+        <div className="flex justify-center flex-wrap gap-3 mb-10 no-print">
+          <button
+            onClick={() => { setActiveTab('qr'); }}
+            className={'px-6 sm:px-8 py-3 rounded-full text-sm font-bold transition-all active:scale-95 flex items-center gap-2.5 cursor-pointer shadow-md ' + (activeTab === 'qr' ? 'bg-gradient-to-r from-orange-600 via-amber-600 to-orange-700 text-white shadow-orange-500/30 border-2 border-yellow-300' : 'bg-white text-gray-700 hover:bg-orange-50 border border-orange-200')}
+          >
+            <i className="fas fa-qrcode text-base text-yellow-300"></i>
+            <span>{lang === 'en' ? 'Sonali Bank Bangla QR & Bank Donation' : 'সোনালী ব্যাংক বাংলা কিউআর ও ব্যাংক প্রণামী'}</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('receipts')}
+            className={'px-6 sm:px-8 py-3 rounded-full text-sm font-bold transition-all active:scale-95 flex items-center gap-2.5 cursor-pointer shadow-md ' + (activeTab === 'receipts' ? 'bg-gradient-to-r from-orange-600 via-amber-600 to-orange-700 text-white shadow-orange-500/30 border-2 border-yellow-300' : 'bg-white text-gray-700 hover:bg-orange-50 border border-orange-200')}
+          >
+            <i className="fas fa-file-invoice text-base"></i>
+            <span>{lang === 'en' ? 'Verified Receipts Archive' : 'স্মারক রশিদ সংগ্রহ ও অনুসন্ধান'}</span>
+          </button>
+        </div>
+
+        {/* TAB 1: BANGLA QR & BANK DONATION */}
+        {activeTab === 'qr' && (
+          <div className="space-y-10 mb-12 anim-fade-up">
+            {/* FEATURED: SONALI BANK BANGLA QR (CLEAN, SACRED, MOBILE-FRIENDLY) */}
+            <div className="bg-white rounded-3xl shadow-xl border border-amber-200/90 relative overflow-hidden card-hover-glow">
+              <div className="h-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600"></div>
+
+              <div className="p-4 sm:p-6 md:p-8">
+                {/* Header Banner */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-amber-100 mb-6">
+                  <div className="flex items-start sm:items-center gap-3">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center text-xl font-black shadow-md shadow-orange-500/20 shrink-0">
+                      <i className="fas fa-qrcode"></i>
+                    </div>
+                    <div>
+                      <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                          <i className="fas fa-shield-alt text-amber-600"></i> {lang === 'en' ? 'Bangladesh Bank Approved' : 'বাংলাদেশ ব্যাংক অনুমোদিত'}
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                          <i className="fas fa-check-circle text-emerald-600"></i> BANGLA QR
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-bold bg-blue-50 text-blue-800 border border-blue-200">
+                          সোনালী ব্যাংক পিএলসি.
+                        </span>
+                      </div>
+                      <h3 className="text-xl sm:text-2xl md:text-3xl font-extrabold font-serif text-stone-900 tracking-tight">
+                        {lang === 'en' ? 'Sonali Bank Bangla QR — Universal Donation' : 'সোনালী ব্যাংক বাংলা কিউআর — সার্বজনীন প্রণামী'}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-stone-600 mt-0.5">
+                        {lang === 'en'
+                          ? 'Scan directly using bKash, Nagad, Rocket, Upay, Cellfin or ANY bank app to send your sacred donation.'
+                          : 'বিকাশ, নগদ, রকেট, উপায়, সেলফিন বা যেকোনো ব্যাংক অ্যাপ দিয়ে সরাসরি স্ক্যান করে নিরাপদ প্রণামী দিন।'}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="bg-white p-8 rounded-3xl shadow-lg border-2 border-orange-100 card-hover-glow relative overflow-hidden">
-                <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-pink-500 to-yellow-500"></div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2 border-b pb-4">
-                  <i className="fas fa-mobile-alt text-yellow-600"></i> {t('mobileBankingTitle', lang)}
-                </h3>
-                <div className="space-y-6">
-                  <div className="flex items-center gap-5 bg-pink-50 p-5 rounded-2xl border border-pink-200 shadow-sm flex-wrap sm:flex-nowrap">
-                    <div className="w-14 h-14 bg-pink-600 text-white font-bold rounded-2xl flex items-center justify-center text-sm shadow-md shrink-0">bKash</div>
-                    <div className="flex-grow">
-                      <p className="text-2xl font-bold text-gray-800 mb-1">{t('bkashLabel', lang)}</p>
-                      <p className="text-sm text-gray-600 font-semibold mb-1">{t('personalAccount', lang)}</p>
-                      <p className="text-sm text-gray-600 font-semibold mb-1">{t('sendMoney', lang)}</p>
-                      <div className="flex flex-wrap items-center gap-3 mt-1">
-                        <p className="text-2xl font-bold text-gray-800 tracking-wider font-mono">01722428334</p>
-                        <button onClick={() => copyToClipboard('01722428334', t('bkashLabel', lang))} className="bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer">
-                          <i className="fas fa-copy"></i> {t('copyBtn', lang)}
+                {/* Supported Apps Chips (Clean, Mobile Wrap) */}
+                <div className="bg-amber-50/60 rounded-2xl p-3 sm:p-4 border border-amber-200/80 mb-6">
+                  <div className="text-[11px] font-bold text-amber-900 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                    <i className="fas fa-wallet text-amber-600"></i>
+                    <span>{lang === 'en' ? 'Scan & Pay with Any App:' : 'যেকোনো মোবাইল ব্যাংকিং বা ব্যাংক অ্যাপ দিয়ে স্ক্যান করুন:'}</span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white text-[#E2136E] border border-pink-200 font-bold text-xs shadow-2xs">
+                      <span className="w-4 h-4 rounded-full bg-[#E2136E] text-white flex items-center justify-center text-[9px] font-black">b</span>
+                      <span>বিকাশ (bKash)</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white text-[#C95E00] border border-orange-200 font-bold text-xs shadow-2xs">
+                      <span className="w-4 h-4 rounded-full bg-[#F7941D] text-white flex items-center justify-center text-[8px]"><i className="fas fa-fire-alt"></i></span>
+                      <span>নগদ (Nagad)</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white text-[#8C3494] border border-purple-200 font-bold text-xs shadow-2xs">
+                      <span className="w-4 h-4 rounded-full bg-[#8C3494] text-white flex items-center justify-center text-[8px]"><i className="fas fa-rocket"></i></span>
+                      <span>রকেট (Rocket)</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white text-[#002D62] border border-blue-200 font-bold text-xs shadow-2xs">
+                      <span className="w-4 h-4 rounded-full bg-[#002D62] text-[#FFD100] flex items-center justify-center text-[9px] font-black">u</span>
+                      <span>উপায় (Upay)</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white text-[#006837] border border-emerald-200 font-bold text-xs shadow-2xs">
+                      <span className="w-4 h-4 rounded-full bg-[#006837] text-white flex items-center justify-center text-[8px]"><i className="fas fa-university"></i></span>
+                      <span>সেলফিন (Cellfin)</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white text-amber-900 border border-amber-300 font-bold text-xs shadow-2xs">
+                      <span className="w-4 h-4 rounded-full bg-amber-500 text-stone-950 flex items-center justify-center text-[8px]"><i className="fas fa-sun"></i></span>
+                      <span>সোনালী ই-সেবা</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white text-stone-700 border border-stone-200 font-bold text-xs shadow-2xs">
+                      <span className="w-4 h-4 rounded-full bg-stone-700 text-white flex items-center justify-center text-[8px]"><i className="fas fa-credit-card"></i></span>
+                      <span>সকল ব্যাংক অ্যাপ</span>
+                    </span>
+                  </div>
+                </div>
+
+                {/* Main QR Showcase & Details Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                  {/* Left: Clean QR Card (Centered & Mobile Perfect) */}
+                  <div className="lg:col-span-5 text-center">
+                    <div className="bg-gradient-to-b from-amber-50/80 to-orange-50/40 rounded-3xl p-3.5 sm:p-5 border-2 border-amber-200 shadow-md inline-block w-full max-w-[310px] mx-auto">
+                      <div className="text-xs font-bold text-amber-900 mb-2 flex items-center justify-center gap-1.5">
+                        <i className="fas fa-building-columns text-amber-700"></i>
+                        <span>মার্চেন্ট: <strong className="font-extrabold text-stone-900">Monosha Mondhir</strong></span>
+                      </div>
+
+                      {/* Clickable Pure QR Code */}
+                      <div
+                        className="relative group cursor-pointer bg-white p-3 rounded-2xl border-2 border-amber-300 shadow-sm transition-all hover:border-orange-500 hover:shadow-md"
+                        onClick={() => { setQrModalZoom(1.2); setIsBanglaQRModalOpen(true); }}
+                        title="ক্লিক করে বড় আকারে দেখুন"
+                      >
+                        <img
+                          src="images/sonali_bangla_qr_code.png"
+                          alt="সোনালী ব্যাংক বাংলা কিউআর কোড - মনসা মন্দির"
+                          className="w-full max-w-[210px] sm:max-w-[240px] aspect-square mx-auto rounded-xl object-contain transition-transform duration-200 group-hover:scale-[1.03]"
+                          style={{ imageRendering: 'pixelated' }}
+                        />
+                        <div className="absolute inset-0 bg-stone-900/40 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1.5 text-white font-bold text-xs backdrop-blur-[2px]">
+                          <i className="fas fa-search-plus text-2xl text-yellow-300"></i>
+                          <span>{lang === 'en' ? 'Click to Enlarge / Zoom' : 'বড় করে দেখুন (Zoom)'}</span>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons for Mobile */}
+                      <div className="grid grid-cols-2 gap-2 mt-3">
+                        <a
+                          href="images/sonali_bangla_qr_code.png"
+                          download="Sonali_Bangla_QR_Monosha_Mondhir.png"
+                          className="btn-shine bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold py-2.5 px-3 rounded-xl text-xs shadow-sm transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <i className="fas fa-download"></i>
+                          <span>{lang === 'en' ? 'Download QR' : 'কিউআর ডাউনলোড'}</span>
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => { setQrModalZoom(1.2); setIsBanglaQRModalOpen(true); }}
+                          className="bg-white hover:bg-orange-50 text-stone-800 font-bold py-2.5 px-3 rounded-xl text-xs border border-orange-300 shadow-sm transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <i className="fas fa-expand"></i>
+                          <span>{lang === 'en' ? 'Enlarge' : 'বড় করুন'}</span>
                         </button>
                       </div>
+
+                      <p className="text-[11px] text-stone-500 mt-2 font-medium leading-tight">
+                        {lang === 'en'
+                          ? 'Tip: Download QR to gallery and scan directly from bKash/Nagad app.'
+                          : 'ছবিটি ডাউনলোড করে bKash বা নগদ অ্যাপের "গ্যালারি" অপশন দিয়ে সরাসরি স্ক্যান করতে পারবেন।'}
+                      </p>
                     </div>
-                    <div className="shrink-0 mt-3 sm:mt-0">
-                      <img src="bkash QR.jpg" alt="bKash QR Code" className="w-24 h-24 border-2 border-pink-300 rounded-xl shadow-sm bg-white p-1" />
+                  </div>
+
+                  {/* Right: Official Sonali Bank Account & Bangla QR Credentials + Guide */}
+                  <div className="lg:col-span-7 space-y-3.5">
+                    {/* Official Bank Account & Merchant Credentials Grid */}
+                    <div className="bg-orange-50/70 rounded-2xl p-3.5 sm:p-4 border border-orange-200">
+                      <div className="flex items-center justify-between pb-2.5 mb-2.5 border-b border-orange-200/80">
+                        <div className="flex items-center gap-2">
+                          <i className="fas fa-university text-orange-600 text-base"></i>
+                          <h4 className="font-serif font-bold text-stone-900 text-sm sm:text-base">
+                            {lang === 'en' ? 'Official Sonali Bank Account & Merchant Details' : 'অফিসিয়াল সোনালী ব্যাংক অ্যাকাউন্ট ও মার্চেন্ট তথ্য'}
+                          </h4>
+                        </div>
+                        <span className="text-[11px] font-bold text-amber-900 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-300">
+                          সোনালী ব্যাংক পিএলসি.
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        {/* Account Name */}
+                        <div className="p-2.5 bg-white rounded-xl border border-orange-200 shadow-2xs">
+                          <span className="text-[11px] text-stone-500 font-semibold block">{lang === 'en' ? 'Account / Merchant Name:' : 'একাউন্ট / মার্চেন্ট নাম:'}</span>
+                          <span className="text-sm sm:text-base font-bold text-stone-900">Manosha Mondhir</span>
+                        </div>
+
+                        {/* Account Number with Copy */}
+                        <div className="p-2.5 bg-white rounded-xl border border-orange-200 shadow-2xs flex items-center justify-between gap-2">
+                          <div>
+                            <span className="text-[11px] text-stone-500 font-semibold block">{lang === 'en' ? 'Account Number:' : 'একাউন্ট নম্বর:'}</span>
+                            <span className="text-sm sm:text-base font-mono font-extrabold text-orange-950">0311100066584</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => copyToClipboard('0311100066584', lang === 'en' ? 'Account Number' : 'একাউন্ট নম্বর')}
+                            className="bg-orange-100 hover:bg-orange-200 text-orange-800 font-bold text-xs px-2.5 py-1.5 rounded-lg border border-orange-300 shadow-2xs transition-all active:scale-95 flex items-center gap-1 cursor-pointer shrink-0"
+                            title="একাউন্ট নম্বর কপি করুন"
+                          >
+                            <i className="fas fa-copy text-orange-600"></i> {t('copyBtn', lang)}
+                          </button>
+                        </div>
+
+                        {/* Bank & Branch */}
+                        <div className="p-2.5 bg-white rounded-xl border border-orange-200 shadow-2xs">
+                          <span className="text-[11px] text-stone-500 font-semibold block">{lang === 'en' ? 'Bank & Branch:' : 'ব্যাংক ও শাখা:'}</span>
+                          <span className="text-xs sm:text-sm font-bold text-stone-800">সোনালী ব্যাংক • ৩১১১-গৈলা শাখা, বরিশাল</span>
+                        </div>
+
+                        {/* Routing Number with Copy */}
+                        <div className="p-2.5 bg-white rounded-xl border border-orange-200 shadow-2xs flex items-center justify-between gap-2">
+                          <div>
+                            <span className="text-[11px] text-stone-500 font-semibold block">{lang === 'en' ? 'Routing Number:' : 'রাউটিং নম্বর:'}</span>
+                            <span className="text-sm sm:text-base font-mono font-extrabold text-stone-900">200060790</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => copyToClipboard('200060790', lang === 'en' ? 'Routing Number' : 'রাউটিং নম্বর')}
+                            className="bg-orange-100 hover:bg-orange-200 text-orange-800 font-bold text-xs px-2.5 py-1.5 rounded-lg border border-orange-300 shadow-2xs transition-all active:scale-95 flex items-center gap-1 cursor-pointer shrink-0"
+                            title="রাউটিং নম্বর কপি করুন"
+                          >
+                            <i className="fas fa-copy text-orange-600"></i> {t('copyBtn', lang)}
+                          </button>
+                        </div>
+
+                        {/* Terminal ID (TID) with Copy */}
+                        <div className="p-2.5 bg-white rounded-xl border border-orange-200 shadow-2xs flex items-center justify-between gap-2">
+                          <div>
+                            <span className="text-[11px] text-stone-500 font-semibold block">{lang === 'en' ? 'Bangla QR Terminal ID (TID):' : 'বাংলা কিউআর টিআইডি (TID):'}</span>
+                            <span className="text-sm sm:text-base font-mono font-extrabold text-orange-950">QR5822034</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => copyToClipboard('QR5822034', 'TID')}
+                            className="bg-orange-100 hover:bg-orange-200 text-orange-800 font-bold text-xs px-2.5 py-1.5 rounded-lg border border-orange-300 shadow-2xs transition-all active:scale-95 flex items-center gap-1 cursor-pointer shrink-0"
+                            title="TID কপি করুন"
+                          >
+                            <i className="fas fa-copy text-orange-600"></i> {t('copyBtn', lang)}
+                          </button>
+                        </div>
+
+                        {/* Helpline with Call */}
+                        <div className="p-2.5 bg-white rounded-xl border border-orange-200 shadow-2xs flex items-center justify-between gap-2">
+                          <div>
+                            <span className="text-[11px] text-stone-500 font-semibold block">{lang === 'en' ? 'Sonali Bank Helpline:' : 'সোনালী ব্যাংক হেল্পলাইন:'}</span>
+                            <span className="text-sm sm:text-base font-mono font-extrabold text-stone-900">16639</span>
+                          </div>
+                          <a
+                            href="tel:16639"
+                            className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-2.5 py-1.5 rounded-lg shadow-2xs transition-all active:scale-95 flex items-center gap-1 cursor-pointer shrink-0"
+                          >
+                            <i className="fas fa-phone-alt"></i> কল করুন
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* How to Pay Guide (Bangla QR & Direct Bank Transfer) */}
+                    <div className="bg-gradient-to-br from-amber-50 to-orange-50/50 rounded-2xl p-4 sm:p-5 border border-amber-300">
+                      <h4 className="font-serif font-bold text-amber-950 text-sm sm:text-base mb-2.5 flex items-center gap-2">
+                        <i className="fas fa-circle-question text-orange-600"></i>
+                        <span>{lang === 'en' ? 'How to Donate (2 Convenient Methods):' : 'প্রণামী পাঠানোর নিয়ম (২টি সহজ উপায়):'}</span>
+                      </h4>
+                      <div className="space-y-2.5 text-xs sm:text-sm text-stone-700">
+                        <div className="flex items-start gap-2.5">
+                          <span className="w-5 h-5 rounded-full bg-orange-600 text-white font-bold text-[11px] flex items-center justify-center shrink-0 mt-0.5">১</span>
+                          <p><strong className="text-stone-900 font-bold">বাংলা কিউআর স্ক্যান:</strong> যেকোনো MFS (বিকাশ, নগদ, রকেট, উপায়) বা ব্যাংক অ্যাপের 'QR স্ক্যান' দিয়ে বাঁপাশের কিউআর কোড স্ক্যান করে মার্চেন্ট নাম <strong className="text-orange-950 font-bold">Monosha Mondhir</strong> যাচাই করে পেমেন্ট করুন।</p>
+                        </div>
+                        <div className="flex items-start gap-2.5">
+                          <span className="w-5 h-5 rounded-full bg-orange-600 text-white font-bold text-[11px] flex items-center justify-center shrink-0 mt-0.5">২</span>
+                          <p><strong className="text-stone-900 font-bold">সরাসরি ব্যাংক একাউন্টে ট্রান্সফার:</strong> যেকোনো ব্যাংক একাউন্ট বা ইন্টারনেট ব্যাংকিং (NPSB / BEFTN / সোনালী ই-সেবা) থেকে উপরের একাউন্ট নম্বর <strong className="font-mono text-stone-900 font-bold">0311100066584</strong> ও রাউটিং নম্বরে সরাসরি পাঠান।</p>
+                        </div>
+                      </div>
+
+                      {/* Quick Jump to Receipt Page */}
+                      <div className="mt-3.5 pt-3 border-t border-amber-200">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setActiveTab('receipts');
+                            window.scrollTo({ top: 160, behavior: 'smooth' });
+                          }}
+                          className="btn-shine w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold py-2.5 px-4 rounded-xl shadow-md text-xs sm:text-sm transition-all active:scale-95 cursor-pointer text-center"
+                        >
+                          <i className="fas fa-file-invoice text-yellow-300"></i>
+                          <span>{lang === 'en' ? 'Payer Verification & Official Receipt Page ➔' : 'পেমেন্ট সম্পন্ন হয়েছে? রশিদ পেজে গিয়ে স্মারক রশিদ প্রিন্ট করুন ➔'}</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+
+            {/* CTA to Receipt Page */}
+            <div className="mb-10 bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 rounded-3xl p-6 sm:p-8 border-2 border-amber-300 text-center shadow-lg">
+              <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold bg-amber-200/70 text-amber-950 mb-3 border border-amber-300 shadow-2xs">
+                <i className="fas fa-certificate text-amber-700"></i>
+                {lang === 'en' ? 'Instant Official Verification & Stamped Memorial Receipt' : 'তাৎক্ষণিক সত্যায়িত স্মারক প্রণামী রশিদ সেবা'}
+              </span>
+              <h4 className="font-serif font-bold text-xl sm:text-2xl text-amber-950 mb-2">
+                {lang === 'en' ? 'Already Paid? Generate & Print Your Sacred Receipt' : 'প্রণামী পাঠানো সম্পন্ন হয়েছে? স্মারক রশিদ সংগ্রহ ও প্রিন্ট করুন'}
+              </h4>
+              <p className="text-xs sm:text-sm text-stone-600 mb-6 max-w-xl mx-auto leading-relaxed">
+                {lang === 'en'
+                  ? 'After paying via Sonali Bank Bangla QR or direct account transfer, visit our Receipt Page to enter your transaction ID, verify your donation, and print your official stamped memorial receipt.'
+                  : 'সোনালী ব্যাংক বাংলা কিউআর বা সরাসরি ব্যাংক একাউন্টে প্রণামী পাঠানোর পর আমাদের রশিদ পেজে গিয়ে ট্রানজেকশন আইডি দিয়ে তাৎক্ষণিক অফিশিয়াল সিলমোহরযুক্ত স্মারক রশিদ তৈরি ও প্রিন্ট করুন।'}
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab('receipts');
+                  window.scrollTo({ top: 160, behavior: 'smooth' });
+                }}
+                className="btn-shine inline-flex items-center justify-center gap-3 bg-gradient-to-r from-orange-600 via-amber-600 to-orange-700 hover:from-orange-500 hover:to-amber-500 text-white font-extrabold py-3.5 px-8 rounded-full shadow-xl shadow-orange-500/25 text-sm sm:text-base transition-all active:scale-95 cursor-pointer border-2 border-yellow-300"
+              >
+                <i className="fas fa-file-invoice text-yellow-300 text-lg"></i>
+                <span>{lang === 'en' ? 'Go to Receipt Page to Print Receipt ➔' : 'স্মারক রশিদ পেজে যান ও প্রিন্ট করুন ➔'}</span>
+              </button>
+            </div>
+
+
 
             {/* Temple Development & Historical Contribution Notice (মহৎ কর্মযজ্ঞ ও ভক্তদের অবদান) */}
             <div className="mb-10 bg-gradient-to-br from-amber-50/90 via-orange-50/80 to-yellow-50/90 rounded-3xl shadow-xl border-2 border-amber-300/80 p-6 sm:p-8 md:p-10 relative overflow-hidden card-hover-glow">
@@ -8859,21 +9302,13 @@ const DonationPage = ({ donations, setDonations, donationReceipts, setDonationRe
                 </div>
 
                 {/* Gratitude & Devotee Appeal Banner */}
-                <div className="bg-gradient-to-r from-orange-600 to-amber-600 text-white p-4 sm:p-5 rounded-2xl shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-xl shrink-0">
-                      🌸
-                    </div>
-                    <p className="text-xs sm:text-sm font-medium leading-relaxed">
-                      <span className="font-bold text-yellow-200">শ্রদ্ধেয় ভক্তবৃন্দের প্রতি বিনীত নিবেদন:</span> এই বিপুল পবিত্র কর্মযজ্ঞে দেবীর কৃপায় ভক্তদের সাহায্যেই মন্দির পূর্ণতা পাচ্ছে। নিচে আমাদের শ্রদ্ধেয় দাতাগণের তালিকা প্রদর্শিত হলো।
-                    </p>
+                <div className="bg-gradient-to-r from-orange-600 via-amber-600 to-orange-700 text-white p-4 sm:p-5 rounded-2xl shadow-md flex items-center gap-3.5 border border-yellow-400/30">
+                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-xl shrink-0 shadow-inner">
+                    🌸
                   </div>
-                  <button
-                    onClick={() => setActiveTab('online')}
-                    className="shrink-0 bg-white text-orange-700 hover:bg-yellow-100 font-bold px-5 py-2 rounded-xl text-xs sm:text-sm shadow-sm transition-all cursor-pointer whitespace-nowrap"
-                  >
-                    <i className="fas fa-hand-holding-heart mr-1.5 text-orange-600"></i> অনুদান প্রদান করুন
-                  </button>
+                  <p className="text-xs sm:text-sm font-medium leading-relaxed">
+                    <span className="font-bold text-yellow-200">শ্রদ্ধেয় ভক্তবৃন্দের প্রতি বিনীত নিবেদন:</span> এই বিপুল পবিত্র কর্মযজ্ঞে দেবীর কৃপায় ভক্তদের সাহায্যেই মন্দির পূর্ণতা পাচ্ছে। নিচে আমাদের শ্রদ্ধেয় দাতাগণের তালিকা প্রদর্শিত হলো।
+                  </p>
                 </div>
               </div>
             </div>
@@ -8903,7 +9338,7 @@ const DonationPage = ({ donations, setDonations, donationReceipts, setDonationRe
                       {publicDonations.map((d) => (
                         <tr key={d.id} className="border-b border-gray-100 hover:bg-orange-50/50 transition-colors">
                           <td className="p-4 font-bold text-gray-800">{d.name}</td>
-                          <td className="p-4 text-gray-600">{d.address || '-'}</td>
+                          <td className="p-4 text-gray-600">{translateDonorAddress(d.address, lang)}</td>
                           <td className="p-4">
                             <span className={'text-xs font-bold px-2.5 py-1 rounded-md border ' + (d.type === 'নগদ অর্থ' || d.type === 'Cash' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-blue-50 text-blue-700 border-blue-200')}>
                               {lang === 'en' && d.type === 'নগদ অর্থ' ? 'Cash' : d.type}
@@ -8927,80 +9362,347 @@ const DonationPage = ({ donations, setDonations, donationReceipts, setDonationRe
 
         {/* TAB 3: VERIFIED RECEIPTS LIST & SEARCH */}
         {activeTab === 'receipts' && (
-          <div className="mb-12 bg-white rounded-3xl p-6 sm:p-8 shadow-xl border-2 border-amber-200 anim-fade-up">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 pb-4 border-b border-amber-100">
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                  <i className="fas fa-file-invoice text-amber-600"></i>
-                  {lang === 'en' ? 'Verified Donation Receipts' : 'স্বয়ংক্রিয়ভাবে সত্যায়িত প্রণামী রশিদসমূহ'}
+          <div className="space-y-8 anim-fade-up">
+            {/* Featured Sacred Devotee Memorial Receipt */}
+            {activeReceiptForDisplay ? (
+              <div className="bg-gradient-to-b from-amber-50/80 via-white to-amber-50/40 p-4 sm:p-7 rounded-3xl border-2 border-amber-300 shadow-xl relative">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5 pb-4 border-b border-amber-200">
+                  <div className="flex items-center gap-3">
+                    <span className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-600 to-orange-500 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-amber-500/30">
+                      <i className="fas fa-certificate text-yellow-300"></i>
+                    </span>
+                    <div>
+                      <h4 className="font-bold text-gray-900 text-base sm:text-lg">
+                        {lang === 'en' ? 'Official Sacred Memorial Receipt' : 'শ্রীশ্রী মা মনসা মন্দির - সত্যায়িত স্মারক প্রণামী রশিদ'}
+                      </h4>
+                      <p className="text-xs text-amber-800 font-medium">
+                        {lang === 'en' ? 'Showing Receipt No: ' : 'প্রদর্শিত রশিদ নং: '}
+                        <span className="font-mono font-bold text-amber-900">{activeReceiptForDisplay.receiptNo}</span>
+                      </p>
+                    </div>
+                  </div>
+                  {selectedArchiveReceipt && (
+                    <button
+                      onClick={() => setSelectedArchiveReceipt(null)}
+                      className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-gray-100 hover:bg-gray-200 text-gray-700 transition flex items-center gap-1.5 self-start sm:self-auto cursor-pointer shadow-sm active:scale-95"
+                    >
+                      <i className="fas fa-times text-gray-500"></i>
+                      {lang === 'en' ? 'Clear Selected' : 'রশিদ পরিবর্তন'}
+                    </button>
+                  )}
+                </div>
+
+                <SacredDevoteeReceiptCard
+                  receipt={activeReceiptForDisplay}
+                  lang={lang}
+                  onReset={() => {
+                    setSelectedArchiveReceipt(null);
+                    setGeneratedReceipt(null);
+                  }}
+                  showNewDonationBtn={false}
+                  showToast={showToast}
+                />
+              </div>
+            ) : null}
+
+            {/* 1. INSTANT SACRED MEMORIAL RECEIPT CLAIM & GENERATOR FORM */}
+            <div id="receipt-claim-form" className="bg-white rounded-3xl p-5 sm:p-8 md:p-9 shadow-xl border-2 border-amber-300 relative overflow-hidden card-hover-glow">
+              <div className="h-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 -mx-5 sm:-mx-8 md:-mx-9 -mt-5 sm:-mt-8 md:-mt-9 mb-6"></div>
+
+              {/* Form Title & Instruction Banner */}
+              <div className="text-center mb-6 sm:mb-8">
+                <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 mb-2 border border-amber-300 shadow-2xs">
+                  <i className="fas fa-certificate text-amber-600"></i>
+                  {lang === 'en' ? 'Instant Official Verification & Memorial Receipt' : 'তাৎক্ষণিক সত্যায়িত স্মারক প্রণামী রশিদ সেবা'}
+                </span>
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-extrabold font-serif text-stone-900 tracking-tight">
+                  {lang === 'en' ? 'Claim, Verify & Print Your Sacred Donation Receipt' : 'প্রণামী নিশ্চিতকরণ ও পবিত্র স্মারক রশিদ সংগ্রহ ও প্রিন্ট'}
                 </h3>
-                <p className="text-xs text-gray-500 mt-1">
-                  {lang === 'en' ? 'Search by your mobile number or view recent receipts.' : 'আপনার মোবাইল নম্বর দিয়ে অনুসন্ধান করুন অথবা সাম্প্রতিক রশিদগুলো প্রিন্ট করুন।'}
+                <p className="text-xs sm:text-sm text-stone-600 mt-1.5 max-w-2xl mx-auto leading-relaxed">
+                  {lang === 'en'
+                    ? 'Already paid via Sonali Bank Bangla QR (bKash, Nagad, Rocket, Upay, Bank Apps) or direct account? Enter your details below to instantly generate and print your official stamped memorial receipt.'
+                    : 'সোনালী ব্যাংক বাংলা কিউআর (বিকাশ, নগদ, রকেট, উপায়, সেলফিন, সোনালী ই-সেবা বা ব্যাংক অ্যাপ) অথবা ব্যাংক অ্যাকাউন্টে প্রণামী পাঠানোর পর নিচের তথ্যগুলো দিন। সাথে সাথে মন্দির কমিটির অফিসিয়াল সিলমোহরযুক্ত স্মারক রশিদ সংগৃহীত ও প্রিন্ট করা যাবে।'}
                 </p>
               </div>
 
-              {/* Mobile Search Input */}
-              <div className="w-full sm:w-72 relative">
-                <input
-                  type="tel"
-                  placeholder="মোবাইল নম্বর দিয়ে খুঁজুন..."
-                  value={searchPhone}
-                  onChange={(e) => setSearchPhone(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 rounded-xl border border-gray-300 text-xs font-mono focus:ring-2 focus:ring-amber-500 outline-none"
-                />
-                <i className="fas fa-search absolute left-3 top-2.5 text-gray-400 text-xs"></i>
-              </div>
+              <form onSubmit={handleBanglaQRSubmit} className="space-y-5 sm:space-y-6 max-w-3xl mx-auto">
+                {/* 1. Donation Amount Selection */}
+                <div className="bg-orange-50/60 p-3.5 sm:p-5 rounded-2xl border border-orange-200">
+                  <label className="block text-sm font-bold text-gray-800 mb-2 flex items-center justify-between">
+                    <span>{lang === 'en' ? 'Donation Amount (BDT) *' : 'প্রণামী পরিমাণ (টাকা) *'}</span>
+                    <span className="text-xs text-orange-700 font-semibold">{lang === 'en' ? 'Select or enter amount' : 'নির্ধারিত পরিমাণ চাপুন বা লিখুন'}</span>
+                  </label>
+                  <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-3">
+                    {quickAmounts.map(amt => (
+                      <button
+                        key={amt}
+                        type="button"
+                        onClick={() => setDonationForm({ ...donationForm, amount: amt })}
+                        className={'py-2.5 rounded-xl font-bold font-mono text-sm border-2 transition-all active:scale-95 cursor-pointer ' + (donationForm.amount === amt ? 'bg-gradient-to-r from-orange-600 to-amber-600 text-white border-amber-500 shadow-md shadow-orange-500/20' : 'bg-white hover:bg-orange-100 text-gray-800 border-orange-200')}
+                      >
+                        ৳ {lang === 'en' ? amt : toBengaliDigits(amt)}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-amber-900 font-black text-xl">
+                      ৳
+                    </div>
+                    <input
+                      type="number"
+                      required
+                      min="10"
+                      placeholder={lang === 'en' ? 'Enter amount (e.g. 500)' : 'যেকোনো পরিমাণ লিখুন (যেমন: ৫০০)...'}
+                      value={donationForm.amount}
+                      onChange={(e) => setDonationForm({ ...donationForm, amount: e.target.value })}
+                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-orange-300 font-mono font-bold text-lg text-amber-950 bg-white focus:border-amber-600 focus:ring-2 focus:ring-amber-200 outline-none"
+                    />
+                  </div>
+                </div>
+
+                {/* 2. Payment Method & Transaction ID (TrxID) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-bold text-gray-800 mb-1.5">
+                      {lang === 'en' ? 'Payment Method Used *' : 'প্রণামী প্রদানের মাধ্যম *'}
+                    </label>
+                    <select
+                      value={donationForm.method}
+                      onChange={(e) => setDonationForm({ ...donationForm, method: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white font-medium text-sm text-gray-800 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                    >
+                      <option value="বিকাশ (Bangla QR)">বিকাশ - bKash (Bangla QR)</option>
+                      <option value="নগদ (Bangla QR)">নগদ - Nagad (Bangla QR)</option>
+                      <option value="রকেট (Bangla QR)">রকেট - Rocket (Bangla QR)</option>
+                      <option value="উপায় (Bangla QR)">উপায় - Upay (Bangla QR)</option>
+                      <option value="সেলফিন (Bangla QR)">সেলফিন - Cellfin (Bangla QR)</option>
+                      <option value="সোনালী ই-সেবা (Bangla QR)">সোনালী ই-সেবা - Sonali e-Sheba (Bangla QR)</option>
+                      <option value="ব্যাংক অ্যাপ (Bangla QR)">অন্যান্য ব্যাংক অ্যাপ (Bangla QR)</option>
+                      <option value="সোনালী ব্যাংক একাউন্ট">সোনালী ব্যাংক সরাসরি ট্রান্সফার (A/C: 0311100066584)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-800 mb-1.5 flex items-center justify-between">
+                      <span>{lang === 'en' ? 'Transaction ID (TrxID) *' : 'ট্রানজেকশন আইডি (TrxID) *'}</span>
+                      <span className="text-[11px] text-emerald-700 font-semibold font-mono">SMS / App থেকে</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder={lang === 'en' ? 'e.g. BL8X9K2P01' : 'যেমন: BL8X9K2P01 অথবা ব্যাংক রেফারেন্স'}
+                      value={donationForm.trxId}
+                      onChange={(e) => setDonationForm({ ...donationForm, trxId: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-300 font-mono font-bold text-sm uppercase text-gray-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                    />
+                    <span className="text-[11px] text-gray-500 mt-1 block">
+                      {lang === 'en' ? 'Enter the TrxID from your payment confirmation SMS or app' : 'পেমেন্ট সফল হওয়ার পর স্ক্রিন বা মেসেজ থেকে প্রাপ্ত TrxID লিখুন'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* 3. Devotee Name & Mobile Number */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-bold text-gray-800 mb-1.5">
+                      {lang === 'en' ? 'Devotee / Donor Full Name *' : 'শ্রদ্ধেয় ভক্ত / দাতার পূর্ণ নাম *'}
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder={lang === 'en' ? 'e.g. Shantanu Das' : 'যেমন: শান্তনু দাস'}
+                      value={donationForm.name}
+                      onChange={(e) => setDonationForm({ ...donationForm, name: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-800 mb-1.5 flex items-center justify-between">
+                      <span>{lang === 'en' ? 'Mobile Number (11 digits) *' : 'মোবাইল নম্বর (১১ ডিজিট) *'}</span>
+                      <span className="text-[11px] text-amber-700 font-semibold">রশিদ অনুসন্ধানের জন্য</span>
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      placeholder="01XXXXXXXXX"
+                      value={donationForm.phone}
+                      onChange={(e) => setDonationForm({ ...donationForm, phone: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-300 font-mono font-bold text-sm text-gray-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                    />
+                  </div>
+                </div>
+
+                {/* 4. Gotra & Purpose */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-bold text-gray-800 mb-1.5">
+                      {lang === 'en' ? 'Gotra (Lineage) - Optional' : 'গোত্র (ঐচ্ছিক)'}
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="যেমন: ভরদ্বাজ / কাশ্যপ / শাণ্ডিল্য"
+                      value={donationForm.gotra}
+                      onChange={(e) => setDonationForm({ ...donationForm, gotra: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none text-sm"
+                    />
+                    <div className="flex flex-wrap gap-1 mt-1.5">
+                      {gotraPresets.slice(0, 5).map(g => (
+                        <button
+                          key={g}
+                          type="button"
+                          onClick={() => setDonationForm({ ...donationForm, gotra: g })}
+                          className="text-[10px] bg-orange-50 hover:bg-orange-100 text-orange-900 px-2 py-0.5 rounded-full border border-orange-200"
+                        >
+                          {g}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-800 mb-1.5">
+                      {lang === 'en' ? 'Donation Purpose' : 'প্রণামীর উদ্দেশ্য'}
+                    </label>
+                    <select
+                      value={donationForm.purpose}
+                      onChange={(e) => setDonationForm({ ...donationForm, purpose: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none text-sm"
+                    >
+                      {purposePresets.map(p => (
+                        <option key={p} value={p}>{p}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Submit CTA Button */}
+                <div className="text-center pt-4">
+                  <button
+                    type="submit"
+                    disabled={isSubmittingQR}
+                    className="btn-shine w-full sm:w-auto bg-gradient-to-r from-orange-600 via-amber-600 to-orange-700 hover:from-orange-500 hover:to-amber-500 text-white font-extrabold px-10 py-4 rounded-full text-base sm:text-lg shadow-xl shadow-orange-500/30 transition-all hover:scale-[1.02] active:scale-95 border-2 border-yellow-300 cursor-pointer flex items-center justify-center gap-3 mx-auto disabled:opacity-70"
+                  >
+                    {isSubmittingQR ? (
+                      <>
+                        <i className="fas fa-spinner fa-spin"></i>
+                        <span>{lang === 'en' ? 'Verifying & Generating...' : 'যাচাই ও রশিদ প্রস্তুত করা হচ্ছে...'}</span>
+                      </>
+                    ) : (
+                      <>
+                        <i className="fas fa-print text-yellow-300 text-lg"></i>
+                        <span>{lang === 'en' ? 'Generate & Print Sacred Receipt' : '✨ স্মারক রশিদ তৈরি ও প্রিন্ট করুন'}</span>
+                        <i className="fas fa-arrow-right text-sm"></i>
+                      </>
+                    )}
+                  </button>
+                  <p className="text-xs text-amber-900 bg-amber-50/80 border border-amber-200/80 rounded-full px-5 py-2 mt-3.5 inline-flex items-center justify-center gap-2 mx-auto">
+                    <i className="fas fa-shield-halved text-amber-600"></i>
+                    <span>{lang === 'en' ? 'Official Temple Verification • Auto Recorded in Sacred Devotee Register' : 'মন্দির কমিটির অফিশিয়াল নিবন্ধন • স্থায়ীভাবে সংরক্ষিত ও ডাউনলোডযোগ্য'}</span>
+                  </p>
+                </div>
+              </form>
             </div>
 
-            {searchedReceipts && searchedReceipts.length > 0 ? (
-              <div className="overflow-x-auto rounded-xl border border-gray-200">
-                <table className="w-full text-left border-collapse text-sm">
-                  <thead>
-                    <tr className="bg-amber-50/70 text-gray-700 font-bold border-b border-amber-200">
-                      <th className="p-3">{lang === 'en' ? 'Receipt No' : 'রশিদ নং'}</th>
-                      <th className="p-3">{lang === 'en' ? 'Donor Name' : 'দাতার নাম'}</th>
-                      <th className="p-3">{lang === 'en' ? 'Amount' : 'পরিমাণ'}</th>
-                      <th className="p-3">{lang === 'en' ? 'Method & TrxID' : 'মাধ্যম ও TrxID'}</th>
-                      <th className="p-3">{lang === 'en' ? 'Date' : 'তারিখ'}</th>
-                      <th className="p-3 text-center">{lang === 'en' ? 'Action' : 'প্রিন্ট'}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {searchedReceipts.map((r, i) => (
-                      <tr key={r.id || r.receiptNo || i} className="border-b border-gray-100 hover:bg-orange-50/40 transition-colors">
-                        <td className="p-3 font-mono font-bold text-amber-900">{r.receiptNo}</td>
-                        <td className="p-3 font-semibold text-gray-900">
-                          {r.name}
-                          {r.gotra && <span className="block text-xs text-gray-500 font-normal">গোত্র: {r.gotra}</span>}
-                        </td>
-                        <td className="p-3 font-bold text-emerald-700 font-serif">
-                          ৳ {typeof r.amount === 'number' ? toBengaliDigits(r.amount.toLocaleString()) : toBengaliDigits(r.amount)} /-
-                        </td>
-                        <td className="p-3 text-xs text-gray-600">
-                          <span className="font-semibold text-gray-800 block">{r.method}</span>
-                          <span className="font-mono text-emerald-800 font-bold">{r.trxId || '-'}</span>
-                        </td>
-                        <td className="p-3 text-xs text-gray-500">{r.date}</td>
-                        <td className="p-3 text-center">
-                          <button
-                            onClick={() => printReceiptDirectly(r, lang)}
-                            className="bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-3 py-1.5 rounded-lg text-xs transition-all active:scale-95 flex items-center gap-1.5 mx-auto cursor-pointer"
-                            title="প্রিন্ট করুন"
-                          >
-                            <i className="fas fa-print text-amber-700"></i>
-                            {lang === 'en' ? 'Print' : 'প্রিন্ট'}
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+            {/* Archive Search & List Card */}
+            <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border-2 border-amber-200">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 pb-4 border-b border-amber-100">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                    <i className="fas fa-file-invoice text-amber-600"></i>
+                    {lang === 'en' ? 'Verified Donation Receipts Archive' : 'প্রণামী রশিদ সংগ্রহ ও অনুসন্ধান তালিকা'}
+                  </h3>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {lang === 'en' ? 'Search by your mobile number or click any receipt below to view/print.' : 'আপনার মোবাইল নম্বর দিয়ে অনুসন্ধান করুন বা যেকোনো রশিদে ক্লিক করে সরাসরি দেখুন ও প্রিন্ট করুন।'}
+                  </p>
+                </div>
+
+                {/* Mobile Search Input */}
+                <div className="w-full sm:w-72 relative">
+                  <input
+                    type="tel"
+                    placeholder="মোবাইল নম্বর দিয়ে খুঁজুন..."
+                    value={searchPhone}
+                    onChange={(e) => setSearchPhone(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2 rounded-xl border border-gray-300 text-xs font-mono focus:ring-2 focus:ring-amber-500 outline-none"
+                  />
+                  <i className="fas fa-search absolute left-3 top-2.5 text-gray-400 text-xs"></i>
+                </div>
               </div>
-            ) : (
-              <p className="text-center text-gray-500 p-8">
-                {searchPhone ? 'এই নম্বরে কোনো প্রণামী রশিদ পাওয়া যায়নি।' : 'এখনও কোনো প্রণামী রশিদ নেই।'}
-              </p>
-            )}
+
+              {searchedReceipts && searchedReceipts.length > 0 ? (
+                <div className="overflow-x-auto rounded-xl border border-gray-200">
+                  <table className="w-full text-left border-collapse text-sm">
+                    <thead>
+                      <tr className="bg-amber-50/70 text-gray-700 font-bold border-b border-amber-200">
+                        <th className="p-3">{lang === 'en' ? 'Receipt No' : 'রশিদ নং'}</th>
+                        <th className="p-3">{lang === 'en' ? 'Donor Name' : 'দাতার নাম'}</th>
+                        <th className="p-3">{lang === 'en' ? 'Amount' : 'পরিমাণ'}</th>
+                        <th className="p-3">{lang === 'en' ? 'Method & TrxID' : 'মাধ্যম ও TrxID'}</th>
+                        <th className="p-3">{lang === 'en' ? 'Date' : 'তারিখ'}</th>
+                        <th className="p-3 text-center">{lang === 'en' ? 'Actions' : 'কার্যক্রম'}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {searchedReceipts.map((r, i) => {
+                        const isSelected = activeReceiptForDisplay && (activeReceiptForDisplay.receiptNo === r.receiptNo || activeReceiptForDisplay.id === r.id);
+                        return (
+                          <tr
+                            key={r.id || r.receiptNo || i}
+                            onClick={() => {
+                              setSelectedArchiveReceipt(r);
+                              window.scrollTo({ top: 200, behavior: 'smooth' });
+                            }}
+                            className={'border-b border-gray-100 transition-colors cursor-pointer ' + (isSelected ? 'bg-amber-100/70 font-medium' : 'hover:bg-orange-50/40')}
+                          >
+                            <td className="p-3 font-mono font-bold text-amber-900 flex items-center gap-1.5">
+                              {isSelected && <i className="fas fa-check-circle text-emerald-600 text-xs"></i>}
+                              <span>{r.receiptNo}</span>
+                            </td>
+                            <td className="p-3 font-semibold text-gray-900">
+                              {r.name}
+                              {r.gotra && <span className="block text-xs text-gray-500 font-normal">গোত্র: {r.gotra}</span>}
+                            </td>
+                            <td className="p-3 font-bold text-emerald-700 font-serif">
+                              ৳ {typeof r.amount === 'number' ? toBengaliDigits(r.amount.toLocaleString()) : toBengaliDigits(r.amount)} /-
+                            </td>
+                            <td className="p-3 text-xs text-gray-600">
+                              <span className="font-semibold text-gray-800 block">{r.method}</span>
+                              <span className="font-mono text-emerald-800 font-bold">{r.trxId || '-'}</span>
+                            </td>
+                            <td className="p-3 text-xs text-gray-500">{r.date}</td>
+                            <td className="p-3 text-center" onClick={(e) => e.stopPropagation()}>
+                              <div className="flex items-center justify-center gap-2">
+                                <button
+                                  onClick={() => {
+                                    setSelectedArchiveReceipt(r);
+                                    window.scrollTo({ top: 200, behavior: 'smooth' });
+                                  }}
+                                  className="bg-orange-100 hover:bg-orange-200 text-orange-900 font-bold px-2.5 py-1.5 rounded-lg text-xs transition-all active:scale-95 flex items-center gap-1 cursor-pointer"
+                                  title="রশিদ দেখুন"
+                                >
+                                  <i className="fas fa-eye text-orange-700"></i>
+                                  {lang === 'en' ? 'View' : 'দেখুন'}
+                                </button>
+                                <button
+                                  onClick={() => printReceiptDirectly(r, lang)}
+                                  className="bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-2.5 py-1.5 rounded-lg text-xs transition-all active:scale-95 flex items-center gap-1 cursor-pointer"
+                                  title="প্রিন্ট করুন"
+                                >
+                                  <i className="fas fa-print text-amber-700"></i>
+                                  {lang === 'en' ? 'Print' : 'প্রিন্ট'}
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-center text-gray-500 p-8">
+                  {searchPhone ? 'এই নম্বরে কোনো প্রণামী রশিদ পাওয়া যায়নি।' : 'এখনও কোনো প্রণামী রশিদ নেই।'}
+                </p>
+              )}
+            </div>
           </div>
         )}
 
@@ -9012,11 +9714,161 @@ const DonationPage = ({ donations, setDonations, donationReceipts, setDonationRe
         </div>
       </div>
 
+      {/* Sonali Bank Bangla QR Zoom & Download Modal (Glitch-Free Portaled & Super Zoom) */}
+      {isBanglaQRModalOpen && typeof document !== 'undefined' && (
+        (window.ReactDOM?.createPortal || ((children) => children))(
+          <div
+            className="fixed inset-0 z-[999999] flex items-center justify-center p-3 sm:p-5 bg-black/85 backdrop-blur-md anim-fade-in"
+            onClick={() => setIsBanglaQRModalOpen(false)}
+          >
+            <div
+              className="bg-white rounded-3xl p-5 sm:p-7 max-w-lg w-full shadow-2xl border-4 border-amber-400 relative anim-scale-up text-stone-900 max-h-[94vh] flex flex-col overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                onClick={() => setIsBanglaQRModalOpen(false)}
+                className="absolute top-4 right-4 w-9 h-9 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 flex items-center justify-center text-lg font-bold transition-all cursor-pointer shadow-sm active:scale-95 z-20"
+                title="বন্ধ করুন"
+              >
+                <i className="fas fa-times"></i>
+              </button>
+
+              {/* Modal Header */}
+              <div className="text-center pb-3 border-b border-gray-100 pr-8">
+                <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-900 mb-1 border border-amber-300">
+                  <i className="fas fa-qrcode text-amber-600"></i> BANGLA QR • সোনালী ব্যাংক পিএলসি.
+                </span>
+                <h3 className="text-lg sm:text-xl font-bold font-serif text-gray-900">
+                  {lang === 'en' ? 'Sonali Bank Official Bangla QR' : 'সোনালী ব্যাংক অফিসিয়াল বাংলা কিউআর'}
+                </h3>
+                <p className="text-[11px] sm:text-xs text-gray-600 mt-0.5">
+                  {lang === 'en' ? 'Scan with bKash, Nagad, Rocket, Upay or Any Bank App' : 'বিকাশ, নগদ, রকেট, উপায় বা যেকোনো ব্যাংক অ্যাপ দিয়ে স্ক্যান করুন'}
+                </p>
+              </div>
+
+              {/* Interactive Zoom Controls */}
+              <div className="flex items-center justify-between gap-2 mt-3 px-3 py-1.5 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-200 text-xs">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-bold text-amber-950 flex items-center gap-1">
+                    <i className="fas fa-search-plus text-amber-600"></i>
+                    <span>{lang === 'en' ? 'Zoom:' : 'জুম স্তর:'}</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setQrModalZoom(prev => Math.max(1, Number((prev - 0.25).toFixed(2))))}
+                    disabled={qrModalZoom <= 1}
+                    className="w-7 h-7 rounded-lg bg-white border border-amber-300 text-stone-700 font-bold flex items-center justify-center hover:bg-amber-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-xs active:scale-95"
+                    title="জুম কমান"
+                  >
+                    <i className="fas fa-minus text-[10px]"></i>
+                  </button>
+                  <span className="font-mono font-bold text-stone-900 px-1 min-w-[44px] text-center">
+                    {Math.round(qrModalZoom * 100)}%
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setQrModalZoom(prev => Math.min(2.5, Number((prev + 0.25).toFixed(2))))}
+                    disabled={qrModalZoom >= 2.5}
+                    className="w-7 h-7 rounded-lg bg-white border border-amber-300 text-stone-700 font-bold flex items-center justify-center hover:bg-amber-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-xs active:scale-95"
+                    title="জুম বাড়ান"
+                  >
+                    <i className="fas fa-plus text-[10px]"></i>
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  {[1, 1.4, 2].map(preset => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => setQrModalZoom(preset)}
+                      className={'px-2.5 py-1 rounded-md text-[11px] font-bold cursor-pointer transition-all ' + (qrModalZoom === preset ? 'bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-xs' : 'bg-white text-stone-700 hover:bg-amber-100 border border-amber-200')}
+                    >
+                      {preset === 1 ? '100%' : preset === 1.4 ? '140%' : '200%'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Pure QR Display Scroll Area */}
+              <div className="my-3 overflow-auto max-h-[46vh] sm:max-h-[50vh] flex items-center justify-center p-3 sm:p-5 bg-gradient-to-b from-amber-50/50 to-orange-50/30 rounded-2xl border border-amber-200">
+                <div
+                  className="bg-white p-3.5 sm:p-4 rounded-2xl border-2 border-amber-300 shadow-xl transition-transform duration-150 inline-block"
+                  style={{ transform: `scale(${qrModalZoom})`, transformOrigin: 'center center' }}
+                >
+                  <img
+                    src="images/sonali_bangla_qr_code.png"
+                    alt="সোনালী ব্যাংক বাংলা কিউআর কোড"
+                    className="w-56 h-56 sm:w-72 sm:h-72 md:w-80 md:h-80 aspect-square object-contain block mx-auto select-none pointer-events-none"
+                    style={{ imageRendering: 'pixelated' }}
+                  />
+                </div>
+              </div>
+
+              {/* Quick Merchant & Bank Account Info Bar */}
+              <div className="bg-stone-50 rounded-xl p-2.5 sm:p-3 border border-stone-200 mb-3 space-y-1.5 text-xs">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-500 font-medium">মার্চেন্ট / একাউন্ট নাম:</span>
+                  <span className="font-bold text-gray-900">Monosha Mondhir</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-500 font-medium">সোনালী ব্যাংক একাউন্ট:</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-mono font-bold text-amber-900">0311100066584</span>
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard('0311100066584', 'একাউন্ট নম্বর')}
+                      className="bg-amber-400 hover:bg-amber-500 text-stone-900 px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer"
+                    >
+                      কপি
+                    </button>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-500 font-medium">বাংলা কিউআর টিআইডি (TID):</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-mono font-bold text-amber-900">QR5822034</span>
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard('QR5822034', 'TID')}
+                      className="bg-amber-400 hover:bg-amber-500 text-stone-900 px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer"
+                    >
+                      কপি
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-2">
+                <a
+                  href="images/sonali_bangla_qr_code.png"
+                  download="Sonali_Bangla_QR_Monosha_Mondhir.png"
+                  className="flex-1 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold py-2.5 px-3 rounded-xl text-center text-xs sm:text-sm shadow-md transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <i className="fas fa-download"></i>
+                  <span>{lang === 'en' ? 'Download QR' : 'কিউআর ডাউনলোড'}</span>
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setIsBanglaQRModalOpen(false)}
+                  className="bg-stone-100 hover:bg-stone-200 text-stone-800 font-bold py-2.5 px-4 rounded-xl text-xs sm:text-sm transition-all active:scale-95 cursor-pointer"
+                >
+                  {lang === 'en' ? 'Close' : 'বন্ধ করুন'}
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )
+      )}
+
       {/* Sacred Payment Maintenance / Coming Soon Modal */}
       <PaymentComingSoonModal
         isOpen={isComingSoonOpen}
         onClose={() => setIsComingSoonOpen(false)}
-        onGoToBank={() => setActiveTab('accounts')}
+        onGoToBank={() => setActiveTab('qr')}
         lang={lang}
       />
 
@@ -9195,6 +10047,7 @@ const AdminPanel = ({
   complaintsSuggestions, setComplaintsSuggestions,
   paymentGatewayConfig, setPaymentGatewayConfig,
   scholars, setScholars,
+  purohits, setPurohits,
   showToast
 }) => {
   const [loginEmail, setLoginEmail] = useState('');
@@ -9212,9 +10065,12 @@ const AdminPanel = ({
   const [editingMantraId, setEditingMantraId] = useState(null);
   const [editingGalleryId, setEditingGalleryId] = useState(null);
   const [editingScholarId, setEditingScholarId] = useState(null);
+  const [editingPurohitId, setEditingPurohitId] = useState(null);
 
   // Form States
   const [newMember, setNewMember] = useState({ name: '', role: '', phone: '', image: null });
+  const [newPurohit, setNewPurohit] = useState({ name: '', role: 'প্রধান পুরোহিত', title: '', experience: '', phone: '', address: 'গৈলা, আগৈলঝাড়া, বরিশাল', image: '', bio: '', mantra: '', order_idx: 0 });
+  const [draggedPurohitIndex, setDraggedPurohitIndex] = useState(null);
   const [newTestimonial, setNewTestimonial] = useState({ name: '', designation: '', text: '', date: '' });
   const [newNotice, setNewNotice] = useState({ title: '', date: '', text: '' });
   const [newEvent, setNewEvent] = useState({ title: '', date: '', description: '', image: null, images: [], video: '', videos: [] });
@@ -10548,6 +11404,186 @@ const AdminPanel = ({
 
   const handleResetDefaultScholars = handleResetScholarsToDefault;
 
+  // -- Revered Priests & Sevayats (Purohits) Handlers --
+  const savePurohitsOrder = async (reorderedList) => {
+    if (!reorderedList) return;
+    if (setPurohits) setPurohits(reorderedList);
+    try {
+      localStorage.setItem('temple_purohits', JSON.stringify(reorderedList));
+      if (supabaseClient) {
+        await saveCloudSetting('temple_purohits', JSON.stringify(reorderedList));
+      }
+      showToast('পুরোহিতবৃন্দের তালিকা ও ক্রম সফলভাবে সংরক্ষিত হয়েছে!');
+    } catch (e) {
+      console.error('Error saving purohits:', e);
+    }
+  };
+
+  const handleSavePurohit = async (e) => {
+    e.preventDefault();
+    if (!newPurohit.name.trim()) {
+      setErrorMsg('পুরোহিতের নাম আবশ্যক');
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const currentList = purohits && purohits.length > 0 ? purohits : DEFAULT_PUROHITS;
+      let updatedPurohits;
+      if (editingPurohitId) {
+        updatedPurohits = currentList.map(p => p.id === editingPurohitId ? {
+          ...p,
+          name: newPurohit.name.trim(),
+          role: newPurohit.role.trim() || 'পুরোহিত',
+          title: newPurohit.title.trim(),
+          experience: newPurohit.experience.trim(),
+          phone: newPurohit.phone.trim(),
+          address: newPurohit.address.trim(),
+          image: newPurohit.image || p.image || 'images/committee/member_13.jpg',
+          bio: newPurohit.bio.trim(),
+          mantra: newPurohit.mantra.trim()
+        } : p);
+        setEditingPurohitId(null);
+      } else {
+        const newEntry = {
+          id: 'purohit_' + Date.now(),
+          name: newPurohit.name.trim(),
+          role: newPurohit.role.trim() || 'পুরোহিত',
+          title: newPurohit.title.trim(),
+          experience: newPurohit.experience.trim(),
+          phone: newPurohit.phone.trim(),
+          address: newPurohit.address.trim(),
+          image: newPurohit.image || 'images/committee/member_13.jpg',
+          bio: newPurohit.bio.trim(),
+          mantra: newPurohit.mantra.trim(),
+          order_idx: currentList.length + 1
+        };
+        updatedPurohits = [...currentList, newEntry];
+      }
+      setNewPurohit({
+        name: '',
+        role: 'প্রধান পুরোহিত',
+        title: '',
+        experience: '',
+        phone: '',
+        address: 'গৈলা, আগৈলঝাড়া, বরিশাল',
+        image: '',
+        bio: '',
+        mantra: '',
+        order_idx: 0
+      });
+      await savePurohitsOrder(updatedPurohits);
+      showToast(editingPurohitId ? 'পুরোহিতের তথ্য সফলভাবে আপডেট হয়েছে!' : 'নতুন পুরোহিত তালিকায় যুক্ত হয়েছে!');
+    } catch (err) {
+      setErrorMsg('পুরোহিত সংরক্ষণ করতে ব্যর্থ হয়েছে');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleEditPurohit = (p) => {
+    setEditingPurohitId(p.id);
+    setNewPurohit({
+      name: p.name || '',
+      role: p.role || 'প্রধান পুরোহিত',
+      title: p.title || '',
+      experience: p.experience || '',
+      phone: p.phone || '',
+      address: p.address || 'গৈলা, আগৈলঝাড়া, বরিশাল',
+      image: p.image || '',
+      bio: p.bio || '',
+      mantra: p.mantra || '',
+      order_idx: p.order_idx || 0
+    });
+    window.scrollTo({ top: 300, behavior: 'smooth' });
+  };
+
+  const handleDeletePurohit = (id) => {
+    requestConfirm('আপনি কি সত্যিই এই পুরোহিতের তথ্য তালিকা থেকে মুছে ফেলতে চান?', async () => {
+      setIsSaving(true);
+      try {
+        const currentList = purohits && purohits.length > 0 ? purohits : DEFAULT_PUROHITS;
+        const updated = currentList.filter(p => p.id !== id);
+        await savePurohitsOrder(updated);
+        showToast('পুরোহিতের তথ্য মুছে ফেলা হয়েছে!');
+      } catch (err) {
+        setErrorMsg('মুছতে ব্যর্থ হয়েছে');
+      } finally {
+        setIsSaving(false);
+      }
+    });
+  };
+
+  const handleMovePurohit = async (index, direction) => {
+    const currentList = [...(purohits && purohits.length > 0 ? purohits : DEFAULT_PUROHITS)];
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= currentList.length) return;
+    const [item] = currentList.splice(index, 1);
+    currentList.splice(targetIndex, 0, item);
+    const reordered = currentList.map((p, idx) => ({ ...p, order_idx: idx + 1 }));
+    await savePurohitsOrder(reordered);
+  };
+
+  const handleSetPurohitSerial = async (fromIndex, targetPosStr) => {
+    const currentList = [...(purohits && purohits.length > 0 ? purohits : DEFAULT_PUROHITS)];
+    const targetPos = parseInt(targetPosStr, 10);
+    if (isNaN(targetPos) || targetPos < 1 || targetPos > currentList.length) return;
+    const targetIndex = targetPos - 1;
+    if (targetIndex === fromIndex) return;
+    const [item] = currentList.splice(fromIndex, 1);
+    currentList.splice(targetIndex, 0, item);
+    const reordered = currentList.map((p, idx) => ({ ...p, order_idx: idx + 1 }));
+    await savePurohitsOrder(reordered);
+  };
+
+  const handlePurohitDragStart = (e, index) => {
+    setDraggedPurohitIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    try { e.dataTransfer.setData('text/plain', String(index)); } catch (err) {}
+  };
+
+  const handlePurohitDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handlePurohitDrop = async (e, targetIndex) => {
+    e.preventDefault();
+    let fromIdx = draggedPurohitIndex;
+    if (fromIdx === null) {
+      try {
+        const data = e.dataTransfer.getData('text/plain');
+        if (data !== '') fromIdx = parseInt(data, 10);
+      } catch (err) {}
+    }
+    if (fromIdx === null || isNaN(fromIdx) || fromIdx === targetIndex) {
+      setDraggedPurohitIndex(null);
+      return;
+    }
+    const currentList = [...(purohits && purohits.length > 0 ? purohits : DEFAULT_PUROHITS)];
+    const [item] = currentList.splice(fromIdx, 1);
+    currentList.splice(targetIndex, 0, item);
+    setDraggedPurohitIndex(null);
+    const reordered = currentList.map((p, idx) => ({ ...p, order_idx: idx + 1 }));
+    await savePurohitsOrder(reordered);
+    showToast('পুরোহিতবৃন্দের ক্রম সফলভাবে সংরক্ষিত হয়েছে!');
+  };
+
+  const handleResetPurohitsToDefault = () => {
+    requestConfirm('আপনি কি আদি ডিফল্ট পুরোহিত তথ্যে রিসেট করতে চান?', async () => {
+      setIsSaving(true);
+      try {
+        await savePurohitsOrder(DEFAULT_PUROHITS);
+        setNewPurohit({ name: '', role: 'প্রধান পুরোহিত', title: '', experience: '', phone: '', address: 'গৈলা, আগৈলঝাড়া, বরিশাল', image: '', bio: '', mantra: '', order_idx: 0 });
+        setEditingPurohitId(null);
+        showToast('ডিফল্ট পুরোহিত তালিকায় রিসেট সম্পন্ন হয়েছে!');
+      } catch (err) {
+        setErrorMsg('রিসেট করতে ব্যর্থ হয়েছে।');
+      } finally {
+        setIsSaving(false);
+      }
+    }, 'ডিফল্ট রিসেট নিশ্চিতকরণ');
+  };
+
   // -- Donation Receipts Handlers --
   const [receiptSearch, setReceiptSearch] = useState('');
   const [showNewReceiptModal, setShowNewReceiptModal] = useState(false);
@@ -11214,6 +12250,11 @@ const AdminPanel = ({
             <div className="text-[10px] text-gray-500 font-bold">পবিত্র মন্ত্র</div>
             <div className="text-xs font-extrabold text-gray-800">{(mantras || []).length} টি</div>
           </div>
+          <div onClick={() => handleTabSwitch('purohits')} className="cursor-pointer bg-white p-3 rounded-2xl border border-gray-200 shadow-xs hover:border-orange-400 hover:shadow-sm transition-all text-center">
+            <i className="fas fa-user-tie text-orange-600 text-base mb-1"></i>
+            <div className="text-[10px] text-gray-500 font-bold">পূজারী ও পুরোহিত</div>
+            <div className="text-xs font-extrabold text-orange-800">{(purohits || []).length} জন</div>
+          </div>
           <div onClick={() => handleTabSwitch('committee')} className="cursor-pointer bg-white p-3 rounded-2xl border border-gray-200 shadow-xs hover:border-orange-400 hover:shadow-sm transition-all text-center">
             <i className="fas fa-users text-blue-500 text-base mb-1"></i>
             <div className="text-[10px] text-gray-500 font-bold">কমিটি সদস্য</div>
@@ -11304,6 +12345,14 @@ const AdminPanel = ({
             </button>
             <button onClick={() => handleTabSwitch('committee')} className={`px-5 py-3 text-left font-bold text-sm border-b ${activeTab === 'committee' ? 'bg-orange-50 text-orange-700 border-l-[5px] border-l-orange-600' : 'text-gray-600 hover:bg-gray-50 border-l-[5px] border-transparent'}`}>
               <i className="fas fa-users w-5 text-blue-500"></i> কমিটি ম্যানেজমেন্ট
+            </button>
+            <button onClick={() => handleTabSwitch('purohits')} className={`px-5 py-3 text-left font-bold text-sm border-b flex items-center justify-between ${activeTab === 'purohits' ? 'bg-orange-50 text-orange-700 border-l-[5px] border-l-orange-600' : 'text-gray-600 hover:bg-gray-50 border-l-[5px] border-transparent'}`}>
+              <span className="flex items-center gap-2">
+                <i className="fas fa-user-tie w-5 text-orange-600"></i> পূজারী ও পুরোহিতবৃন্দ
+              </span>
+              <span className="text-[10px] bg-orange-100 text-orange-800 px-2 py-0.5 rounded-full font-bold">
+                {(purohits || []).length}
+              </span>
             </button>
             <button onClick={() => handleTabSwitch('testimonials')} className={`px-5 py-3 text-left font-bold text-sm border-b ${activeTab === 'testimonials' ? 'bg-orange-50 text-orange-700 border-l-[5px] border-l-orange-600' : 'text-gray-600 hover:bg-gray-50 border-l-[5px] border-transparent'}`}>
               <i className="fas fa-comments w-5 text-amber-500"></i> মতামত ম্যানেজমেন্ট
@@ -11892,10 +12941,11 @@ const AdminPanel = ({
                               {currentEventVideos.map((vid, idx) => (
                                 <div
                                   key={idx}
-                                  className="bg-stone-950 rounded-2xl border-2 border-red-300 shadow-md p-3 flex flex-col justify-between relative group"
+                                  className="bg-stone-950 rounded-2xl border-2 border-red-300 shadow-md p-3 flex flex-col justify-between relative group overflow-hidden"
+                                  style={{ isolation: 'isolate', contain: 'paint' }}
                                 >
                                   {/* Header Badge & Remove Button */}
-                                  <div className="w-full flex items-center justify-between mb-2 px-1">
+                                  <div className="w-full flex items-center justify-between mb-2 px-1 z-10 shrink-0">
                                     <span className="text-xs font-bold text-amber-300 bg-red-950/80 border border-red-500/40 px-2.5 py-0.5 rounded-full flex items-center gap-1.5 shadow-xs">
                                       <i className="fas fa-video text-red-400"></i> ভিডিও #{idx + 1}
                                     </span>
@@ -11910,13 +12960,13 @@ const AdminPanel = ({
                                   </div>
 
                                   {/* Adaptive Video Box - Strictly contained so portrait and landscape videos fit nicely */}
-                                  <div className="w-full flex items-center justify-center h-[340px] sm:h-[380px] max-h-[420px] rounded-xl bg-black p-2 overflow-hidden relative" data-video-container="true">
+                                  <div className="w-full flex items-center justify-center h-[320px] sm:h-[360px] max-h-[380px] rounded-xl bg-black p-1.5 overflow-hidden relative" data-video-container="true" style={{ isolation: 'isolate', contain: 'paint' }}>
                                     <MediaViewer
                                       url={vid}
                                       isVideo={true}
                                       alt={`Event Video ${idx + 1}`}
-                                      className="max-h-full max-w-full w-auto h-auto object-contain block mx-auto rounded-lg"
-                                      style={{ maxHeight: '100%', maxWidth: '100%' }}
+                                      className="w-full h-full max-h-full max-w-full object-contain block mx-auto rounded-lg"
+                                      style={{ maxHeight: '100%', maxWidth: '100%', width: '100%', height: '100%' }}
                                       controls={true}
                                     />
                                   </div>
@@ -14211,7 +15261,7 @@ const AdminPanel = ({
                       {/* Video Preview */}
                       {(newGalleryPhoto.image || newGalleryPhoto.url) && (
                         <div className="p-3 bg-white rounded-xl border border-red-200">
-                          <div className="w-full max-w-md min-h-[200px] max-h-[420px] rounded-xl bg-black mb-2 shadow-xs relative group flex items-center justify-center p-2 border border-red-300">
+                          <div className="w-full max-w-md h-[320px] sm:h-[360px] max-h-[380px] rounded-xl bg-black mb-2 shadow-xs relative group flex items-center justify-center p-2 border border-red-300 overflow-hidden" data-video-container="true" style={{ isolation: 'isolate', contain: 'paint' }}>
                             <button
                               type="button"
                               onClick={() => setNewGalleryPhoto(prev => ({ ...prev, url: '', image: null }))}
@@ -14225,7 +15275,8 @@ const AdminPanel = ({
                               url={newGalleryPhoto.image || newGalleryPhoto.url}
                               isVideo={true}
                               alt="Gallery Video Preview"
-                              className="max-h-[380px] max-w-full w-auto h-auto object-contain block mx-auto rounded-lg"
+                              className="w-full h-full max-h-full max-w-full object-contain block mx-auto rounded-lg"
+                              style={{ maxHeight: '100%', maxWidth: '100%', width: '100%', height: '100%' }}
                               controls={true}
                             />
                           </div>
@@ -14877,6 +15928,343 @@ const AdminPanel = ({
                           title="মুছে ফেলুন"
                         >
                           <i className="fas fa-trash-alt text-xs"></i>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Revered Priests & Purohits Management Tab */}
+          {activeTab === 'purohits' && (
+            <div className="space-y-6">
+              {/* Header Banner */}
+              <div className="bg-white p-6 sm:p-7 rounded-2xl shadow-sm border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center text-xl border border-amber-200 shrink-0">
+                    <i className="fas fa-om"></i>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-800">পূজারী ও পুরোহিতবৃন্দ ব্যবস্থাপনা</h3>
+                    <p className="text-xs text-gray-500 mt-0.5">শ্রীশ্রী মা মনসা মন্দিরের পূজনীয় পুরোহিতমণ্ডলীর পরিচিতি, ছবি, পদবী, সেবা কাল ও মোবাইল নম্বর নিয়ন্ত্রণ</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleResetPurohitsToDefault}
+                    className="bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer active:scale-95"
+                    title="মূল পুরোহিত তালিকায় রিসেট করুন"
+                  >
+                    <i className="fas fa-rotate-left text-amber-700"></i> আদি তালিকায় রিসেট
+                  </button>
+                </div>
+              </div>
+
+              {/* Add / Edit Form */}
+              <div id="purohit-form-top" className="bg-white p-6 sm:p-7 rounded-2xl shadow-sm border border-gray-100">
+                <div className="flex items-center justify-between pb-3 border-b mb-5">
+                  <h4 className="font-bold text-gray-800 flex items-center gap-2 text-base">
+                    <i className={`fas ${editingPurohitId ? 'fa-user-pen text-amber-600' : 'fa-user-plus text-orange-600'}`}></i>
+                    {editingPurohitId ? 'পুরোহিতের তথ্য সম্পাদন ও পরিবর্তন' : 'নতুন পূজারী / পুরোহিত যোগ করুন'}
+                  </h4>
+                  {editingPurohitId && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingPurohitId(null);
+                        setNewPurohit({ name: '', role: 'প্রধান পুরোহিত', title: '', experience: '', phone: '', address: 'গৈলা, আগৈলঝাড়া, বরিশাল', image: '', bio: '', mantra: '', order_idx: 0 });
+                      }}
+                      className="text-xs text-gray-500 hover:text-red-600 font-bold flex items-center gap-1 cursor-pointer"
+                    >
+                      <i className="fas fa-times"></i> বাতিল
+                    </button>
+                  )}
+                </div>
+
+                <form onSubmit={handleSavePurohit} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">পুরোহিতের নাম *</label>
+                      <input
+                        type="text"
+                        required
+                        value={newPurohit.name}
+                        onChange={(e) => setNewPurohit({ ...newPurohit, name: e.target.value })}
+                        placeholder="যেমনঃ শ্রী মিলন চক্রবর্তী"
+                        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:bg-white focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">পদবী / ভূমিকা *</label>
+                      <select
+                        value={newPurohit.role}
+                        onChange={(e) => setNewPurohit({ ...newPurohit, role: e.target.value })}
+                        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:bg-white focus:outline-none font-medium"
+                      >
+                        <option value="প্রধান পুরোহিত">প্রধান পুরোহিত</option>
+                        <option value="সহকারী পুরোহিত">সহকারী পুরোহিত</option>
+                        <option value="সেবাইত">সেবাইত</option>
+                        <option value="হোম ও চণ্ডীপাঠ পুরোহিত">হোম ও চণ্ডীপাঠ পুরোহিত</option>
+                        <option value="পুরোহিত">পুরোহিত</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">মোবাইল নম্বর (যোগাযোগ)</label>
+                      <input
+                        type="text"
+                        value={newPurohit.phone}
+                        onChange={(e) => setNewPurohit({ ...newPurohit, phone: e.target.value })}
+                        placeholder="যেমনঃ ০১৭২২০০০০০০"
+                        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:bg-white focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">সেবা দায়িত্ব / উপাধি</label>
+                      <input
+                        type="text"
+                        value={newPurohit.title}
+                        onChange={(e) => setNewPurohit({ ...newPurohit, title: e.target.value })}
+                        placeholder="যেমনঃ দৈনিক পূজা, ভোগ নিবেদন ও আরতি পরিচালক"
+                        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:bg-white focus:outline-none"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 mb-1">সেবাকার্য কাল / অভিজ্ঞতা</label>
+                        <input
+                          type="text"
+                          value={newPurohit.experience}
+                          onChange={(e) => setNewPurohit({ ...newPurohit, experience: e.target.value })}
+                          placeholder="যেমনঃ ১৫+ বছর"
+                          className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:bg-white focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 mb-1">ধাম / এলাকা</label>
+                        <input
+                          type="text"
+                          value={newPurohit.address}
+                          onChange={(e) => setNewPurohit({ ...newPurohit, address: e.target.value })}
+                          placeholder="যেমনঃ গৈলা, আগৈলঝাড়া"
+                          className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:bg-white focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">পুরোহিতের ছবি</label>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                      <div className="flex-1 w-full">
+                        <input
+                          type="text"
+                          value={newPurohit.image || ''}
+                          onChange={(e) => setNewPurohit({ ...newPurohit, image: e.target.value })}
+                          placeholder="ছবির লিংক বা নিচের বাটন থেকে ছবি আপলোড করুন"
+                          className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:bg-white focus:outline-none font-mono text-xs"
+                        />
+                        <div className="mt-2 flex items-center gap-2">
+                          <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-lg text-xs font-bold cursor-pointer transition-colors border border-stone-300">
+                            <i className="fas fa-upload text-amber-600"></i> ডিভাইস থেকে ছবি আপলোড
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => handleImageChange(e, setNewPurohit, newPurohit)}
+                            />
+                          </label>
+                          <span className="text-[11px] text-gray-500">বা ফাইল পাথ লিখুন</span>
+                        </div>
+                      </div>
+
+                      {newPurohit.image && (
+                        <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-amber-400 bg-stone-900 shrink-0 shadow-md relative">
+                          <MediaViewer
+                            url={newPurohit.image}
+                            alt="প্রিভিউ"
+                            fallbackSrc="images/committee/member_13.jpg"
+                            className="w-full h-full object-cover object-top"
+                            controls={false}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">পরিচিতি ও সেবা বিবরণ</label>
+                      <textarea
+                        rows="3"
+                        value={newPurohit.bio || ''}
+                        onChange={(e) => setNewPurohit({ ...newPurohit, bio: e.target.value })}
+                        placeholder="মা মনসার চরণে সেবা, নিত্য পূজা ও আরতি পরিচালনার সংক্ষিপ্ত বিবরণ..."
+                        className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:bg-white focus:outline-none"
+                      ></textarea>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">আশীর্বাদ বাণী / বিশেষ বীজমন্ত্র</label>
+                      <textarea
+                        rows="3"
+                        value={newPurohit.mantra || ''}
+                        onChange={(e) => setNewPurohit({ ...newPurohit, mantra: e.target.value })}
+                        placeholder="ওঁ হ্রীং ক্লীং ঐং শ্রীং মনসাদেবৈ নমঃ..."
+                        className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:bg-white focus:outline-none"
+                      ></textarea>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-3 pt-3 border-t">
+                    {editingPurohitId && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingPurohitId(null);
+                          setNewPurohit({ name: '', role: 'প্রধান পুরোহিত', title: '', experience: '', phone: '', address: 'গৈলা, আগৈলঝাড়া, বরিশাল', image: '', bio: '', mantra: '', order_idx: 0 });
+                        }}
+                        className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                      >
+                        বাতিল
+                      </button>
+                    )}
+                    <button
+                      type="submit"
+                      disabled={isSaving}
+                      className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-bold px-6 py-2.5 rounded-xl text-xs transition-all shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                    >
+                      {isSaving ? (
+                        <><i className="fas fa-spinner fa-spin"></i> সংরক্ষণ হচ্ছে...</>
+                      ) : (
+                        <><i className="fas fa-check"></i> {editingPurohitId ? 'তথ্য আপডেট করুন' : 'তালিকায় যোগ করুন'}</>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              {/* Purohits List with Drag & Drop & Direct Serialing */}
+              <div className="bg-white p-6 sm:p-7 rounded-2xl shadow-sm border border-gray-100">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b mb-4 gap-2">
+                  <div>
+                    <h4 className="font-bold text-gray-800 text-base flex items-center gap-2">
+                      <i className="fas fa-list-ol text-amber-600"></i> বর্তমান পুরোহিতবৃন্দের তালিকা ও ক্রম
+                    </h4>
+                    <p className="text-xs text-gray-500 mt-0.5">মোট {(purohits && purohits.length > 0 ? purohits : DEFAULT_PUROHITS).length} জন পুরোহিত যুক্ত রয়েছে</p>
+                  </div>
+                  <div className="text-xs bg-amber-50 text-amber-900 border border-amber-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+                    <i className="fas fa-lightbulb text-amber-600"></i>
+                    <span>সিরিয়াল বক্সে নতুন নম্বর লিখে সরাসরি ক্রম পরিবর্তন করতে পারেন</span>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  {(purohits && purohits.length > 0 ? purohits : DEFAULT_PUROHITS).map((purohit, idx, arr) => (
+                    <div
+                      key={purohit.id || idx}
+                      draggable
+                      onDragStart={(e) => handlePurohitDragStart(e, idx)}
+                      onDragOver={handlePurohitDragOver}
+                      onDrop={(e) => handlePurohitDrop(e, idx)}
+                      onDragEnd={() => setDraggedPurohitIndex(null)}
+                      className={`p-4 rounded-xl border-2 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
+                        draggedPurohitIndex === idx ? 'border-dashed border-amber-500 bg-amber-50/70 opacity-60' : 'border-gray-200 bg-white hover:border-amber-300 hover:shadow-xs'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 w-full sm:w-auto">
+                        {/* Drag Handle */}
+                        <div className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-amber-600 p-1" title="টেনে ধরে স্থান পরিবর্তন করুন">
+                          <i className="fas fa-grip-vertical"></i>
+                        </div>
+
+                        {/* Serial Number Box */}
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="number"
+                            min="1"
+                            max={arr.length}
+                            defaultValue={idx + 1}
+                            key={`serial_${purohit.id}_${idx}`}
+                            onBlur={(e) => handleSetPurohitSerial(idx, e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.target.blur();
+                              }
+                            }}
+                            className="w-12 text-center py-1 border border-gray-300 rounded-lg text-xs font-mono font-bold focus:ring-2 focus:ring-amber-500 focus:outline-none bg-stone-50"
+                            title="সিরিয়াল নম্বর লিখুন এবং এন্টার বা বাইরে ক্লিক করুন"
+                          />
+                        </div>
+
+                        <div className="flex flex-col gap-0.5">
+                          <button
+                            type="button"
+                            onClick={() => handleMovePurohit(idx, -1)}
+                            disabled={idx === 0}
+                            className="w-6 h-5 rounded bg-gray-100 hover:bg-amber-100 text-gray-700 hover:text-amber-800 text-[10px] flex items-center justify-center transition-colors disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
+                            title="উপরে সরান"
+                          >
+                            <i className="fas fa-chevron-up"></i>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleMovePurohit(idx, 1)}
+                            disabled={idx === arr.length - 1}
+                            className="w-6 h-5 rounded bg-gray-100 hover:bg-amber-100 text-gray-700 hover:text-amber-800 text-[10px] flex items-center justify-center transition-colors disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
+                            title="নিচে সরান"
+                          >
+                            <i className="fas fa-chevron-down"></i>
+                          </button>
+                        </div>
+
+                        {/* Thumbnail */}
+                        <div className="w-12 h-12 rounded-full overflow-hidden border border-amber-300 bg-stone-900 shrink-0">
+                          <MediaViewer
+                            url={purohit.image}
+                            alt={purohit.name}
+                            fallbackSrc="images/committee/member_13.jpg"
+                            className="w-full h-full object-cover object-top"
+                            controls={false}
+                          />
+                        </div>
+
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h5 className="font-bold text-gray-900 text-sm">{purohit.name}</h5>
+                            <span className="text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+                              {purohit.role || 'পুরোহিত'}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            {purohit.title || ''} {purohit.phone ? `• মোবাইলঃ ${purohit.phone}` : ''} {purohit.experience ? `• সেবা কালঃ ${purohit.experience}` : ''}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Edit & Delete Action Buttons */}
+                      <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => handleEditPurohit(purohit)}
+                          className="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer active:scale-95"
+                        >
+                          <i className="fas fa-edit text-xs"></i> এডিট
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeletePurohit(purohit.id)}
+                          className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer active:scale-95"
+                        >
+                          <i className="fas fa-trash-alt text-xs"></i> মুছুন
                         </button>
                       </div>
                     </div>
@@ -15577,6 +16965,19 @@ function App() {
     return DEFAULT_SCHOLARS;
   });
 
+  const [purohits, setPurohits] = useState(() => {
+    try {
+      const saved = localStorage.getItem('temple_purohits');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.sort((a, b) => (Number(a.order_idx) || 0) - (Number(b.order_idx) || 0));
+        }
+      }
+    } catch (e) {}
+    return DEFAULT_PUROHITS;
+  });
+
   const [isComplainModalOpen, setIsComplainModalOpen] = useState(false);
 
   const handleSaveComplaintSuggestion = async (newEntry) => {
@@ -16078,6 +17479,18 @@ function App() {
             }
           } catch (e) { }
         }
+
+        const pr = settingsData.find(s => s.key === 'temple_purohits');
+        if (pr && pr.value) {
+          try {
+            const parsed = JSON.parse(pr.value);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              const sortedPurohits = parsed.sort((a, b) => (Number(a.order_idx) || 0) - (Number(b.order_idx) || 0));
+              setPurohits(sortedPurohits);
+              localStorage.setItem('temple_purohits', JSON.stringify(sortedPurohits));
+            }
+          } catch (e) { }
+        }
       }
 
       // 2. Process Committee
@@ -16201,7 +17614,7 @@ function App() {
 
   const renderPage = () => {
     switch (currentPage) {
-      case 'home': return <Home dbError={dbError} marqueeText={marqueeText} marqueeTextEn={marqueeTextEn} testimonials={testimonials} featuredTestimonialIds={featuredTestimonialIds} committeeMembers={committeeMembers} events={events} notices={notices} timings={timings} travelInfo={travelInfo} mantras={mantras} galleryItems={galleryItems} scholars={scholars} navigateTo={navigateTo} showToast={showToast} lang={lang} openComplainModal={() => setIsComplainModalOpen(true)} />;
+      case 'home': return <Home dbError={dbError} marqueeText={marqueeText} marqueeTextEn={marqueeTextEn} testimonials={testimonials} featuredTestimonialIds={featuredTestimonialIds} committeeMembers={committeeMembers} events={events} notices={notices} timings={timings} travelInfo={travelInfo} mantras={mantras} galleryItems={galleryItems} scholars={scholars} purohits={purohits} navigateTo={navigateTo} showToast={showToast} lang={lang} openComplainModal={() => setIsComplainModalOpen(true)} />;
       case 'timings': return <TimingsPage timings={timings} navigateTo={navigateTo} lang={lang} />;
       case 'travel': return <TravelPage travelInfo={travelInfo} navigateTo={navigateTo} lang={lang} showToast={showToast} />;
       case 'mantras': return <MantrasPage mantras={mantras} navigateTo={navigateTo} lang={lang} showToast={showToast} />;
@@ -16235,9 +17648,10 @@ function App() {
         complaintsSuggestions={complaintsSuggestions} setComplaintsSuggestions={setComplaintsSuggestions}
         paymentGatewayConfig={paymentGatewayConfig} setPaymentGatewayConfig={setPaymentGatewayConfig}
         scholars={scholars} setScholars={setScholars}
+        purohits={purohits} setPurohits={setPurohits}
         showToast={showToast}
       />;
-      default: return <Home dbError={dbError} marqueeText={marqueeText} marqueeTextEn={marqueeTextEn} testimonials={testimonials} featuredTestimonialIds={featuredTestimonialIds} committeeMembers={committeeMembers} events={events} notices={notices} timings={timings} travelInfo={travelInfo} mantras={mantras} galleryItems={galleryItems} scholars={scholars} navigateTo={navigateTo} showToast={showToast} lang={lang} openComplainModal={() => setIsComplainModalOpen(true)} />;
+      default: return <Home dbError={dbError} marqueeText={marqueeText} marqueeTextEn={marqueeTextEn} testimonials={testimonials} featuredTestimonialIds={featuredTestimonialIds} committeeMembers={committeeMembers} events={events} notices={notices} timings={timings} travelInfo={travelInfo} mantras={mantras} galleryItems={galleryItems} scholars={scholars} purohits={purohits} navigateTo={navigateTo} showToast={showToast} lang={lang} openComplainModal={() => setIsComplainModalOpen(true)} />;
     }
   };
 

@@ -249,6 +249,24 @@
             background: #c2410c;
         }
 
+        /* Universal Video Containment (Supports all aspect ratios: vertical 9:16 mobile, 16:9 landscape, square 1:1) */
+        video,
+        [data-video-player],
+        video[data-video-player="true"] {
+            max-width: 100% !important;
+            max-height: 100% !important;
+            object-fit: contain !important;
+            box-sizing: border-box !important;
+        }
+
+        [data-video-container],
+        [data-video-wrapper] {
+            overflow: hidden !important;
+            contain: paint !important;
+            isolation: isolate !important;
+            position: relative !important;
+        }
+
         /* Animation for Toast Message */
         @keyframes slideUp {
             0% {
@@ -737,7 +755,7 @@
     <div id="root"></div>
 
     <!-- Pre-compiled Ultra-Fast Production JS (Zero Babel Delay, 120 FPS) -->
-    <script src="app.min.js?v=79" defer></script>
+    <script src="app.min.js?v=85" defer></script>
 </body>
 
 </html>
